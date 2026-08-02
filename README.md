@@ -32,8 +32,8 @@ you can email it to yourself or open it offline.
 ## Setup
 
 ```
-git clone https://github.com/YOUR_USERNAME/ibkr-fire-dashboard.git
-cd ibkr-fire-dashboard
+git clone https://github.com/jmp1909/ibkr-dashboard.git
+cd ibkr-dashboard
 python -m venv .venv
 .venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
@@ -50,22 +50,52 @@ That writes `dashboard.html`. If it looks right, set up live data.
 
 Copy `config.example.json` to `config.json`, then edit it:
 
-| Block | What it controls |
-|---|---|
-| `person.birth_date` | Drives every age on the projection |
-| `goal.target` | The number you're aiming at, in `target_currency` |
-| `goal.real_return` | Assumed return after inflation and fees |
-| `goal.withdrawal_rate` | Sets the income your target funds |
-| `goal.coast_full_age` | Age the coast portfolio must reach the target by, unaided |
-| `phases[]` | Your savings timeline. `monthly_saving = monthly_income * savings_rate` |
-| `targets` | Your intended allocation. Must sum to 1. Tickers you don't hold yet are fine |
-| `lookthrough` | Regional split inside each fund, from its factsheet |
-| `currency_basket` | Currencies held *inside* each fund — not the currency it's priced in |
-| `account.display_currency` | The currency you actually spend |
+| Block | Required | What it controls |
+|---|---|---|
+| `person.birth_date` | yes | Drives every age on the projection |
+| `goal.target` | yes | The number you're aiming at |
+| `goal.real_return` | yes | Assumed return after inflation and fees |
+| `goal.withdrawal_rate` | yes | Sets the income your target funds |
+| `goal.coast_full_age` | yes | Age the coast portfolio must reach the target by, unaided |
+| `goal.milestones` | no | Explicit milestone ladder. Omit it and one is generated to fit your target |
+| `phases[]` | yes | Your savings timeline — see below |
+| `targets` | no | Intended allocation. Must sum to 1. Omit to hide the drift section |
+| `lookthrough` | no | Regional split inside each fund, from its factsheet |
+| `currency_basket` | no | Currencies held *inside* each fund — not the one it's priced in |
+| `currency.enabled` | no | Set false if your funds report in the currency you spend |
+| `account.display_currency` | yes | The currency you actually spend |
+| `output.locale` | no | Number formatting, e.g. `en-US` → 1,234,567 · `de-CH` → 1'234'567 · `de-DE` → 1.234.567 |
 
-The bundled `lookthrough` and `currency_basket` values describe a specific set of ETFs
-(VT and some Avantis funds). **If you hold different funds, replace them** — otherwise the
-exposure and currency sections will confidently describe someone else's portfolio.
+### Phases
+
+`phases[]` is a list of any length. Each entry is a period with its own income and savings
+rate, so it fits whatever your life actually looks like — not a fixed student → career
+template. Gaps between phases are allowed and simply save nothing.
+
+```json
+{ "id": "break", "label": "Career break", "start": "2032-01", "end": "2032-12",
+  "monthly_income": 0, "savings_rate": 0.0, "income_growth": 0.0 }
+```
+
+`monthly_saving = monthly_income * savings_rate`. `end: null` means open-ended, and
+`income_growth` is real annual growth above inflation. Phases entirely in the past are
+dropped automatically, so you can leave old ones in place as a record.
+
+### Sections that disable themselves
+
+The dashboard hides what it can't describe honestly, so a minimal config still produces a
+clean page:
+
+- **no `targets`** → the drift and next-buy section disappears
+- **no `lookthrough` entry for your holdings** → the regional exposure panel disappears
+  rather than inventing a split
+- **no `currency_basket` entry** → the currency-denomination panel disappears
+- **`currency.enabled: false`**, or assets and spending in the same currency → the whole
+  currency section disappears
+
+The bundled `lookthrough` and `currency_basket` values describe one specific set of ETFs
+(VT and some Avantis funds). **If you hold different funds, replace them** — otherwise
+those panels describe someone else's portfolio rather than yours.
 
 ## Live data
 

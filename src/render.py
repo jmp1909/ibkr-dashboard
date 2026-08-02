@@ -116,7 +116,7 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
     <thead><tr><th class="l">Ticker</th><th class="l">Role</th><th>Units</th><th>Price</th><th>Value</th><th>Weight</th>
       <th class="costcol">Cost</th><th class="costcol">Total return</th><th>Unreal. P&amp;L</th></tr></thead>
     <tbody></tbody></table></div>
-  <div class="panel" style="margin-top:28px">
+  <div class="panel" style="margin-top:28px" id="exposurepanel">
     <div class="eyebrow" style="margin-bottom:4px">True exposure &mdash; fund look-through</div>
     <p style="font-size:12.5px;color:var(--muted);margin:0 0 18px;max-width:560px;line-height:1.5">
       IBKR reports this account as United States / Broad because all the funds are US-domiciled.
@@ -207,7 +207,7 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
       <div class="eyebrow" style="margin-bottom:10px;padding-left:8px" id="ratelbl"></div>
       <div id="ratechart"></div>
     </div>
-    <div class="panel">
+    <div class="panel" id="basketpanel">
       <div class="eyebrow" style="margin-bottom:4px">Where your wealth is actually denominated</div>
       <p style="font-size:12px;color:var(--muted);margin:0 0 16px;line-height:1.5">
         Look-through to the currencies inside the funds, not the currency they are priced in.</p>
@@ -265,8 +265,9 @@ second pillar. They show the shape of the problem, not a forecast. Not investmen
 
 <script>
 const D = __DATA__;
-const nf = new Intl.NumberFormat('de-CH',{maximumFractionDigits:0});
-const nf2 = new Intl.NumberFormat('de-CH',{minimumFractionDigits:2,maximumFractionDigits:2});
+const LOCALE = (D.fmt && D.fmt.locale) || 'en-US';
+const nf = new Intl.NumberFormat(LOCALE,{maximumFractionDigits:0});
+const nf2 = new Intl.NumberFormat(LOCALE,{minimumFractionDigits:2,maximumFractionDigits:2});
 const money = v => D.ccy + " " + nf.format(Math.round(v));
 const pc = (v,d=2) => (v>=0?"":"\u2212") + Math.abs(v*100).toFixed(d) + "%";
 const el = h => { const t=document.createElement('template'); t.innerHTML=h.trim(); return t.content.firstChild; };
@@ -310,6 +311,16 @@ const el = h => { const t=document.createElement('template'); t.innerHTML=h.trim
       ${costCells}
       <td class="${p.unrealised_pnl>=0?'pos':'neg'}">${p.unrealised_pnl>=0?'+':'\u2212'}${nf.format(Math.abs(p.unrealised_pnl))}</td></tr>`));
   });
+
+  /* Look-through is only meaningful if the config actually describes the funds
+     held. With no mapping the panel would confidently show a made-up split, so
+     hide it instead. */
+  const mapped = D.positions.filter(p=>D.lookthrough_keys && D.lookthrough_keys.includes(p.ticker)).length;
+  if(!mapped){
+    const panel=document.getElementById('exposurepanel');
+    if(panel) panel.hidden = true;
+    return;
+  }
 
   const g = D.exposure, cols=[['United States',g.us,'var(--path)'],['Developed ex-US',g.dev,'var(--coast)'],['Emerging',g.em,'var(--fire)']];
   const geo=document.getElementById('geo'), leg=document.getElementById('geolegend');
@@ -685,7 +696,13 @@ function chart(host, opts){
     });
   }
 
-  /* basket */
+  /* basket - only if config actually describes what is inside the funds held */
+  const classified = F.basket.filter(b=>b.ccy!=='Unclassified');
+  if(!classified.length){
+    const bp=document.getElementById('basketpanel');
+    if(bp) bp.hidden = true;
+    return;
+  }
   const palette=['var(--path)','var(--coast)','var(--fire)','#6B7F6E','#9A7B4F','#5A6B7C','#8C3A2E','#B0B5AE'];
   const bk=document.getElementById('basket'), bl=document.getElementById('basketlegend');
   F.basket.forEach((b,i)=>{
@@ -795,10 +812,22 @@ function drawProjection(){
 const MS_NOW = D.series.length ? new Date(D.series[D.series.length-1].t) : new Date();
 
 function milestoneLadder(target){
-  const ladder=[10000,25000,50000,100000,250000,500000,1000000,1500000,2000000,3000000,5000000];
-  const out=ladder.filter(v=>v<target);
-  out.push(target);
-  return out;
+  /* Explicit list from config wins. Otherwise generate a 1/2.5/5 ladder that
+     scales to whatever the target is, so this works for a 50k goal and a 10M
+     one alike rather than assuming a particular size of ambition. */
+  const custom = D.plan && D.plan.milestones;
+  if(Array.isArray(custom) && custom.length){
+    const out = custom.filter(v=>v>0 && v<target).sort((a,b)=>a-b);
+    out.push(target);
+    return out;
+  }
+  const out=[];
+  for(let mag=Math.pow(10,Math.floor(Math.log10(Math.max(target,10)))-3); mag<=target; mag*=10){
+    [1,2.5,5].forEach(m=>{ const v=mag*m; if(v>0 && v<target) out.push(v); });
+  }
+  const trimmed = out.sort((a,b)=>a-b).slice(-8);   /* keep the ladder readable */
+  trimmed.push(target);
+  return trimmed;
 }
 
 /* first date the recorded NAV closed at or above `level`, else null */
@@ -973,9 +1002,10 @@ def render(snapshot: dict[str, Any], out_path: Path) -> Path:
     ccy = snapshot["ccy"]
     target = snapshot["plan"]["target"]
     net = snapshot["summary"]["net_liquidation"]
+    sep = (snapshot.get("fmt") or {}).get("thousands_separator", ",")
 
     def money(v: float) -> str:
-        return f"{ccy} {v:,.0f}".replace(",", "'")
+        return f"{ccy} {v:,.0f}".replace(",", sep)
 
     html = TEMPLATE
     html = html.replace("__DATA__", json.dumps(snapshot, default=str))

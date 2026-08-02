@@ -99,6 +99,8 @@ def build_plan(cfg: dict[str, Any], today: date) -> dict[str, Any]:
         "real_return": float(goal["real_return"]),
         "withdrawal_rate": float(goal["withdrawal_rate"]),
         "coast_full_age": float(goal["coast_full_age"]),
+        # Optional. Absent means the dashboard generates a ladder scaled to the target.
+        "milestones": [float(m) for m in goal.get("milestones", [])],
         "phases": phases,
     }
 
@@ -209,14 +211,31 @@ def build_fx_section(
     }
 
 
-def build_lede(net: float, target: float, ccy: str, plan: dict[str, Any]) -> str:
+def build_lede(net: float, target: float, ccy: str, plan: dict[str, Any], sep: str = ",") -> str:
     """One honest paragraph under the headline."""
-    saving = plan["phases"][0]["monthly_income"] * plan["phases"][0]["savings_rate"]
+    def amount(v: float) -> str:
+        # Format each number individually. A blanket replace across the whole
+        # sentence also rewrites grammatical commas ("target, currently" ->
+        # "target' currently"), which is how this read before.
+        return f"{ccy} {v:,.0f}".replace(",", sep)
+
+    first = plan["phases"][0]
+    saving = first["monthly_income"] * first["savings_rate"]
+    # The first remaining phase may not have started yet: don't claim someone is
+    # saving that amount "right now" when it begins next year.
+    if first["start_month"] > 0:
+        opening = (
+            f"Saving starts at {amount(saving)} a month in the "
+            f"{first['label'].lower()} phase, against a {amount(target)} target"
+        )
+    else:
+        opening = f"Saving {amount(saving)} a month right now against a {amount(target)} target"
+
     return (
-        f"Saving {ccy} {saving:,.0f} a month right now against a {ccy} {target:,.0f} target, "
-        f"currently {net / target * 100:.1f}% of the way there. Returns below are money-weighted. "
-        "Every input in section 03 is a slider — the projection is only as good as what you put in it."
-    ).replace(",", "'")
+        f"{opening}, currently {net / target * 100:.1f}% of the way there. Returns below are "
+        "money-weighted. Every input in the projection is a slider - it is only as good as "
+        "what you put in it."
+    )
 
 
 # ----------------------------------------------------------------------
@@ -341,7 +360,15 @@ def main(argv: list[str] | None = None) -> int:
         ],
         "fx": fx_block,
         "plan": plan,
-        "lede": build_lede(summary["net_liquidation"], plan["target"], ccy, plan),
+        "fmt": {
+            "locale": out_cfg.get("locale", "en-US"),
+            "thousands_separator": out_cfg.get("thousands_separator", ","),
+        },
+        "lookthrough_keys": list(lookthrough.keys()),
+        "lede": build_lede(
+            summary["net_liquidation"], plan["target"], ccy, plan,
+            out_cfg.get("thousands_separator", ","),
+        ),
     }
 
     out_path = ROOT / out_cfg.get("html_path", "dashboard.html")

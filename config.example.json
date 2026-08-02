@@ -3,21 +3,30 @@
   "account": {
     "gateway_url": "https://localhost:5000/v1/api",
     "account_id": null,
-    "display_currency": "CHF"
+    "display_currency": "USD"
   },
   "person": {
-    "birth_date": "1995-01-01"
+    "birth_date": "1995-06-15"
   },
   "goal": {
     "target": 1000000,
     "target_currency": "CHF",
     "coast_full_age": 55,
     "real_return": 0.05,
-    "withdrawal_rate": 0.0375
+    "withdrawal_rate": 0.0375,
+    "milestones": [
+      25000,
+      50000,
+      100000,
+      250000,
+      500000,
+      750000
+    ],
+    "_milestones_note": "Optional. Delete this list and the dashboard generates a ladder scaled to your target."
   },
   "currency": {
-    "_note": "Splits the reported return into asset performance and exchange-rate movement. Rates come from the ECB via frankfurter.app - free, no key. Set enabled=false to skip.",
-    "enabled": true,
+    "_note": "Splits reported return into asset performance and exchange-rate movement. Only useful when your funds report in a different currency from the one you spend. Set enabled=true and asset_currency accordingly.",
+    "enabled": false,
     "asset_currency": "USD",
     "cache_path": "data/fx_history.json"
   },
@@ -30,25 +39,43 @@
     "AVIV": 0.07,
     "AVES": 0.09
   },
-  "_phases_note": "monthly_saving = monthly_income * savings_rate. end=null means open-ended. Amounts are real (today's money).",
+  "_phases_note": "Your savings timeline. Have as many phases as you like, in any order of size - study, part-time, career breaks, a sabbatical, retirement run-up. monthly_saving = monthly_income * savings_rate. end=null means open-ended, and gaps between phases are allowed (nothing is saved during them). Amounts are real, in today's money.",
   "phases": [
     {
-      "id": "early",
-      "label": "Early career",
+      "id": "study",
+      "label": "Studying, part-time work",
       "start": "2026-01",
-      "end": "2028-12",
-      "monthly_income": 3000,
-      "savings_rate": 0.3,
+      "end": "2027-08",
+      "monthly_income": 1400,
+      "savings_rate": 0.2,
       "income_growth": 0.0
     },
     {
-      "id": "career",
-      "label": "Career",
-      "start": "2029-01",
+      "id": "first_job",
+      "label": "First job",
+      "start": "2027-09",
+      "end": "2031-12",
+      "monthly_income": 4500,
+      "savings_rate": 0.3,
+      "income_growth": 0.02
+    },
+    {
+      "id": "break",
+      "label": "Career break",
+      "start": "2032-01",
+      "end": "2032-12",
+      "monthly_income": 0,
+      "savings_rate": 0.0,
+      "income_growth": 0.0
+    },
+    {
+      "id": "senior",
+      "label": "Senior",
+      "start": "2033-01",
       "end": null,
-      "monthly_income": 6000,
-      "savings_rate": 0.35,
-      "income_growth": 0.015
+      "monthly_income": 8000,
+      "savings_rate": 0.38,
+      "income_growth": 0.01
     }
   ],
   "_lookthrough_note": "Regional split inside each fund. Update when the funds publish new factsheets. tilt=1 marks a deliberate factor fund.",
@@ -132,6 +159,9 @@
     }
   },
   "output": {
+    "_format_note": "e.g. de-CH + \"'\" gives 1'234'567; en-US + \",\" gives 1,234,567; de-DE + \".\" gives 1.234.567.",
+    "locale": "en-US",
+    "thousands_separator": ",",
     "html_path": "dashboard.html",
     "history_path": "data/nav_history.json",
     "open_browser": true
