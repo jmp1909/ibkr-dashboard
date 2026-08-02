@@ -6,6 +6,36 @@ Pulls your Interactive Brokers account, reconstructs your deposit history, compu
 Everything personal lives in `config.json` — your account, goals, savings phases and
 target allocation. The code has nothing about you in it.
 
+## What it looks like
+
+All screenshots below use the bundled sample data, not a real account.
+
+**Where you stand** — value against target, a milestone track, and what the total is actually
+made of. Here 174,207 of the 186,383 is money paid in; only 12,176 is market growth.
+
+![Overview](docs/screenshots/overview.png)
+
+**How much is saving, how much is the market** — total value plotted against cumulative
+deposits. The darker band is money paid in, the gap above it is growth. Early on the band is
+nearly the whole chart: at this stage the savings rate does the work, not the returns. The
+third figure is deliberately unflattering — the worst point where the account was worth less
+than had been paid into it.
+
+![Saved vs market](docs/screenshots/saved-vs-market.png)
+
+**What you own, and what you're actually exposed to** — positions with cost basis and true
+total return. IBKR files this account as "United States / Broad" because every fund is
+US-domiciled, which is a custody fact rather than an exposure fact; looking through the funds
+to their underlying holdings gives the real split.
+
+![Holdings](docs/screenshots/holdings.png)
+
+**Two finish lines** — the age you could stop saving (coast) and the age you could stop
+working. One block per life stage, each with its own income and savings rate, and every
+assumption is a slider that redraws the projection instantly.
+
+![Projection](docs/screenshots/projection.png)
+
 ## What it shows
 
 | Section | |
