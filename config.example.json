@@ -1,0 +1,139 @@
+{
+  "_comment": "Edit this file, then re-run. Nothing else needs changing.",
+  "account": {
+    "gateway_url": "https://localhost:5000/v1/api",
+    "account_id": null,
+    "display_currency": "CHF"
+  },
+  "person": {
+    "birth_date": "1995-01-01"
+  },
+  "goal": {
+    "target": 1000000,
+    "target_currency": "CHF",
+    "coast_full_age": 55,
+    "real_return": 0.05,
+    "withdrawal_rate": 0.0375
+  },
+  "currency": {
+    "_note": "Splits the reported return into asset performance and exchange-rate movement. Rates come from the ECB via frankfurter.app - free, no key. Set enabled=false to skip.",
+    "enabled": true,
+    "asset_currency": "USD",
+    "cache_path": "data/fx_history.json"
+  },
+  "_targets_note": "Your intended portfolio weights. Must sum to 1. Tickers with a target you do not yet hold are fine - the next-buy allocator will start building them. Rebalancing here is buy-only: it never suggests selling.",
+  "targets": {
+    "VT": 0.52,
+    "AVUV": 0.13,
+    "AVLV": 0.09,
+    "AVDV": 0.1,
+    "AVIV": 0.07,
+    "AVES": 0.09
+  },
+  "_phases_note": "monthly_saving = monthly_income * savings_rate. end=null means open-ended. Amounts are real (today's money).",
+  "phases": [
+    {
+      "id": "early",
+      "label": "Early career",
+      "start": "2026-01",
+      "end": "2028-12",
+      "monthly_income": 3000,
+      "savings_rate": 0.3,
+      "income_growth": 0.0
+    },
+    {
+      "id": "career",
+      "label": "Career",
+      "start": "2029-01",
+      "end": null,
+      "monthly_income": 6000,
+      "savings_rate": 0.35,
+      "income_growth": 0.015
+    }
+  ],
+  "_lookthrough_note": "Regional split inside each fund. Update when the funds publish new factsheets. tilt=1 marks a deliberate factor fund.",
+  "lookthrough": {
+    "VT": {
+      "us": 0.62,
+      "dev": 0.26,
+      "em": 0.12,
+      "tilt": 0,
+      "role": "Core - whole global market"
+    },
+    "AVUV": {
+      "us": 1.0,
+      "dev": 0.0,
+      "em": 0.0,
+      "tilt": 1,
+      "role": "Tilt - US small value"
+    },
+    "AVLV": {
+      "us": 1.0,
+      "dev": 0.0,
+      "em": 0.0,
+      "tilt": 1,
+      "role": "Tilt - US large value"
+    },
+    "AVIV": {
+      "us": 0.0,
+      "dev": 1.0,
+      "em": 0.0,
+      "tilt": 1,
+      "role": "Tilt - developed ex-US large value"
+    },
+    "AVDV": {
+      "us": 0.0,
+      "dev": 1.0,
+      "em": 0.0,
+      "tilt": 1,
+      "role": "Tilt - developed ex-US small value"
+    },
+    "AVES": {
+      "us": 0.0,
+      "dev": 0.0,
+      "em": 1.0,
+      "tilt": 1,
+      "role": "Tilt - emerging markets value"
+    }
+  },
+  "_basket_note": "Approximate currency of the assets INSIDE each fund. USD is only the fund's reporting currency - VT holds euros and yen too. Update from fund factsheets.",
+  "currency_basket": {
+    "VT": {
+      "USD": 0.62,
+      "EUR": 0.075,
+      "JPY": 0.055,
+      "GBP": 0.04,
+      "CHF": 0.022,
+      "Other developed": 0.068,
+      "Emerging": 0.12
+    },
+    "AVUV": {
+      "USD": 1.0
+    },
+    "AVLV": {
+      "USD": 1.0
+    },
+    "AVIV": {
+      "EUR": 0.3,
+      "JPY": 0.22,
+      "GBP": 0.15,
+      "CHF": 0.06,
+      "Other developed": 0.27
+    },
+    "AVDV": {
+      "EUR": 0.3,
+      "JPY": 0.24,
+      "GBP": 0.14,
+      "CHF": 0.03,
+      "Other developed": 0.29
+    },
+    "AVES": {
+      "Emerging": 1.0
+    }
+  },
+  "output": {
+    "html_path": "dashboard.html",
+    "history_path": "data/nav_history.json",
+    "open_browser": true
+  }
+}

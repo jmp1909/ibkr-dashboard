@@ -1,0 +1,16 @@
+# Your personal settings - copy config.example.json to config.json and edit.
+# Never commit this: it holds your birth date, income, savings rate and target.
+config.json
+
+# Your account data and generated output
+data/
+dashboard.html
+
+# The Client Portal Gateway is a separate download from IBKR
+clientportal.gw/
+clientportal.gw.zip
+
+# Python
+.venv/
+__pycache__/
+*.pyc
