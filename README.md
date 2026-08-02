@@ -63,8 +63,21 @@ Copy `config.example.json` to `config.json`, then edit it:
 | `lookthrough` | no | Regional split inside each fund, from its factsheet |
 | `currency_basket` | no | Currencies held *inside* each fund — not the one it's priced in |
 | `currency.enabled` | no | Set false if your funds report in the currency you spend |
-| `account.display_currency` | yes | The currency you actually spend |
+| `account.display_currency` | yes | The currency your figures are shown in — see the note below |
 | `output.locale` | no | Number formatting, e.g. `en-US` → 1,234,567 · `de-CH` → 1'234'567 · `de-DE` → 1.234.567 |
+
+### A note on currency
+
+`display_currency` **labels** your figures; it does not convert them. IBKR reports your
+account in whatever base currency the account itself is set to, and that's the number this
+tool receives. So set `display_currency` to match your IBKR base currency — if they
+disagree the run prints a warning, because otherwise you'd be reading one currency's
+numbers under another's name. To genuinely change the currency, change the account's base
+currency in IBKR.
+
+Separately, `currency.asset_currency` is the currency your *funds report in* (often USD).
+When that differs from what you spend, section 05 splits your return into what the
+investments did and what the exchange rate did.
 
 ### Phases
 

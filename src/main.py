@@ -319,7 +319,18 @@ def main(argv: list[str] | None = None) -> int:
     today = dates[-1]
     birth = datetime.strptime(cfg["person"]["birth_date"], "%Y-%m-%d").date()
     plan = build_plan(cfg, today)
-    ccy = cfg["account"].get("display_currency", series.get("base_currency", "CHF"))
+    # display_currency only *labels* the figures - it does not convert them. IBKR
+    # reports NAV in the account's own base currency, so a mismatch here silently
+    # prints one currency's numbers under another's name.
+    reported_ccy = series.get("base_currency")
+    ccy = cfg["account"].get("display_currency") or reported_ccy or "USD"
+    if not args.demo and reported_ccy and ccy != reported_ccy:
+        log.warning(
+            "config display_currency is %s but IBKR reports this account in %s. "
+            "No conversion is applied - the figures are %s shown under a %s label. "
+            "Either set display_currency to %s, or change the account's base currency in IBKR.",
+            ccy, reported_ccy, reported_ccy, ccy, reported_ccy,
+        )
 
     lookthrough = cfg.get("lookthrough", {})
     for p in positions:
