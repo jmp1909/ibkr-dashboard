@@ -339,6 +339,9 @@ def main(argv: list[str] | None = None) -> int:
     snapshot = {
         "as_of": today.strftime("%d %B %Y"),
         "age_days": (date.today() - today).days,
+        # Sample data is frozen, so its "age" only ever grows. Staleness is a
+        # live-data concept; flagging it on the demo just nags about nothing.
+        "demo": bool(args.demo),
         "ccy": ccy,
         "measure": series.get("measure", "TWR"),
         "age_now": round(age_on(birth, today), 2),

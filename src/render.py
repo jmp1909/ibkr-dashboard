@@ -96,9 +96,9 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
 </style></head><body><div class="wrap">
 
 <header style="margin-bottom:46px">
-  <div class="eyebrow">Interactive Brokers &middot; snapshot __ASOF__ &middot; base __CCY__ &middot; target __TARGETLBL__</div>
-  <h1>__NETLIQLBL__ today.<br><span style="color:var(--path)">__TARGETLBL__</span> is the line.</h1>
-  <p class="lede">__LEDE__</p>
+  <div class="eyebrow">Interactive Brokers &middot; snapshot __ASOF__ &middot; base __CCY__ &middot; target <span id="ebTarget">__TARGETLBL__</span></div>
+  <h1>__NETLIQLBL__ today.<br><span style="color:var(--path)" id="h1Target">__TARGETLBL__</span> is the line.</h1>
+  <p class="lede" id="lede">__LEDE__</p>
 </header>
 
 <div id="staleness"></div>
@@ -280,7 +280,7 @@ const el = h => { const t=document.createElement('template'); t.innerHTML=h.trim
 
 /* ---------- staleness ---------- */
 (function(){
-  if(D.age_days > 5){
+  if(D.age_days > 5 && !D.demo){
     document.getElementById('staleness').appendChild(el(
       `<div class="warnbox"><b>Data is ${D.age_days} days old.</b> Re-run the script to refresh positions and returns.</div>`));
   }
@@ -450,7 +450,10 @@ const el = h => { const t=document.createElement('template'); t.innerHTML=h.trim
     return run;
   });
   const totalIn = F.reduce((s,f)=>s+f.amount,0);
-  const finalNav = S[S.length-1].nav;
+  // Single source of truth for "what it is worth now": the account summary,
+  // which is also what the headline shows. The performance endpoint's NAV
+  // series is a derived daily series and can sit a franc or two off it.
+  const finalNav = D.summary.net_liquidation;
   const growth = finalNav - totalIn;
   const growthPc = totalIn ? growth/totalIn : 0;
 
@@ -812,6 +815,7 @@ function drawProjection(){
 
   drawMilestones(P);
   drawHero(P);
+  refreshHeader();
 }
 
 /* ---------- milestones ---------- */
@@ -853,6 +857,31 @@ function projectedAge(rows, level){
     }
   }
   return null;
+}
+
+/* ---------- header text, kept in step with the sliders ----------
+   The server renders these from config so the page reads correctly before any
+   JS runs; from then on they track `state`, otherwise dragging the target
+   slider leaves the headline and lede quoting a number nothing else uses. */
+function refreshHeader(){
+  const target = state.target;
+  const net = D.summary.net_liquidation;
+  const eb = document.getElementById('ebTarget');
+  const h1 = document.getElementById('h1Target');
+  if(eb) eb.textContent = money(target);
+  if(h1) h1.textContent = money(target);
+
+  const lede = document.getElementById('lede');
+  if(!lede) return;
+  const first = state.phases[0];
+  const saving = first.monthly_income * first.savings_rate;
+  const opening = first.start_month > 0
+    ? `Saving starts at ${money(saving)} a month in the ${first.label.toLowerCase()} phase, `
+      + `against a ${money(target)} target`
+    : `Saving ${money(saving)} a month right now against a ${money(target)} target`;
+  lede.textContent = `${opening}, currently ${(net/target*100).toFixed(1)}% of the way there. `
+    + 'Returns below are money-weighted. Every input in the projection is a slider - '
+    + 'it is only as good as what you put in it.';
 }
 
 /* ---------- hero band ---------- */
