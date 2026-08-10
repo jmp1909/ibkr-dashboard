@@ -190,16 +190,22 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
 
 <section id="ccysection" hidden>
   <div class="shead"><span class="n">05</span><h2>Currency</h2><span class="k" id="ccyk"></span></div>
-  <p style="font-size:12.5px;color:var(--muted);max-width:660px;margin:0 0 20px;line-height:1.55">
+  <p style="font-size:12.5px;color:var(--muted);max-width:660px;margin:0 0 14px;line-height:1.55">
     Your funds are priced in one currency and you will spend another. That gap is not noise: the
     reported return is the asset return multiplied by the exchange-rate move, and the two legs are
     separated below. The identity is exact &mdash; (1&nbsp;+&nbsp;assets) &times; (1&nbsp;+&nbsp;currency)
     reproduces the reported figure with no residual beyond the cross term.</p>
+  <p style="font-size:12.5px;color:var(--muted);max-width:660px;margin:0 0 20px;line-height:1.55">
+    <b>These figures are time-weighted, not money-weighted.</b> Splitting a return into asset and
+    currency legs only works on a series that ignores deposits, so this section cannot use the
+    money-weighted figure from section 04 &mdash; the two will differ whenever the timing of your
+    transfers mattered. Neither is wrong: section 04 answers &ldquo;how did my money do&rdquo;,
+    this one answers &ldquo;what drove the underlying return&rdquo;.</p>
 
   <div class="grid g3" id="ccystats" style="margin-bottom:26px"></div>
 
   <div style="overflow-x:auto"><table id="ccytbl">
-    <thead><tr><th class="l">Window</th><th>Reported</th><th>Assets</th><th>Currency</th><th>Cross term</th><th>Currency share</th></tr></thead>
+    <thead><tr><th class="l">Window</th><th>Time-weighted</th><th>Assets</th><th>Currency</th><th>Cross term</th><th>Currency share</th></tr></thead>
     <tbody></tbody></table></div>
 
   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-top:26px">
@@ -641,7 +647,7 @@ function chart(host, opts){
 (function(){
   const F = D.fx; if(!F) return;
   document.getElementById('ccysection').hidden = false;
-  document.getElementById('ccyk').textContent = F.pair + ' \u00b7 ECB reference rates';
+  document.getElementById('ccyk').textContent = F.pair + ' \u00b7 ECB reference rates \u00b7 time-weighted';
 
   const done = F.splits.filter(s=>s.available);
   const main = done.length ? done[done.length-1] : null;
@@ -884,7 +890,8 @@ function drawHero(P){
     fig('Portfolio', money(net), `${(net/target*100).toFixed(1)}% of ${money(target)}`) +
     fig('You contributed', money(totalIn), `${F.length} transfers`,'var(--coast)') +
     fig('Market growth', (growth>=0?'':'−')+money(Math.abs(growth)),
-        totalIn?`${pc(growth/totalIn)} on contributions`:'—', growth>=0?'var(--path)':'var(--warn)') +
+        totalIn?`${pc(growth/totalIn)} of what you paid in — not a rate of return`:'—',
+        growth>=0?'var(--path)':'var(--warn)') +
     fig('Return since start', since?pc(since.cumulative):'—',
         since?`money-weighted · ${since.days} days`:'—', since&&since.cumulative>=0?'var(--path)':'var(--warn)') +
     fig('Target reached', yrs?`${yrs.toFixed(0)} yr`:'—',
