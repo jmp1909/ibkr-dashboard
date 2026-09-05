@@ -114,13 +114,18 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
   <div class="shead"><span class="n">01</span><h2>Holdings</h2><span class="k" id="hk"></span></div>
   <div style="overflow-x:auto"><table id="postbl">
     <thead><tr><th class="l">Ticker</th><th class="l">Role</th><th>Units</th><th>Price</th><th>Value</th><th>Weight</th>
-      <th class="costcol">Cost</th><th class="costcol">Total return</th><th>Unreal. P&amp;L</th></tr></thead>
+      <th class="costcol">Cost</th><th class="costcol" title="Gain against the money put into this position. Reinvested dividends raise the cost basis, so for dividend-payers this sits below the true total return.">Gain on cost</th><th>Unreal. P&amp;L</th></tr></thead>
     <tbody></tbody></table></div>
   <div class="panel" style="margin-top:28px" id="exposurepanel">
     <div class="eyebrow" style="margin-bottom:4px">True exposure &mdash; fund look-through</div>
     <p style="font-size:12.5px;color:var(--muted);margin:0 0 18px;max-width:560px;line-height:1.5">
       IBKR reports this account as United States / Broad because all the funds are US-domiciled.
       That is a custody fact, not an exposure fact. Regional splits come from <code>config.json</code>.</p>
+    <p style="font-size:11.5px;color:var(--muted);margin:-8px 0 18px;max-width:560px;line-height:1.5">
+      <b>Gain on cost is not total return.</b> Reinvested dividends buy more shares, which raises the
+      cost basis without showing up as a gain &mdash; so for dividend-paying funds this column sits
+      below the true total return by roughly the yield since purchase. The portfolio-level returns in
+      sections 03&ndash;05 <i>do</i> include dividends; they come from the NAV series, which reflects them.</p>
     <div class="geo" id="geo"></div><div class="legend" id="geolegend"></div>
     <div class="grid g3" style="margin-top:20px;padding-top:18px;border-top:1px solid var(--rule)" id="expstats"></div>
   </div>
