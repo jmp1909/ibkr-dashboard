@@ -25,8 +25,8 @@ TEMPLATE = r"""<!DOCTYPE html>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--fn:'Inter Tight','Helvetica Neue',Helvetica,Arial,sans-serif;
---ground:#FFFFFF;--panel:#FFFFFF;--ink:#000000;--muted:#6E6E6E;--rule:#DCDCDC;
---path:#2D327D;--fire:#EB0000;--coast:#8A8A8A;--warn:#A20013;--soft:#F4F4F4;}
+--ground:#FFFFFF;--panel:#FFFFFF;--ink:#111111;--muted:#6B6B6B;--rule:#E0E0E0;
+--path:#111111;--fire:#D7262E;--coast:#9C9C9C;--warn:#B3261E;--soft:#F5F5F5;}
 *{box-sizing:border-box}
 body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--fn);-webkit-font-smoothing:antialiased}
 .wrap{max-width:1120px;margin:0 auto;padding:40px 24px 80px}
@@ -56,7 +56,7 @@ td.role{color:var(--muted);font-size:11.5px;font-family:var(--fn)}
 .stat .val{font-family:var(--fn);font-weight:700;font-size:26px;line-height:1.15;letter-spacing:-.02em;margin-top:3px}
 .stat .sub{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4}
 .geo{display:flex;height:34px;border:1px solid var(--ink)}
-.geo div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600;font-family:var(--fn)}
+.geo div{display:flex;align-items:center;justify-content:center;color:#fff;text-shadow:0 0 2px rgba(0,0,0,.35);font-size:11px;font-weight:600;font-family:var(--fn)}
 .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:11.5px;color:var(--muted)}
 .cols{display:grid;grid-template-columns:minmax(250px,320px) minmax(0,1fr);gap:34px;align-items:start}
 @media(max-width:860px){.cols{grid-template-columns:1fr}}
@@ -230,7 +230,7 @@ tbody tr:hover td{background:#FAFAFA}
 .btn.ghost{border-color:var(--rule)}
 .seg{border-radius:0;border:1px solid var(--rule)}
 .seg button{font-size:12.5px;font-weight:500;padding:6px 11px;color:var(--muted)}
-.seg button.on{background:#fff;color:var(--ink);font-weight:700;box-shadow:inset 0 -2px 0 var(--fire)}
+.seg button.on{background:#fff;color:var(--ink);font-weight:700;box-shadow:inset 0 -2px 0 var(--ink)}
 .ctl label{font-size:13px;font-weight:500;color:var(--ink)}
 .ctl .v{font-size:15px}
 .phase{border-left-width:3px}
@@ -245,7 +245,7 @@ tbody tr:hover td{background:#FAFAFA}
 .warnbox{border-radius:0;background:#FFF4F4}
 .modal{background:rgba(0,0,0,.18)}
 .modal .box{border-radius:0;border:1px solid var(--ink)}
-input[type=range]{accent-color:var(--fire)}
+input[type=range]{accent-color:var(--ink)}
 @media(max-width:640px){
   .wrap{padding:24px 16px 72px}
   .secnav{margin:0 -16px 24px;padding:0 10px}
@@ -265,23 +265,56 @@ details.more summary::-webkit-details-marker{display:none}
 details.more summary:hover{color:var(--ink);border-bottom-color:var(--ink)}
 details.more[open] summary{margin-bottom:8px}
 details.more p,details.more .note{margin:0 0 8px!important}
+/* ---- three views ---- */
+body[data-view] [data-view]{display:none!important}
+body[data-view="today"] [data-view~="today"],body[data-view="portfolio"] [data-view~="portfolio"],body[data-view="plan"] [data-view~="plan"]{display:block!important}
+body[data-view] section[hidden][data-view]{display:none!important}
+body[data-view="portfolio"] nav.jump[data-view]{display:flex!important}
+.tabs{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  margin:-40px -32px 40px;padding:0 32px;background:rgba(255,255,255,.97);border-bottom:1px solid var(--rule)}
+.tabs .brand{font-weight:700;font-size:15px;padding:14px 0;letter-spacing:-.01em}
+.tabs .brand span{font-weight:400;color:var(--muted);margin-left:8px}
+.tablist{display:flex;gap:4px}
+.tabs button{font:inherit;font-size:15px;font-weight:600;color:var(--muted);background:none;border:0;padding:14px 12px 12px;cursor:pointer;border-bottom:2px solid transparent}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.tabs button:focus-visible{outline:2px solid var(--ink);outline-offset:-4px}
+.cols>*,.cols2>*{min-width:0}
+#controls{max-width:100%}
+#controls .seg{max-width:100%;flex-wrap:wrap}
+nav.jump{gap:6px 18px;flex-wrap:wrap;margin:0 0 40px;font-size:14px}
+nav.jump a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--rule)}
+nav.jump a:hover{color:var(--ink);border-bottom-color:var(--ink)}
+section{scroll-margin-top:70px}
+/* quieter: colour only where it means something */
+.tk b{color:var(--ink)} .tk b.neg{color:var(--warn)}
+.pos{color:var(--ink)}
+.bar i{background:var(--ink)}
+.st.early{color:var(--ink)}
+.chart-end{font-size:12px;font-weight:600}
+@media(max-width:640px){.tabs{margin:-24px -16px 28px;padding:0 16px}.tabs .brand span{display:none}.tabs button{padding:12px 8px 10px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 html{scroll-behavior:smooth}
-</style></head><body><div class="wrap">
+</style></head><body data-view="today"><div class="wrap">
+<nav class="tabs" aria-label="Views">
+  <span class="brand">Portfolio and FIRE <span>__ASOF__</span></span>
+  <span class="tablist" role="tablist">
+    <button type="button" role="tab" data-v="today">Today</button>
+    <button type="button" role="tab" data-v="portfolio">Portfolio</button>
+    <button type="button" role="tab" data-v="plan">Plan</button>
+  </span>
+</nav>
 
-<header style="margin-bottom:46px">
+<header style="margin-bottom:46px" data-view="today">
   <div class="eyebrow">Interactive Brokers snapshot from __ASOF__, in __CCY__, aiming for <span id="ebTarget">__TARGETLBL__</span></div>
   <h1>__NETLIQLBL__ today.<br><span style="color:var(--path)" id="h1Target">__TARGETLBL__</span> is the line.</h1>
   <p class="lede" id="lede">__LEDE__</p>
 </header>
 
-<nav class="secnav" aria-label="Sections">
-  <a href="#holdings">Holdings</a><a href="#growthsection">Saved vs market</a><a href="#returns">Returns</a>
-  <a href="#risksection">Risk and costs</a><a href="#ccysection">Currency</a><a href="#milestones">Milestones</a><a href="#plansection">Plan</a>
-</nav>
+
 <div id="staleness"></div>
 
-<div class="hero">
+<div class="hero" data-view="today">
   <table class="board" aria-label="When you arrive at each stop on the plan">
     <thead><tr><th>Stop</th><th class="r">Age</th><th class="r hide-s">Year</th><th class="r">Against config.json</th></tr></thead>
     <tbody id="board"></tbody></table>
@@ -290,9 +323,13 @@ html{scroll-behavior:smooth}
     Milestones are evenly spaced, not to scale. Your position within the current step is exact.</div>
   <div class="figs" id="herofigs"></div>
 </div>
-<div class="glance" id="glance"><div class="eyebrow" style="margin:0">At a glance</div><ul id="glancelist"></ul></div>
+<div class="glance" id="glance" data-view="today"><div class="eyebrow" style="margin:0">At a glance</div><ul id="glancelist"></ul></div>
 
-<section id="holdings">
+<nav class="jump" data-view="portfolio" aria-label="Portfolio sections">
+  <a href="#holdings">Holdings</a><a href="#driftsection">Drift</a><a href="#growthsection">Saved vs market</a><a href="#returns">Returns</a>
+  <a href="#risksection">Risk and costs</a><a href="#ccysection">Currency</a>
+</nav>
+<section id="holdings" data-view="portfolio">
   <div class="shead"><span class="n">01</span><h2>Holdings</h2><span class="k" id="hk"></span></div>
   <div style="overflow-x:auto"><table id="postbl">
     <thead><tr><th class="l">Ticker</th><th class="l">Role</th><th>Units</th><th>Price</th><th>Value</th><th>Weight</th>
@@ -319,7 +356,7 @@ html{scroll-behavior:smooth}
   </div>
 </section>
 
-<section id="driftsection" hidden>
+<section id="driftsection" data-view="portfolio" hidden>
   <div class="shead"><span class="n">02</span><h2>Drift from target</h2><span class="k" id="driftk"></span></div>
   <p style="font-size:12.5px;color:var(--muted);max-width:660px;margin:0 0 22px;line-height:1.55">
     Targets come from <code>config.json</code>. Rebalancing here is <b>buy-only</b>: it never suggests
@@ -345,7 +382,7 @@ html{scroll-behavior:smooth}
   </div>
 </section>
 
-<section id="growthsection" hidden>
+<section id="growthsection" data-view="portfolio" hidden>
   <div class="shead"><span class="n">03</span><h2>What you saved vs what the market added</h2><span class="k" id="growthk"></span></div>
   <p style="font-size:12.5px;color:var(--muted);max-width:660px;margin:0 0 20px;line-height:1.55">
     The darker band is money you transferred in. Where the value line sits above it, the gap is market
@@ -367,7 +404,7 @@ html{scroll-behavior:smooth}
     <tbody></tbody></table></div>
 </section>
 
-<section id="returns">
+<section id="returns" data-view="portfolio">
   <div class="shead"><span class="n">04</span><h2>Money-weighted returns</h2><span class="k">what your money earned, not what the funds did</span></div>
   <p style="font-size:12.5px;color:var(--muted);max-width:660px;margin:0 0 18px;line-height:1.55">
     IBKR reports this account as __MEASURE__. These figures are money-weighted: external transfers are
@@ -387,7 +424,7 @@ html{scroll-behavior:smooth}
 </section>
 
 
-<section id="risksection" hidden>
+<section id="risksection" data-view="portfolio" hidden>
   <div class="shead"><span class="n">05</span><h2>Risk and costs</h2><span class="k" id="riskk"></span></div>
   <div id="riskbody">
   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:18px" id="riskstats"></div>
@@ -408,7 +445,7 @@ html{scroll-behavior:smooth}
   </div>
 </section>
 
-<section id="ccysection" hidden>
+<section id="ccysection" data-view="portfolio" hidden>
   <div class="shead"><span class="n">06</span><h2>Currency</h2><span class="k" id="ccyk"></span></div>
   <p style="font-size:12.5px;color:var(--muted);max-width:660px;margin:0 0 14px;line-height:1.55">
     Your funds are priced in one currency and you will spend another. That gap is not noise: the
@@ -452,7 +489,7 @@ html{scroll-behavior:smooth}
   </div>
 </section>
 
-<section id="milestones">
+<section id="milestones" data-view="today">
   <div class="shead"><span class="n">07</span><h2>Milestones</h2><span class="k" id="msk"></span></div>
   <p style="font-size:12.5px;color:var(--muted);max-width:660px;margin:0 0 22px;line-height:1.55">
     Dates in the past are real &mdash; the day your recorded NAV first closed above the line. Dates in
@@ -463,7 +500,7 @@ html{scroll-behavior:smooth}
     <tbody></tbody></table></div>
 </section>
 
-<section id="plansection">
+<section id="plansection" data-view="plan">
   <div class="shead"><span class="n">08</span><h2>The two finish lines</h2><span class="k">drag the timeline, change anything &mdash; it all recalculates</span></div>
   <div class="dark" style="margin-bottom:30px"><div class="grid g3" id="goalstats"></div></div>
   <div class="planbar" id="planbar"></div>
@@ -481,7 +518,7 @@ html{scroll-behavior:smooth}
     <div>
       <div style="display:flex;justify-content:flex-end;margin-bottom:10px"><div class="seg" id="chartmode" role="group" aria-label="Chart detail" style="margin:0">
         <button type="button" data-cm="simple">Simple charts</button><button type="button" data-cm="detailed">Detailed</button></div></div>
-      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:18px" id="crossstats"></div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:16px;margin-bottom:18px" id="crossstats"></div>
       <div class="panel" style="padding:16px 12px 8px;margin-bottom:18px">
         <div class="eyebrow" style="margin:0 0 6px 8px">Each year: what you earn, save, withdraw, and what the portfolio earns</div>
         <div id="flowchart"></div>
@@ -496,7 +533,7 @@ html{scroll-behavior:smooth}
         <div class="note" id="flownote" style="padding:0 6px 6px;font-size:12px;max-width:640px"></div>
       </div>
       <div class="panel" style="padding:16px 12px 8px"><div id="projchart"></div>
-        <div class="legend" style="padding:6px 4px">
+        <div class="legend" style="padding:6px 4px;display:none">
           <span><b style="color:var(--path)">&mdash;</b> Portfolio</span>
           <span data-detail><b style="color:var(--coast)">- -</b> Coast threshold</span>
           <span><b style="color:var(--fire)">&mdash;</b> Target</span>
@@ -599,7 +636,7 @@ const el = h => { const t=document.createElement('template'); t.innerHTML=h.trim
     return;
   }
 
-  const g = D.exposure, cols=[['United States',g.us,'var(--path)'],['Developed ex-US',g.dev,'var(--coast)'],['Emerging',g.em,'var(--fire)']];
+  const g = D.exposure, cols=[['United States',g.us,'#111'],['Developed ex-US',g.dev,'#7A7A7A'],['Emerging',g.em,'#B5B5B5']];
   const geo=document.getElementById('geo'), leg=document.getElementById('geolegend');
   cols.forEach(([lab,v,c])=>{
     if(v<=0) return;
@@ -809,7 +846,7 @@ const el = h => { const t=document.createElement('template'); t.innerHTML=h.trim
 
 /* ---------- tiny SVG chart helper ---------- */
 function chart(host, opts){
-  const W=760, H=opts.height||320, ml=54, mr=14, mt=10, mb=28;
+  const W=760, H=opts.height||320, ml=54, mr=opts.endLabels?96:14, mt=10, mb=28;
   const xs=opts.xmin, xe=opts.xmax;
   let ymin=opts.ymin, ymax=opts.ymax;
   const logs = !!opts.log;
@@ -830,7 +867,7 @@ function chart(host, opts){
   if(opts.area && opts.area.length){   /* shaded range between two curves: [[x, lo, hi], ...] */
     const top=opts.area.map(p=>`${tx(p[0]).toFixed(1)},${ty(p[2]).toFixed(1)}`);
     const bot=opts.area.slice().reverse().map(p=>`${tx(p[0]).toFixed(1)},${ty(p[1]).toFixed(1)}`);
-    s+=`<polygon points="${top.concat(bot).join(' ')}" fill="var(--path)" opacity="0.10"/>`;
+    s+=`<polygon points="${top.concat(bot).join(' ')}" fill="var(--ink)" opacity="0.06"/>`;
   }
   (opts.bands||[]).forEach(b=>{
     s+=`<rect x="${tx(b[0])}" y="${mt}" width="${Math.max(0,tx(b[1])-tx(b[0]))}" height="${H-mt-mb}" fill="${b[2]}" opacity="0.08"/>`;
@@ -854,6 +891,14 @@ function chart(host, opts){
     s+=`<polyline points="${pts}" fill="none" stroke="${ser.color}" stroke-width="${ser.w||2}"
         ${ser.dash?`stroke-dasharray="${ser.dash}"`:''} stroke-linejoin="round"/>`;
   });
+  if(opts.endLabels){   /* name each line where it ends; nudge apart when they'd collide */
+    const ends=(opts.series||[]).filter(sr=>sr.name&&sr.label!==false).map(sr=>{
+      const pts=sr.data.filter(p=>p[1]!=null); if(!pts.length) return null;
+      const lp=pts[pts.length-1]; return {y:ty(lp[1]), x:tx(lp[0]), name:sr.label||sr.name, color:sr.color};
+    }).filter(Boolean).sort((a,b)=>a.y-b.y);
+    for(let i=1;i<ends.length;i++) if(ends[i].y-ends[i-1].y<13) ends[i].y=ends[i-1].y+13;
+    ends.forEach(e=>{ s+=`<text class="chart-end" x="${(e.x+6).toFixed(1)}" y="${(e.y+4).toFixed(1)}" fill="${e.color}">${e.name}</text>`; });
+  }
   (opts.dots||[]).forEach(d=>{
     s+=`<circle cx="${tx(d[0])}" cy="${ty(d[1])}" r="4.5" fill="${d[2]}" stroke="var(--panel)" stroke-width="2"/>`;
   });
@@ -935,7 +980,7 @@ function chart(host, opts){
     xfmt:v=>new Date(v).toLocaleDateString('en-GB',{month:'short',year:'2-digit'}),
     aria:'cumulative return since inception',
     tip:{fmt:v=>v.toFixed(2)+'%', xfmt:v=>new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})},
-    series:[{name:'Cumulative',data:S.map(p=>[p.t,p.cps*100]),color:'var(--path)',w:2,fill:true}]
+    series:[{name:'Cumulative',data:S.map(p=>[p.t,p.cps*100]),color:'var(--ink)',w:2,fill:true,fillOpacity:0.05}]
   });
 })();
 
@@ -1011,7 +1056,7 @@ function chart(host, opts){
     if(bp) bp.hidden = true;
     return;
   }
-  const palette=['var(--path)','var(--coast)','var(--fire)','#6B7F6E','#9A7B4F','#5A6B7C','#8C3A2E','#B0B5AE'];
+  const palette=['#111','#5C5C5C','#8A8A8A','#ABABAB','#C6C6C6','#D9D9D9','#E6E6E6','#EFEFEF'];
   const bk=document.getElementById('basket'), bl=document.getElementById('basketlegend');
   F.basket.forEach((b,i)=>{
     const c=palette[i%palette.length];
@@ -1157,7 +1202,7 @@ const phaseAt = n => state.phases.find(p=>n>=p.s && (p.e===null || n<=p.e)) || n
 /* income growth compounds from the later of the phase start and now */
 const incomeAt = (p,n) => p.monthly_income*Math.pow(1+(p.income_growth||0),(n-Math.max(p.s,M0))/12);
 const savingAt = (p,n) => p.saving_mode==='fixed' ? p.monthly_saving : incomeAt(p,n)*p.savings_rate;
-const PHASE_COLORS = ['#C9CEEA','#F2D4CC','#D5E6D2','#E6D7EB','#F1E5B8','#CFE4E8','#E3DED1','#EAD0D0'];
+const PHASE_COLORS = ['#DADADA','#EDEDED','#C9C9C9','#E4E4E4','#D2D2D2','#F0F0F0','#CFCFCF','#E8E8E8'];
 const phaseColor = p => PHASE_COLORS[Math.max(0,state.phases.indexOf(p))%PHASE_COLORS.length];
 function uniqueId(prefix){
   const used = new Set([...state.phases.map(p=>p.id), ...state.events.map(e=>e.id)]);
@@ -1623,8 +1668,8 @@ function drawProjection(){
   ];
   if(!det){ series.splice(1,1); }
   if(mc && det){
-    series.push({name:'Bad markets (10th pct)',data:mc.band.map(b=>[b.age,b.p10]),color:'var(--warn)',w:1,dash:'2 3'});
-    series.push({name:'Good markets (90th pct)',data:mc.band.map(b=>[b.age,b.p90>maxY?null:b.p90]),color:'var(--path)',w:1,dash:'2 3'});
+    series.push({name:'Bad markets (10th pct)',label:'Bad markets',data:mc.band.map(b=>[b.age,b.p10]),color:'var(--coast)',w:1,dash:'2 3'});
+    series.push({name:'Good markets (90th pct)',label:false,data:mc.band.map(b=>[b.age,b.p90>maxY?null:b.p90]),color:'var(--coast)',w:1,dash:'2 3'});
   }
   chart(document.getElementById('projchart'),{
     height:340, xmin:ageMin, xmax:ageMax, ymin:minY, ymax:maxY, yticks:yt, xticks:xt,
@@ -1633,7 +1678,7 @@ function drawProjection(){
     vlines: det ? vl : vl.filter(v=>v[1]==='retire'),
     area: mc && det ? mc.band.map(b=>[b.age, clip(b.p10), clip(b.p90)]) : null,
     tip:{fmt:v=>money(v), xfmt:v=>'age '+v.toFixed(1)},
-    series:series,
+    series:series, endLabels:true,
     dots: det ? dots : dots.filter(d=>d[2]==='var(--fire)')
   });
 
@@ -1690,7 +1735,7 @@ function drawSensitivity(P){
     ms.forEach(m=>{
       const o=project({r, saveMul:m, lite:true});
       const y=o.fireAge===null?null:o.fireAge-D.age_now;
-      const shade = y===null ? 'var(--rule)' : `rgba(45,50,125,${Math.max(0.05,Math.min(0.42,0.46-y/70)).toFixed(2)})`;
+      const shade = y===null ? 'var(--rule)' : `rgba(0,0,0,${Math.max(0.03,Math.min(0.22,0.25-y/110)).toFixed(2)})`;
       h+=`<td style="background:${shade}"${near&&m===1?' class="cur"':''}>${y===null?'—':y.toFixed(0)+' yr'}</td>`;
     });
     h+='</tr>';
@@ -1725,7 +1770,7 @@ function drawGlance(P, mc){
     ? `On the current plan you reach it at <b>age ${P.fireAge.toFixed(0)}</b>`
       + (P.coastAge?`; you could stop saving from age ${P.coastAge.toFixed(0)} and still get there by ${state.coast_full_age}`:'')
       + (cur?`. You're saving ${money(savingAt(cur,M0))} a month now.`:'.')
-    : `The current plan doesn't reach the target by ${Math.floor(ageAt(M0+P.N))}; section 08 shows what would.`);
+    : `The current plan doesn't reach the target by ${Math.floor(ageAt(M0+P.N))}; the Plan tab shows what would.`);
   const S=D.series;
   if(S.length>1){
     const r=S[S.length-1].cps, B=(D.income||{}).benchmark;
@@ -2234,7 +2279,7 @@ function showExport(){
     st('Received', fm(total), `${L.length} payments since ${first.toLocaleDateString('en-GB',{month:'short',year:'numeric'})}`,'var(--path)') +
     st('Last 12 months', fm(ttm), span<1?'less than a year of history':'trailing twelve months','var(--path)') +
     st('Yield', mv?(ttmRaw/mv*100).toFixed(2)+'%':'—', span<1?'so far, on today’s holdings &mdash; understated':'trailing 12 months on today’s holdings','var(--ink)') +
-    st('Withholding (est.)', fm(total*wr), `${(wr*100).toFixed(0)}% of gross &mdash; not reported by IBKR here`,'var(--warn)');
+    st('Withholding (est.)', fm(total*wr), `${(wr*100).toFixed(0)}% of gross &mdash; not reported by IBKR here`,'var(--ink)');
 
   /* by quarter */
   const q=new Map(); L.forEach(d=>{ const t=new Date(d.date), k=t.getFullYear()+' Q'+(Math.floor(t.getMonth()/3)+1); q.set(k,(q.get(k)||0)+amt(d)); });
@@ -2293,7 +2338,7 @@ function showExport(){
   chart(document.getElementById('benchchart'),{ height:260, xmin:t0, xmax:t1, ymin:lo, ymax:hi, yticks:yt, xticks:xt,
     yfmt:v=>(v*100).toFixed(0)+'%', xfmt:v=>new Date(v).toLocaleDateString('en-GB',{month:'short',year:'2-digit'}),
     aria:'portfolio return against the benchmark', tip:{fmt:v=>pc(v), xfmt:v=>new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})},
-    series:[ {name:B.ticker,data:vt,color:'var(--muted)',w:1.8,dash:'5 4'}, {name:'You',data:you,color:'var(--path)',w:2.4} ] });
+    endLabels:true, series:[ {name:B.ticker,data:vt,color:'var(--coast)',w:1.8,dash:'5 4'}, {name:'You',data:you,color:'var(--ink)',w:2.4} ] });
   document.getElementById('benchnote').innerHTML = `Both lines are time-weighted, so your deposits don't count as gains. ${B.ticker} is built from
     its daily closes with each distribution reinvested on its ex-date &mdash; price alone would understate it by its yield.
     ${B.converted?`It is converted to ${B.currency} with the same ECB rates as the currency section, so the exchange rate affects both lines alike.`:''}
@@ -2366,8 +2411,8 @@ const RISK = (function(){
     h+=`<tr><th class="l">${y}</th>`;
     for(let k=0;k<12;k++){ const m=row.find(x=>x.m===k);
       if(!m){ h+='<td></td>'; continue; }
-      const a=Math.min(0.75,0.12+Math.abs(m.r)/mx*0.6), bg=m.r>=0?`rgba(45,50,125,${(a*0.7).toFixed(2)})`:`rgba(235,0,0,${(a*0.6).toFixed(2)})`;
-      h+=`<td class="${m.part?'part':''}" style="background:${bg};color:${a>0.45?'#fff':'inherit'}" title="${ml(m)}${m.part?' (partial)':''}: ${pc(m.r)}">${(m.r*100).toFixed(1)}</td>`; }
+      const a=Math.min(0.75,0.12+Math.abs(m.r)/mx*0.6), bg=m.r>=0?`rgba(0,0,0,${(a*0.32).toFixed(2)})`:`rgba(215,38,46,${(a*0.45).toFixed(2)})`;
+      h+=`<td class="${m.part?'part':''}" style="background:${bg};color:inherit" title="${ml(m)}${m.part?' (partial)':''}: ${pc(m.r)}">${(m.r*100).toFixed(1)}</td>`; }
     h+=`<td style="font-weight:600">${(yr*100).toFixed(1)}%</td></tr>`;
   });
   document.getElementById('heatmap').innerHTML=h+'</tbody></table>';
@@ -2389,6 +2434,22 @@ const RISK = (function(){
     e.parentNode.insertBefore(d,e); run.forEach(x=>d.appendChild(x));
   });
 })();
+/* ---------- views: Today / Portfolio / Plan ---------- */
+const VIEWS=['today','portfolio','plan'];
+function showView(v, fromHash){
+  if(!VIEWS.includes(v)) v='today';
+  document.body.dataset.view=v;
+  document.querySelectorAll('.tabs [data-v]').forEach(b=>b.setAttribute('aria-selected', String(b.dataset.v===v)));
+  try{ localStorage.setItem('ibkr-fire-view', v); }catch(e){}
+  if(!fromHash && location.hash.slice(1)!==v){ try{ history.replaceState(null,'','#'+v); }catch(e){} }
+  window.scrollTo(0,0);
+  if(v==='plan'){ renderTimeline(); drawProjection(); }
+}
+document.querySelector('.tabs').addEventListener('click',ev=>{ const b=ev.target.closest('[data-v]'); if(b) showView(b.dataset.v); });
+/* the jump list inside Portfolio scrolls without changing the view */
+document.querySelectorAll('nav.jump a').forEach(a=>a.addEventListener('click',ev=>{
+  ev.preventDefault(); const t=document.querySelector(a.getAttribute('href')); if(t) t.scrollIntoView({behavior:'smooth'}); }));
+window.addEventListener('hashchange',()=>{ const h=location.hash.slice(1); if(VIEWS.includes(h)) showView(h,true); });
 function renderChartMode(){
   document.getElementById('plansection').classList.toggle('plansimple', chartMode==='simple');
   document.querySelectorAll('#chartmode button').forEach(b=>{ const on=b.dataset.cm===chartMode;
@@ -2406,6 +2467,9 @@ renderTimeline();
 renderPlanBar();
 drawProjection();
 window.addEventListener('resize',()=>{drawProjection();});
+(function(){ let v=location.hash.slice(1);
+  if(!VIEWS.includes(v)){ try{ v=localStorage.getItem('ibkr-fire-view')||'today'; }catch(e){ v='today'; } }
+  showView(v, VIEWS.includes(location.hash.slice(1))); })();
 </script></body></html>
 """
 

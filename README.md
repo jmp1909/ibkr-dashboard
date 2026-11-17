@@ -28,6 +28,11 @@ no account involved.
 | Milestones | Real crossing dates for milestones you've passed, projected dates for the rest |
 | The two finish lines | Coast FIRE and full FIRE on an editable life plan: a draggable timeline of phases and one-off events, a yearly chart of income, saving, withdrawals and investment return, the crossover year, life after retirement (how long the money lasts, and after a −30% crash), an uncertainty band from 500 simulated markets, optional Swiss pensions, and a grid of years-to-target across return and saving assumptions |
 
+The page has three views: **Today** (where you stand, a timetable of when you reach each
+stop on the plan, milestones), **Portfolio** (holdings, dividends, returns, risk, currency) and
+**Plan** (the editable timeline and projections). The tab you last used is remembered, and
+`#today`, `#portfolio` or `#plan` in the URL opens a view directly.
+
 An **at a glance** box under the header sums up where you stand, whether you're on plan, and
 what changed since your last refresh. Every chart has a one-line headline saying what it shows,
 so the page can be read from the headlines alone; the two busiest plan charts have a
