@@ -140,6 +140,31 @@ class IBKRClient:
             time.sleep(0.3)  # the gateway rate-limits aggressively
         return out
 
+    def conids(self) -> dict[int, str]:
+        """conid -> ticker for the open positions."""
+        rows = self._get(f"/portfolio/{self.account_id}/positions/0") or []
+        return {int(r["conid"]): r.get("contractDesc") or "?" for r in rows if r.get("conid")}
+
+    def transactions(self, conids: list[int], currency: str, days: int = 3650) -> dict[str, Any]:
+        """Trades and dividends for the given contracts (portfolio analyst)."""
+        return self._post(
+            "/pa/transactions",
+            json={"acctIds": [self.account_id], "conids": conids, "currency": currency, "days": days},
+        )
+
+    def price_history(self, conid: int, period: str = "5y") -> dict[str, Any]:
+        """Daily bars; distributions come back as chart annotations."""
+        self._get("/iserver/accounts")  # history needs the brokerage session primed
+        return self._get("/iserver/marketdata/history", params={"conid": conid, "period": period, "bar": "1d"})
+
+    def search_conid(self, symbol: str) -> int | None:
+        """Look up a US-listed ETF/stock's conid, for a benchmark you don't hold."""
+        rows = self._get("/iserver/secdef/search", params={"symbol": symbol}) or []
+        for r in rows:
+            if r.get("conid"):
+                return int(r["conid"])
+        return None
+
     def summary(self) -> dict[str, float]:
         """Account-level figures: net liquidation, cash, gross position value."""
         raw = self._get(f"/portfolio/{self.account_id}/summary")

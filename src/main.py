@@ -373,9 +373,9 @@ def build_lede(net: float, target: float, ccy: str, plan: dict[str, Any], sep: s
 # ----------------------------------------------------------------------
 def demo_snapshot() -> tuple[list[dict[str, Any]], dict[str, float], dict[str, Any]]:
     """Bundled sample data so the dashboard can be built without the gateway."""
-    from demo_data import DEMO_POSITIONS, DEMO_SERIES, DEMO_SUMMARY
+    from demo_data import DEMO_EXTRAS, DEMO_POSITIONS, DEMO_SERIES, DEMO_SUMMARY
 
-    return DEMO_POSITIONS, DEMO_SUMMARY, DEMO_SERIES
+    return DEMO_POSITIONS, DEMO_SUMMARY, dict(DEMO_SERIES, extras=DEMO_EXTRAS)
 
 
 def live_snapshot(cfg: dict[str, Any]) -> tuple[list[dict[str, Any]], dict[str, float], dict[str, Any]]:
@@ -402,10 +402,94 @@ def live_snapshot(cfg: dict[str, Any]) -> tuple[list[dict[str, Any]], dict[str, 
         for p in client.positions()
         if abs(p.quantity) > 1e-9
     ]
-    return positions, client.summary(), client.performance()
+    summary, performance = client.summary(), client.performance()
+    performance["extras"] = fetch_income(client, cfg, summary.get("currency") or "USD")
+    return positions, summary, performance
+
+
+def fetch_income(client: Any, cfg: dict[str, Any], base_ccy: str) -> dict[str, Any]:
+    """
+    Dividends and the benchmark's total-return index. Best effort: the core
+    dashboard never depends on these, so a failure is logged and skipped.
+    """
+    import income
+
+    extras: dict[str, Any] = {}
+    ticker = (cfg.get("benchmark") or {}).get("ticker", "VT")
+    try:
+        tickers = client.conids()
+        raw = client.transactions(list(tickers), "USD")
+        extras["dividends"] = income.parse_dividends(raw, tickers)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Dividend history unavailable: %s", exc)
+        tickers = {}
+    if ticker:
+        try:
+            conid = next((c for c, t in tickers.items() if t == ticker), None) or client.search_conid(ticker)
+            if conid is None:
+                raise ValueError(f"no contract found for {ticker}")
+            extras["benchmark_index"] = income.total_return_index(client.price_history(conid))
+            extras["benchmark_ticker"] = ticker
+        except Exception as exc:  # noqa: BLE001
+            log.warning("Benchmark %s unavailable: %s", ticker, exc)
+    return extras
 
 
 # ----------------------------------------------------------------------
+def build_income_section(
+    cfg: dict[str, Any], root: Path, dates: list[date], extras: dict[str, Any]
+) -> dict[str, Any]:
+    """
+    Dividends and the benchmark, in the display currency where FX allows.
+
+    The benchmark is converted with the same daily rates as the currency
+    section, so it is compared with your return in one currency. Without rates
+    (currency section off, or the same currency throughout) it stays as is.
+    """
+    import income
+
+    display = cfg["account"].get("display_currency", "USD")
+    fx_cfg = cfg.get("currency", {})
+    asset_ccy = fx_cfg.get("asset_currency", "USD")
+    rates: list[float | None] | None = None
+    if fx_cfg.get("enabled") and asset_ccy != display:
+        try:
+            from fx import FXSeries
+
+            fxs = FXSeries(asset_ccy, display, root / fx_cfg.get("cache_path", "data/fx_history.json"))
+            fxs.ensure_range(dates[0], dates[-1])
+            rates = fxs.aligned(dates)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("No FX for income/benchmark, leaving them in %s: %s", asset_ccy, exc)
+
+    divs = []
+    rate_on = dict(zip(dates, rates)) if rates else {}
+    for d in extras.get("dividends", []):
+        day = date.fromisoformat(d["date"])
+        r = None
+        if rate_on:  # last fix on or before the payment day
+            r = next((rate_on[x] for x in reversed(dates) if x <= day and rate_on.get(x)), None)
+        conv = r is not None and d["currency"] == asset_ccy
+        divs.append({**d, "display_amount": d["amount"] * r if conv else d["amount"],
+                     "display_currency": display if conv else d["currency"]})
+
+    bench = None
+    idx = extras.get("benchmark_index")
+    if idx:
+        cum = income.align_cumulative(dates, idx, rates)
+        bench = {
+            "ticker": extras.get("benchmark_ticker", "VT"),
+            "currency": display if rates else asset_ccy,
+            "converted": rates is not None,
+            "cps": cum,
+        }
+    return {
+        "dividends": divs,
+        "withholding_rate": float((cfg.get("dividends") or {}).get("withholding_rate", 0.15)),
+        "benchmark": bench,
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Build the IBKR portfolio and FIRE dashboard.")
     ap.add_argument("--demo", action="store_true", help="use bundled sample data instead of IBKR")
@@ -446,6 +530,7 @@ def main(argv: list[str] | None = None) -> int:
     log.info("Reconstructed %d external cash flows.", len(flows))
     windows = all_window_returns(dates, navs, flows)
     fx_block = build_fx_section(cfg, ROOT, dates, cps, positions)
+    income_block = build_income_section(cfg, ROOT, dates, series.get("extras") or {})
 
     # -- assemble ------------------------------------------------------
     today = dates[-1]
@@ -505,6 +590,7 @@ def main(argv: list[str] | None = None) -> int:
             for w in windows
         ],
         "fx": fx_block,
+        "income": income_block,
         "plan": plan,
         "fmt": {
             "locale": out_cfg.get("locale", "en-US"),

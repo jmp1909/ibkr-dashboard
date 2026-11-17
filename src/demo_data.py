@@ -44,3 +44,32 @@ DEMO_SERIES = {
     "navs": _NAVS,
     "cps": _CPS,
 }
+
+
+# Synthetic dividends and benchmark for the demo. Amounts are invented; dates
+# follow the funds' usual quarterly calendar so the panels look realistic.
+def _demo_extras() -> dict:
+    import math
+
+    divs = [
+        ("2026-03-12", "AVES", 31.20), ("2026-03-12", "AVUV", 52.80),
+        ("2026-03-24", "VT", 301.40), ("2026-06-11", "AVES", 118.60),
+        ("2026-06-11", "AVDV", 196.30), ("2026-06-11", "AVUV", 88.10),
+        ("2026-06-23", "VT", 512.70),
+    ]
+    dividends = [{"date": d, "ticker": t, "amount": a, "currency": "USD"} for d, t, a in divs]
+    # A benchmark that tracks the sample portfolio loosely: a bit less
+    # small-cap and value tilt, so the two lines visibly differ.
+    index = [
+        (datetime.strptime(d, "%Y%m%d").date(), (1 + c) * (1 - 0.0004 * i) + 0.006 * math.sin(i / 9))
+        for i, (d, c) in enumerate(zip(_DATES, _CPS))
+    ]
+    base = index[0][1]
+    return {
+        "dividends": dividends,
+        "benchmark_index": [(d, v / base) for d, v in index],
+        "benchmark_ticker": "VT",
+    }
+
+
+DEMO_EXTRAS = _demo_extras()

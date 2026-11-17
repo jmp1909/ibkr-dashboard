@@ -210,5 +210,13 @@
       "yearly_amount": 0,
       "start_age": 65
     }
+  },
+  "benchmark": {
+    "_note": "Compared with your time-weighted return in section 04, as a total-return index (dividends reinvested), converted to display_currency when the currency section is on. Any ticker IBKR can find. Set ticker to null to hide.",
+    "ticker": "VT"
+  },
+  "dividends": {
+    "_note": "IBKR's feed reports dividends gross; this rate estimates tax withheld at source. 0.15 = US treaty rate with a W-8BEN on file.",
+    "withholding_rate": 0.15
   }
 }

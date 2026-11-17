@@ -171,6 +171,12 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
     <thead><tr><th class="l">Ticker</th><th class="l">Role</th><th>Units</th><th>Price</th><th>Value</th><th>Weight</th>
       <th class="costcol">Cost</th><th class="costcol" title="Gain against the money put into this position. Reinvested dividends raise the cost basis, so for dividend-payers this sits below the true total return.">Gain on cost</th><th>Unreal. P&amp;L</th></tr></thead>
     <tbody></tbody></table></div>
+  <div class="panel" style="margin-top:28px" id="divpanel" hidden>
+    <div class="eyebrow" style="margin-bottom:10px">Dividend income</div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:16px" id="divstats"></div>
+    <div class="cols2"><div id="divq"></div><div style="overflow-x:auto"><table id="divtbl"></table></div></div>
+    <div class="note" style="margin-top:10px" id="divnote"></div>
+  </div>
   <div class="panel" style="margin-top:28px" id="exposurepanel">
     <div class="eyebrow" style="margin-bottom:4px">True exposure &mdash; fund look-through</div>
     <p style="font-size:12.5px;color:var(--muted);margin:0 0 18px;max-width:560px;line-height:1.5">
@@ -180,7 +186,7 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
       <b>Gain on cost is not total return.</b> Reinvested dividends buy more shares, which raises the
       cost basis without showing up as a gain &mdash; so for dividend-paying funds this column sits
       below the true total return by roughly the yield since purchase. The portfolio-level returns in
-      sections 03&ndash;05 <i>do</i> include dividends; they come from the NAV series, which reflects them.</p>
+      sections 03 and 04 <i>do</i> include dividends; they come from the NAV series, which reflects them.</p>
     <div class="geo" id="geo"></div><div class="legend" id="geolegend"></div>
     <div class="grid g3" style="margin-top:20px;padding-top:18px;border-top:1px solid var(--rule)" id="expstats"></div>
   </div>
@@ -245,6 +251,12 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
     <thead><tr><th class="l">Window</th><th>Cumulative</th><th>Annualised</th><th>Net contributed</th><th>Closing value</th><th class="l">&nbsp;</th></tr></thead>
     <tbody></tbody></table></div>
   <div class="panel" style="margin-top:24px;padding:18px 14px 6px"><div id="navchart"></div></div>
+  <div class="panel" style="margin-top:24px;padding:18px 14px 8px" id="benchpanel" hidden>
+    <div class="eyebrow" style="margin:0 0 10px 6px" id="benchtitle"></div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:0 6px 14px" id="benchstats"></div>
+    <div id="benchchart"></div>
+    <div class="note" style="margin:8px 6px 4px" id="benchnote"></div>
+  </div>
 </section>
 
 
@@ -1935,6 +1947,83 @@ function showExport(){
   document.body.appendChild(m);
   ta.focus(); ta.select();
 }
+
+/* ---------- dividends (gross from IBKR; withholding is an estimate) ---------- */
+(function drawDividends(){
+  const I=D.income||{}, L=I.dividends||[];
+  if(!L.length) return;
+  document.getElementById('divpanel').hidden=false;
+  const ccy=L[0].display_currency, mixed=L.some(d=>d.display_currency!==ccy);
+  const amt=d=>mixed?d.amount:d.display_amount, cur=mixed?L[0].currency:ccy;
+  const fm=v=>cur+' '+Math.round(v).toLocaleString((D.fmt||{}).locale||'en-US');
+  const fm2=v=>cur+' '+v.toFixed(2);
+  const last=new Date(D.series[D.series.length-1].t), yearAgo=new Date(last.getTime()-365*864e5);
+  const total=L.reduce((s,d)=>s+amt(d),0);
+  const ttm=L.filter(d=>new Date(d.date)>yearAgo).reduce((s,d)=>s+amt(d),0);
+  /* yield in the funds' own currency, so the exchange rate can't distort it */
+  const ttmRaw=L.filter(d=>new Date(d.date)>yearAgo).reduce((s,d)=>s+d.amount,0);
+  const mv=D.positions.reduce((s,p)=>s+p.market_value,0);
+  const wr=I.withholding_rate||0;
+  const st=(l,v,sub,c)=>`<div class="stat" style="border-color:${c}"><div class="lab">${l}</div><div class="val" style="color:${c}">${v}</div><div class="sub">${sub}</div></div>`;
+  const first=new Date(L[0].date);
+  const span=(last-first)/(365.25*864e5);
+  document.getElementById('divstats').innerHTML =
+    st('Received', fm(total), `${L.length} payments since ${first.toLocaleDateString('en-GB',{month:'short',year:'numeric'})}`,'var(--path)') +
+    st('Last 12 months', fm(ttm), span<1?'less than a year of history':'trailing twelve months','var(--path)') +
+    st('Yield', mv?(ttmRaw/mv*100).toFixed(2)+'%':'—', span<1?'so far, on today’s holdings &mdash; understated':'trailing 12 months on today’s holdings','var(--ink)') +
+    st('Withholding (est.)', fm(total*wr), `${(wr*100).toFixed(0)}% of gross &mdash; not reported by IBKR here`,'var(--warn)');
+
+  /* by quarter */
+  const q=new Map(); L.forEach(d=>{ const t=new Date(d.date), k=t.getFullYear()+' Q'+(Math.floor(t.getMonth()/3)+1); q.set(k,(q.get(k)||0)+amt(d)); });
+  const qs=[...q.entries()], mx=Math.max(...qs.map(x=>x[1]));
+  document.getElementById('divq').innerHTML = '<div class="lab" style="margin-bottom:8px">By quarter, gross</div>' + qs.map(([k,v])=>
+    `<div style="display:grid;grid-template-columns:62px 1fr 92px;gap:8px;align-items:center;font-size:12px;margin:5px 0">
+      <span style="font-family:'IBM Plex Mono',monospace">${k}</span>
+      <span style="height:12px;background:var(--path);opacity:.8;width:${(v/mx*100).toFixed(1)}%"></span>
+      <span style="text-align:right;font-family:'IBM Plex Mono',monospace">${fm2(v)}</span></div>`).join('');
+
+  /* by fund */
+  const f=new Map(); L.forEach(d=>f.set(d.ticker,(f.get(d.ticker)||0)+amt(d)));
+  document.getElementById('divtbl').innerHTML = `<thead><tr><th class="l">Fund</th><th>Gross</th><th>Est. net</th><th>Share</th></tr></thead><tbody>`
+    + [...f.entries()].sort((a,b)=>b[1]-a[1]).map(([t,v])=>`<tr><td class="l">${esc(t)}</td><td>${fm2(v)}</td><td>${fm2(v*(1-wr))}</td><td>${(v/total*100).toFixed(0)}%</td></tr>`).join('')
+    + '</tbody>';
+  document.getElementById('divnote').innerHTML = `IBKR reports these gross. Tax withheld at source isn't in this feed, so the net column
+    assumes ${(wr*100).toFixed(0)}% (the US treaty rate with a W-8BEN on file; set <code>dividends.withholding_rate</code> in config).
+    Your account statement has the exact figure, and in Switzerland it can usually be reclaimed against your tax bill.
+    ${mixed?'':(ccy!==L[0].currency?`Converted from ${L[0].currency} at the ECB rate on the payment day.`:'')}`;
+})();
+
+/* ---------- benchmark: your time-weighted return against a total-return index ---------- */
+(function drawBenchmark(){
+  const B=(D.income||{}).benchmark;
+  if(!B || !D.series.length) return;
+  const S=D.series, c0=1+S[0].cps;
+  const you=S.map((p,i)=>[p.t,(1+p.cps)/c0-1]);
+  const vt=S.map((p,i)=>[p.t,B.cps[i]]).filter(x=>x[1]!=null);
+  if(vt.length<10) return;
+  document.getElementById('benchpanel').hidden=false;
+  const yEnd=you[you.length-1][1], bEnd=vt[vt.length-1][1], diff=yEnd-bEnd;
+  const since=new Date(S[0].t).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  document.getElementById('benchtitle').textContent=`You against ${B.ticker}, with dividends, since ${since}`;
+  const st=(l,v,sub,c)=>`<div class="stat" style="border-color:${c}"><div class="lab">${l}</div><div class="val" style="color:${c}">${v}</div><div class="sub">${sub}</div></div>`;
+  document.getElementById('benchstats').innerHTML =
+    st('Your portfolio', pc(yEnd), 'time-weighted, as IBKR reports it','var(--path)') +
+    st(B.ticker+' total return', pc(bEnd), `dividends reinvested${B.converted?', in '+B.currency:''}`,'var(--muted)') +
+    st('Difference', (diff>=0?'+':'−')+Math.abs(diff*100).toFixed(2)+' pts', diff>=0?'ahead of the benchmark':'behind the benchmark', diff>=0?'var(--path)':'var(--warn)');
+  const all=you.concat(vt).map(x=>x[1]);
+  let lo=Math.min(0,...all), hi=Math.max(0,...all);
+  const step=niceStep((hi-lo)/4); lo=Math.floor(lo/step)*step; hi=Math.ceil(hi/step)*step;
+  const yt=[]; for(let v=lo; v<=hi+1e-9; v+=step) yt.push(v);
+  const t0=S[0].t, t1=S[S.length-1].t, xt=[]; for(let i=0;i<=4;i++) xt.push(t0+(t1-t0)*i/4);
+  chart(document.getElementById('benchchart'),{ height:260, xmin:t0, xmax:t1, ymin:lo, ymax:hi, yticks:yt, xticks:xt,
+    yfmt:v=>(v*100).toFixed(0)+'%', xfmt:v=>new Date(v).toLocaleDateString('en-GB',{month:'short',year:'2-digit'}),
+    aria:'portfolio return against the benchmark', tip:{fmt:v=>pc(v), xfmt:v=>new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})},
+    series:[ {name:B.ticker,data:vt,color:'var(--muted)',w:1.8,dash:'5 4'}, {name:'You',data:you,color:'var(--path)',w:2.4} ] });
+  document.getElementById('benchnote').innerHTML = `Both lines are time-weighted, so your deposits don't count as gains. ${B.ticker} is built from
+    its daily closes with each distribution reinvested on its ex-date &mdash; price alone would understate it by its yield.
+    ${B.converted?`It is converted to ${B.currency} with the same ECB rates as the currency section, so the exchange rate affects both lines alike.`:''}
+    A short window says little about skill: a tilt to small-cap value can trail or lead the world index for years.`;
+})();
 
 /* ---------- risk: from the time-weighted series, so deposits never look like gains ---------- */
 const RISK = (function(){

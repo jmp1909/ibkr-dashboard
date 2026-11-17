@@ -19,10 +19,10 @@ no account involved.
 | Section | |
 |---|---|
 | Hero band | Portfolio value, contributions, growth, return, years to target |
-| 01 Holdings | Positions with cost basis, true total return, and fund look-through to real regional exposure |
+| 01 Holdings | Positions with cost basis, dividend income (by quarter and fund, with estimated withholding), and fund look-through to real regional exposure |
 | 02 Drift from target | Target vs actual weights, plus a **buy-only** allocator that points your next contribution at whatever has fallen furthest behind |
 | 03 Saved vs market | Your deposits against total value — how much of your wealth is savings rather than returns |
-| 04 Money-weighted returns | XIRR over standard windows, from cash flows reconstructed out of the NAV and TWR series |
+| 04 Money-weighted returns | XIRR over standard windows, from cash flows reconstructed out of the NAV and TWR series, plus your time-weighted return against a total-return benchmark (VT by default) |
 | 05 Risk and costs | Volatility, worst fall and recovery, an underwater chart, a monthly-returns heatmap, and what your funds' expense ratios cost you by retirement |
 | 06 Currency | Splits return into asset performance vs exchange-rate movement, with look-through to the currencies actually inside your funds |
 | 07 Milestones | Real crossing dates for milestones you've passed, projected dates for the rest |
@@ -75,6 +75,8 @@ Copy `config.example.json` to `config.json`, then edit it:
 | `events[]` | no | One-off lump sums: a bonus, an inheritance, or a purchase (negative) |
 | `targets` | no | Intended allocation. Must sum to 1. Omit to hide the drift section |
 | `lookthrough` | no | Regional split inside each fund, from its factsheet, plus `ter` (expense ratio) for the fee comparison |
+| `benchmark.ticker` | no | Benchmark for section 04, as total return. Default VT; null hides it |
+| `dividends.withholding_rate` | no | Estimated tax withheld at source. Default 0.15 |
 | `pensions` | no | Swiss pillar 2 / 3a pots and AHV — see below. Off by default |
 | `currency_basket` | no | Currencies held *inside* each fund — not the one it's priced in |
 | `currency.enabled` | no | Set false if your funds report in the currency you spend |
@@ -237,6 +239,17 @@ Leave that running, log in at `https://localhost:5000`, then:
 ```
 .venv\Scripts\python.exe src\main.py
 ```
+
+## Dividends and the benchmark
+
+IBKR's transaction feed reports dividends **gross** — on real data they match the per-share
+payout times shares held to the cent — and doesn't report the tax withheld. The net figures
+are therefore an estimate at `dividends.withholding_rate`; your statement has the exact amount.
+
+The benchmark is a **total-return** index: built from daily closes with each distribution
+(which IBKR returns alongside the prices) reinvested on its ex-date. A price-only line would
+understate a fund like VT by its yield, roughly 2 points a year. When the currency section is
+on, it is converted with the same daily rates as your return, so both lines are in one currency.
 
 ## How the returns are computed
 
