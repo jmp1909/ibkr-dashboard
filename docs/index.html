@@ -139,92 +139,113 @@ svg{display:block;width:100%;height:auto}
 footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:var(--muted);line-height:1.65;max-width:760px}
 .warnbox{background:#F6E9E4;border-left:3px solid var(--warn);padding:12px 16px;font-size:12.5px;line-height:1.5;margin-bottom:24px}
 
-/* ---- design layer: Swiss railway timetable ----
-   White ground, black type, one red for the destination, SBB blue for your
-   money. Square corners; each section opens under a heavy rule like a
-   platform sign. The departure board in the hero is the one loud element. */
-body{font-family:var(--fn);font-size:15px;line-height:1.5;background:#fff}
-.wrap{max-width:1160px;padding:40px 32px 96px;overflow-x:clip}
-h1{font-weight:800;letter-spacing:-.045em;line-height:.95;font-size:clamp(34px,6vw,64px)}
+/* ---- design layer: the printed timetable ----
+   Paper white, black type, thin rules. No dark surfaces and no boxes for the
+   sake of boxes: structure comes from rules and spacing, as on a printed SBB
+   timetable. Colour only carries meaning - red for the destination and for
+   delays, blue for your money. */
+body{font-family:var(--fn);font-size:15px;line-height:1.5;background:#fff;color:var(--ink)}
+.wrap{max-width:1100px;padding:40px 32px 96px;overflow-x:clip}
+h1{font-weight:800;letter-spacing:-.045em;line-height:.96;font-size:clamp(34px,6vw,62px)}
 h1 #h1Target{color:var(--fire)!important}
 h2{font-size:26px;font-weight:800;letter-spacing:-.03em}
-.eyebrow{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px}
+.eyebrow{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px}
 header .eyebrow{font-weight:500;color:var(--muted)}
-.lede{color:#2B2B2B;font-size:16px;max-width:620px}
-section{margin-bottom:80px;scroll-margin-top:60px}
-.shead{border-top:6px solid var(--ink);border-bottom:0;padding:12px 0 0;margin-bottom:22px;gap:12px}
+.lede{color:#333;font-size:16px;max-width:600px}
+section{margin-bottom:84px;scroll-margin-top:56px}
+.shead{border-top:3px solid var(--ink);border-bottom:0;padding:12px 0 0;margin-bottom:24px;gap:12px}
 .shead .n{display:none}
 .shead .k{font-size:13px}
-.panel{background:#fff;border:1px solid var(--rule);border-radius:0;padding:22px 24px}
-.dark{border-radius:0}
+/* panels become ruled areas, not cards */
+.panel{background:transparent;border:0;border-top:1px solid var(--rule);border-radius:0;padding:20px 0 4px}
+.dark{background:transparent;color:var(--ink);border-top:1px solid var(--ink);border-bottom:1px solid var(--rule);border-radius:0;padding:18px 0}
 table{font-size:14px}
-th{font-size:12.5px;font-weight:700;color:var(--ink);padding:8px 10px;border-bottom:2px solid var(--ink)}
-td{padding:11px 10px}
-tbody tr:hover td{background:var(--soft)}
-.stat{border-left:4px solid var(--rule);padding-left:14px}
-.stat .lab{font-size:13px;font-weight:600;color:var(--muted)}
-.stat .val{font-weight:800;letter-spacing:-.03em}
+th{font-size:12.5px;font-weight:600;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--ink)}
+td{padding:10px 10px;border-bottom-color:#EBEBEB}
+tbody tr:hover td{background:#FAFAFA}
+.stat{border:0;border-top:1px solid var(--rule);padding:10px 0 0}
+.stat .lab{font-size:13px;font-weight:500;color:var(--muted)}
+.stat .val{font-weight:700;letter-spacing:-.03em}
 .stat .sub{font-size:12px}
 .legend{font-size:12.5px}
-.note{font-size:12px}
+.note{font-size:12.5px;color:var(--muted)}
 .axl{font-size:11px}
-.tk{font-size:18px;font-weight:700;letter-spacing:-.015em;line-height:1.35;max-width:700px}
-.tk b{color:var(--path)} .tk b.neg{color:var(--warn)}
-.glance{background:var(--soft);border:0;border-left:6px solid var(--fire);border-radius:0;padding:20px 24px;margin:0 0 64px}
-.glance .eyebrow{font-size:14px}
-.glance li{font-size:16px;padding:8px 0;border-top-color:#E2E2E2}
-.secnav{position:sticky;top:0;z-index:20;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;margin:0 -32px 30px;padding:0 32px;
-  background:var(--ink);border:0}
+.tk{font-size:17px;font-weight:600;letter-spacing:-.01em;line-height:1.4;max-width:680px;margin:0 0 12px}
+.tk b{color:var(--path);font-weight:700} .tk b.neg{color:var(--warn)}
+/* at a glance: plain sentences under a rule, the way a summary sits on a timetable */
+.glance{background:transparent;border:0;border-top:1px solid var(--ink);border-radius:0;padding:14px 0 0;margin:0 0 72px;max-width:780px}
+.glance .eyebrow{font-size:14px;margin:0}
+.glance li{font-size:17px;line-height:1.5;padding:9px 0;border-top:1px solid #EBEBEB}
+.glance li b{font-weight:700}
+.secnav{position:sticky;top:0;z-index:20;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin:0 -32px 32px;padding:0 26px;
+  background:rgba(255,255,255,.96);border-bottom:1px solid var(--rule)}
 .secnav::-webkit-scrollbar{display:none}
-.secnav a{flex:none;font-size:14px;font-weight:600;color:#fff;text-decoration:none;padding:11px 14px;border-radius:0}
-.secnav a:hover{background:var(--fire);color:#fff}
-.secnav a:focus-visible{outline:2px solid #fff;outline-offset:-4px}
-/* hero: the departure board */
-.hero{--path:#8A92E6;--coast:#BDBDBD;--fire:#FF4A4A;--warn:#FF7B7B;border:0;background:#000;color:#fff;border-radius:0;padding:26px 30px 26px;margin:0 0 24px}
-.board{width:100%;border-collapse:collapse;margin:0 0 26px;font-variant-numeric:tabular-nums}
-.board th{color:#9A9A9A;font-size:12px;font-weight:600;text-align:left;border-bottom:1px solid #333;padding:0 12px 8px 0}
+.secnav a{flex:none;font-size:14px;font-weight:600;color:var(--ink);text-decoration:none;padding:12px 8px 10px;margin:0 4px;border-bottom:2px solid transparent}
+.secnav a:hover{border-bottom-color:var(--fire)}
+.secnav a:focus-visible{outline:2px solid var(--fire);outline-offset:-2px}
+/* hero: the timetable itself, on paper */
+.hero{border:0;border-top:3px solid var(--ink);border-bottom:1px solid var(--rule);background:transparent;color:var(--ink);border-radius:0;padding:14px 0 26px;margin:0 0 40px}
+.board{width:100%;border-collapse:collapse;margin:0 0 30px}
+.board th{color:var(--muted);font-size:12.5px;font-weight:500;text-align:left;border-bottom:1px solid var(--ink);padding:0 12px 8px 0}
 .board th.r,.board td.r{text-align:right}
-.board td{border-bottom:1px solid #2A2A2A;padding:12px 12px 12px 0;font-size:20px;font-weight:700;color:#fff;text-align:left;white-space:nowrap}
-.board td.dest{font-weight:600;white-space:normal}
-.board td .sm{display:block;font-size:12px;font-weight:500;color:#9A9A9A;margin-top:2px}
+.board td{border-bottom:1px solid #EBEBEB;padding:13px 12px 13px 0;font-size:22px;font-weight:700;color:var(--ink);text-align:left;white-space:nowrap;letter-spacing:-.02em}
+.board td.dest{font-size:19px;white-space:normal}
+.board td .sm{display:block;font-size:12.5px;font-weight:400;color:var(--muted);margin-top:1px;letter-spacing:0}
 .board tr:hover td{background:transparent}
-.st{display:inline-block;font-size:13px;font-weight:700;padding:3px 8px;background:#1F1F1F;color:#fff}
-.st.late{background:#FFDE15;color:#000}
-.st.early{background:#fff;color:#000}
-.st.gone{background:var(--fire);color:#fff}
-.hero .fig .lab{font-size:12.5px;color:#9A9A9A}
-.hero .fig .num{font-size:26px;color:#fff;font-weight:800}
-.hero .fig .sub{font-size:12px;color:#9A9A9A}
-.hero > div[style*="font-size:10.5px"]{color:#9A9A9A!important;font-size:12px!important}
+.st{font-size:14px;font-weight:600;color:var(--muted);letter-spacing:0}
+.st.late{color:var(--fire)}
+.st.early{color:var(--path)}
+.st.gone{color:var(--fire)}
+.hero .fig .lab{font-size:13px;color:var(--muted)}
+.hero .fig .num{font-size:25px;color:var(--ink);font-weight:700}
+.hero .fig .sub{font-size:12px;color:var(--muted)}
+.hero > div[style*="font-size:10.5px"]{color:var(--muted)!important;font-size:12px!important}
 .track{height:34px}
-.track .rail{top:12px;height:10px;border-radius:0;background:#333}
-.track .fill{top:12px;height:10px;border-radius:0;background:#fff}
-.track .tick{background:#000;top:10px;height:14px;width:2px}
-.track .tick span{top:26px;font-size:11px;color:#9A9A9A}
-.track .pin{top:4px;height:26px;width:4px;border-radius:0;background:var(--fire)}
-.btn{font-size:13px;font-weight:700;border-radius:0;padding:8px 14px;border-width:2px}
-.seg{border-radius:0;border:2px solid var(--ink)}
-.seg button{font-size:12.5px;font-weight:600;padding:6px 11px;color:var(--ink)}
-.ctl label{font-size:12.5px;font-weight:600;color:var(--ink)}
+.track .rail{top:12px;height:6px;border-radius:0;background:#E6E6E6}
+.track .fill{top:12px;height:6px;border-radius:0;background:var(--ink)}
+.track .tick{background:#fff;top:10px;height:10px;width:2px}
+.track .tick span{top:24px;font-size:11px;color:var(--muted)}
+.track .pin{top:5px;height:20px;width:3px;border-radius:0;background:var(--fire)}
+.btn{font-size:13px;font-weight:600;border-radius:0;padding:7px 13px;border:1px solid var(--ink);background:#fff}
+.btn:hover{background:#F2F2F2;color:var(--ink)}
+.btn.ghost{border-color:var(--rule)}
+.seg{border-radius:0;border:1px solid var(--rule)}
+.seg button{font-size:12.5px;font-weight:500;padding:6px 11px;color:var(--muted)}
+.seg button.on{background:#fff;color:var(--ink);font-weight:700;box-shadow:inset 0 -2px 0 var(--fire)}
+.ctl label{font-size:13px;font-weight:500;color:var(--ink)}
 .ctl .v{font-size:15px}
-.phname{font-size:13.5px;font-weight:700}
-.evrow input,.pengrid input{border-radius:0}
-.tipbox{border-radius:0;font-size:12.5px;background:#000}
-.tipbox .tt{font-size:11.5px}
-.tl .blk{border-radius:0}
-.warnbox{border-radius:0}
-.modal .box{border-radius:0}
+.phase{border-left-width:3px}
+.phname{font-size:14px;font-weight:700}
+.evrow input,.pengrid input{border-radius:0;background:#fff}
+.tipbox{border-radius:0;font-size:12.5px;background:#fff;color:var(--ink);border:1px solid var(--ink);box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.tipbox .tt{font-size:11.5px;color:var(--muted)}
+.dtip{background:#fff;color:var(--ink);border:1px solid var(--ink)}
+.tl .lane{background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(0,0,0,.05) 6px 12px)}
+.tl .blk{border-radius:0;color:var(--ink);box-shadow:inset -1px 0 0 #fff}
+.tl .h::after{background:rgba(0,0,0,.35)}
+.warnbox{border-radius:0;background:#FFF4F4}
+.modal{background:rgba(0,0,0,.18)}
+.modal .box{border-radius:0;border:1px solid var(--ink)}
 input[type=range]{accent-color:var(--fire)}
 @media(max-width:640px){
   .wrap{padding:24px 16px 72px}
-  .secnav{margin:0 -16px 22px;padding:0 16px}
-  .hero{padding:20px 16px}
-  .board td{font-size:16px}
+  .secnav{margin:0 -16px 24px;padding:0 10px}
+  .board td{font-size:17px}.board td.dest{font-size:16px}
   .board .hide-s{display:none}
-  .panel{padding:18px 16px}
-  .tk{font-size:16.5px}
+  .tk{font-size:16px}
+  .glance li{font-size:15.5px}
   h2{font-size:22px}
 }
+/* numbers are black; colour is kept only for losses and the target */
+.stat .val,.hero .fig .num{color:var(--ink)!important}
+.stat .val[style*="--warn"],.hero .fig .num[style*="--warn"]{color:var(--warn)!important}
+.stat .val[style*="--fire"],.hero .fig .num[style*="--fire"]{color:var(--fire)!important}
+details.more{margin:6px 0 18px;max-width:680px}
+details.more summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);list-style:none;display:inline-block;border-bottom:1px solid var(--rule)}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary:hover{color:var(--ink);border-bottom-color:var(--ink)}
+details.more[open] summary{margin-bottom:8px}
+details.more p,details.more .note{margin:0 0 8px!important}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 html{scroll-behavior:smooth}
 </style>
@@ -236,10 +257,10 @@ html{scroll-behavior:smooth}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="description" content="Interactive demo of an open-source Interactive Brokers portfolio and FIRE dashboard, running on sample data.">
 </head><body>
-<div style="background:#EB0000;color:#fff;padding:10px 20px;font-family:'Inter Tight',Helvetica,Arial,sans-serif;
+<div style="background:#fff;color:#000;border-bottom:1px solid #DCDCDC;padding:10px 20px;font-family:'Inter Tight',Helvetica,Arial,sans-serif;
             font-size:12.5px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center">
   <span><b>Live demo</b> &mdash; sample data, not a real account.</span>
-  <a href="https://github.com/jmp1909/ibkr-dashboard" style="color:#fff;font-weight:700">Source on GitHub</a>
+  <a href="https://github.com/jmp1909/ibkr-dashboard" style="color:#EB0000;font-weight:700">Source on GitHub</a>
 </div>
 <div class="wrap">
 
@@ -1131,7 +1152,7 @@ const phaseAt = n => state.phases.find(p=>n>=p.s && (p.e===null || n<=p.e)) || n
 /* income growth compounds from the later of the phase start and now */
 const incomeAt = (p,n) => p.monthly_income*Math.pow(1+(p.income_growth||0),(n-Math.max(p.s,M0))/12);
 const savingAt = (p,n) => p.saving_mode==='fixed' ? p.monthly_saving : incomeAt(p,n)*p.savings_rate;
-const PHASE_COLORS = ['#1B4D3E','#4C6272','#A8632B','#5A7A6A','#6E5A7C','#9A7B4F','#3E5F52','#7A4A3A'];
+const PHASE_COLORS = ['#C9CEEA','#F2D4CC','#D5E6D2','#E6D7EB','#F1E5B8','#CFE4E8','#E3DED1','#EAD0D0'];
 const phaseColor = p => PHASE_COLORS[Math.max(0,state.phases.indexOf(p))%PHASE_COLORS.length];
 function uniqueId(prefix){
   const used = new Set([...state.phases.map(p=>p.id), ...state.events.map(e=>e.id)]);
@@ -1559,15 +1580,15 @@ function drawProjection(){
     : cur.saving_mode==='fixed' ? `fixed amount · ${esc(cur.label)}`
     : `${(cur.savings_rate*100).toFixed(0)}% of ${money(incomeAt(cur,M0))} income`;
   document.getElementById('goalstats').innerHTML = `
-    <div><div class="lab" style="color:#8A959C">Annual income at target</div>
-      <div style="font-family:var(--fn);font-weight:700;font-size:27px;margin-top:3px;color:#7FBFA5">${money(T*state.withdrawal_rate)}</div>
-      <div style="font-size:11.5px;color:#8A959C;margin-top:3px">${(state.withdrawal_rate*100).toFixed(2)}% withdrawal rate</div></div>
-    <div><div class="lab" style="color:#8A959C">Saving right now</div>
+    <div><div class="lab" style="color:var(--muted)">Annual income at target</div>
+      <div style="font-family:var(--fn);font-weight:700;font-size:27px;margin-top:3px;color:var(--path)">${money(T*state.withdrawal_rate)}</div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:3px">${(state.withdrawal_rate*100).toFixed(2)}% withdrawal rate</div></div>
+    <div><div class="lab" style="color:var(--muted)">Saving right now</div>
       <div style="font-family:var(--fn);font-weight:700;font-size:27px;margin-top:3px">${money(nowSave)}<span style="font-size:14px">/mo</span></div>
-      <div style="font-size:11.5px;color:#8A959C;margin-top:3px">${saveSub}</div></div>
-    <div><div class="lab" style="color:#8A959C">Years to target</div>
-      <div style="font-family:var(--fn);font-weight:700;font-size:27px;margin-top:3px;color:#E8A05E">${yrsToFire?yrsToFire.toFixed(0):'—'}</div>
-      <div style="font-size:11.5px;color:#8A959C;margin-top:3px">${yrsToFire?('from today, age '+D.age_now.toFixed(0)):'unreachable on these inputs'}</div></div>`;
+      <div style="font-size:11.5px;color:var(--muted);margin-top:3px">${saveSub}</div></div>
+    <div><div class="lab" style="color:var(--muted)">Years to target</div>
+      <div style="font-family:var(--fn);font-weight:700;font-size:27px;margin-top:3px;color:var(--fire)">${yrsToFire?yrsToFire.toFixed(0):'—'}</div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:3px">${yrsToFire?('from today, age '+D.age_now.toFixed(0)):'unreachable on these inputs'}</div></div>`;
 
   drawFlows(P);
 
@@ -1664,7 +1685,7 @@ function drawSensitivity(P){
     ms.forEach(m=>{
       const o=project({r, saveMul:m, lite:true});
       const y=o.fireAge===null?null:o.fireAge-D.age_now;
-      const shade = y===null ? 'var(--rule)' : `rgba(27,77,62,${Math.max(0.06,Math.min(0.55,0.6-y/60)).toFixed(2)})`;
+      const shade = y===null ? 'var(--rule)' : `rgba(45,50,125,${Math.max(0.05,Math.min(0.42,0.46-y/70)).toFixed(2)})`;
       h+=`<td style="background:${shade}"${near&&m===1?' class="cur"':''}>${y===null?'—':y.toFixed(0)+' yr'}</td>`;
     });
     h+='</tr>';
@@ -2340,13 +2361,29 @@ const RISK = (function(){
     h+=`<tr><th class="l">${y}</th>`;
     for(let k=0;k<12;k++){ const m=row.find(x=>x.m===k);
       if(!m){ h+='<td></td>'; continue; }
-      const a=Math.min(0.75,0.12+Math.abs(m.r)/mx*0.6), bg=m.r>=0?`rgba(27,77,62,${a.toFixed(2)})`:`rgba(168,64,43,${a.toFixed(2)})`;
+      const a=Math.min(0.75,0.12+Math.abs(m.r)/mx*0.6), bg=m.r>=0?`rgba(45,50,125,${(a*0.7).toFixed(2)})`:`rgba(235,0,0,${(a*0.6).toFixed(2)})`;
       h+=`<td class="${m.part?'part':''}" style="background:${bg};color:${a>0.45?'#fff':'inherit'}" title="${ml(m)}${m.part?' (partial)':''}: ${pc(m.r)}">${(m.r*100).toFixed(1)}</td>`; }
     h+=`<td style="font-weight:600">${(yr*100).toFixed(1)}%</td></tr>`;
   });
   document.getElementById('heatmap').innerHTML=h+'</tbody></table>';
 })();
 
+/* Explanations stay available but fold away: each run of grey explanatory
+   paragraphs, and each chart's footnote, goes behind one "How this works". */
+(function tuckNotes(){
+  const isNote=e=>e && e.nodeType===1 && !e.closest('#controls') &&
+    ((e.tagName==='P' && /color:var\(--muted\)/.test(e.getAttribute('style')||'')) || ['divnote','benchnote','flownote'].includes(e.id));
+  const seen=new Set();
+  document.querySelectorAll('section p, #divnote, #benchnote, #flownote').forEach(e=>{
+    if(seen.has(e) || !isNote(e)) return;
+    const run=[e]; let n=e.nextElementSibling;
+    while(isNote(n)){ run.push(n); n=n.nextElementSibling; }
+    run.forEach(x=>seen.add(x));
+    const d=document.createElement('details'); d.className='more';
+    d.innerHTML='<summary>How this works</summary>';
+    e.parentNode.insertBefore(d,e); run.forEach(x=>d.appendChild(x));
+  });
+})();
 function renderChartMode(){
   document.getElementById('plansection').classList.toggle('plansimple', chartMode==='simple');
   document.querySelectorAll('#chartmode button').forEach(b=>{ const on=b.dataset.cm===chartMode;

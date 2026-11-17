@@ -30,10 +30,10 @@ OG_TAGS = f"""
 """
 
 BANNER = f"""
-<div style="background:#EB0000;color:#fff;padding:10px 20px;font-family:'Inter Tight',Helvetica,Arial,sans-serif;
+<div style="background:#fff;color:#000;border-bottom:1px solid #DCDCDC;padding:10px 20px;font-family:'Inter Tight',Helvetica,Arial,sans-serif;
             font-size:12.5px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center">
   <span><b>Live demo</b> &mdash; sample data, not a real account.</span>
-  <a href="{REPO_URL}" style="color:#fff;font-weight:700">Source on GitHub</a>
+  <a href="{REPO_URL}" style="color:#EB0000;font-weight:700">Source on GitHub</a>
 </div>
 """
 
