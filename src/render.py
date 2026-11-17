@@ -59,6 +59,20 @@ td.role{color:var(--muted);font-size:11.5px;font-family:Inter,sans-serif}
 .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:11.5px;color:var(--muted)}
 .cols{display:grid;grid-template-columns:minmax(250px,320px) minmax(0,1fr);gap:34px;align-items:start}
 @media(max-width:860px){.cols{grid-template-columns:1fr}}
+.cols2{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;align-items:start}
+@media(max-width:860px){.cols2{grid-template-columns:1fr}}
+.mcv{font-family:Archivo;font-weight:700;font-size:21px;margin:2px 0}
+table.sens td,table.sens th{text-align:center;padding:7px 6px;font-size:12px}
+table.sens th.l{text-align:left;white-space:nowrap}
+table.sens .cur{outline:2px solid var(--ink);outline-offset:-2px;font-weight:700}
+table.heat td{text-align:center;padding:5px 3px;font-size:11px;min-width:38px}
+table.heat td.part{font-style:italic;opacity:.75}
+details.pen{border-top:1px solid var(--rule);padding-top:14px;margin-top:6px}
+details.pen summary{cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+.pengrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin-top:10px}
+.pengrid label{font-size:11.5px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+.pengrid input{font:inherit;font-size:13px;padding:5px 7px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:3px;width:100%;box-sizing:border-box}
+.pengrid .h{grid-column:1/-1;font-weight:600;color:var(--ink);font-size:12px;margin-top:6px}
 .phase{border-left:2px solid var(--path);padding-left:12px;margin-bottom:24px}
 .phase .ph{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:2px}
 .phase .pd{font-size:11px;color:var(--muted);margin-bottom:12px}
@@ -234,8 +248,29 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
 </section>
 
 
+<section id="risksection" hidden>
+  <div class="shead"><span class="n">05</span><h2>Risk and costs</h2><span class="k" id="riskk"></span></div>
+  <div id="riskbody">
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:18px" id="riskstats"></div>
+  <div class="cols2">
+    <div class="panel" style="padding:16px 12px 8px">
+      <div class="eyebrow" style="margin:0 0 6px 8px">Underwater: how far below its last high</div>
+      <div id="ddchart"></div></div>
+    <div class="panel" style="padding:16px 18px 12px">
+      <div class="eyebrow" style="margin:0 0 8px">Monthly returns</div>
+      <div id="heatmap" style="overflow-x:auto"></div>
+      <div class="note" style="margin-top:8px">Time-weighted, so deposits don&rsquo;t count as gains. Partial first and last months are marked.</div></div>
+  </div>
+  </div>
+  <div id="feesection" hidden style="margin-top:18px">
+    <div class="panel" style="padding:16px 18px 12px">
+      <div class="eyebrow" style="margin:0 0 10px">What the funds charge</div>
+      <div id="feepanel"></div></div>
+  </div>
+</section>
+
 <section id="ccysection" hidden>
-  <div class="shead"><span class="n">05</span><h2>Currency</h2><span class="k" id="ccyk"></span></div>
+  <div class="shead"><span class="n">06</span><h2>Currency</h2><span class="k" id="ccyk"></span></div>
   <p style="font-size:12.5px;color:var(--muted);max-width:660px;margin:0 0 14px;line-height:1.55">
     Your funds are priced in one currency and you will spend another. That gap is not noise: the
     reported return is the asset return multiplied by the exchange-rate move, and the two legs are
@@ -279,7 +314,7 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
 </section>
 
 <section>
-  <div class="shead"><span class="n">06</span><h2>Milestones</h2><span class="k" id="msk"></span></div>
+  <div class="shead"><span class="n">07</span><h2>Milestones</h2><span class="k" id="msk"></span></div>
   <p style="font-size:12.5px;color:var(--muted);max-width:660px;margin:0 0 22px;line-height:1.55">
     Dates in the past are real &mdash; the day your recorded NAV first closed above the line. Dates in
     the future come from the projection in section 07 and move when you change its sliders, so treat
@@ -290,7 +325,7 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
 </section>
 
 <section>
-  <div class="shead"><span class="n">07</span><h2>The two finish lines</h2><span class="k">drag the timeline, change anything &mdash; it all recalculates</span></div>
+  <div class="shead"><span class="n">08</span><h2>The two finish lines</h2><span class="k">drag the timeline, change anything &mdash; it all recalculates</span></div>
   <div class="dark" style="margin-bottom:30px"><div class="grid g3" id="goalstats"></div></div>
   <div class="planbar" id="planbar"></div>
   <div class="panel" style="margin-bottom:26px;padding:18px 22px 10px">
@@ -307,13 +342,15 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
     <div>
       <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:18px" id="crossstats"></div>
       <div class="panel" style="padding:16px 12px 8px;margin-bottom:18px">
-        <div class="eyebrow" style="margin:0 0 6px 8px">Each year: what you earn, what you save, what the portfolio earns</div>
+        <div class="eyebrow" style="margin:0 0 6px 8px">Each year: what you earn, save, withdraw, and what the portfolio earns</div>
         <div id="flowchart"></div>
         <div class="legend" style="padding:6px 4px">
           <span><b style="color:var(--rule)">&#9612;</b> Income</span>
           <span><b style="color:var(--coast)">&#9612;</b> Saved</span>
           <span><b style="color:var(--path)">&#9612;</b> Investment return</span>
+          <span><b style="color:var(--warn);opacity:.8">&#9612;</b> Withdrawn in retirement</span>
           <span><b style="color:var(--fire)">&#9670;</b> One-off event</span>
+          <span><b style="color:var(--coast)">&#9670;</b> Pension pot</span>
         </div>
         <div class="note" id="flownote" style="padding:0 6px 6px;font-size:12px;max-width:640px"></div>
       </div>
@@ -322,8 +359,16 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
           <span><b style="color:var(--path)">&mdash;</b> Portfolio</span>
           <span><b style="color:var(--coast)">- -</b> Coast threshold</span>
           <span><b style="color:var(--fire)">&mdash;</b> Target</span>
-          <span><b style="color:var(--muted)">&#9612;</b> phase or event</span>
+          <span><b style="color:var(--path);opacity:.35">&#9608;</b> middle 80% of markets</span>
+          <span><b style="color:var(--muted)">&#9612;</b> phase, event or pension</span>
         </div>
+        <div id="mcnote" style="padding:10px 8px 8px;border-top:1px solid var(--rule);margin-top:6px"></div>
+      </div>
+      <div class="panel" style="padding:16px 18px 12px;margin-top:18px">
+        <div class="eyebrow" style="margin:0 0 4px">Years to target if things go differently</div>
+        <div class="note" style="margin:0 0 10px">Each cell reruns your plan with that real return and every phase&rsquo;s saving scaled.
+          Darker is sooner. The outlined cell is closest to your current settings.</div>
+        <div id="sensgrid" style="overflow-x:auto"></div>
       </div>
     </div>
   </div>
@@ -621,6 +666,11 @@ function chart(host, opts){
   (opts.xticks||[]).forEach(t=>{
     s+=`<text class="axl" x="${tx(t)}" y="${H-8}" text-anchor="middle">${opts.xfmt(t)}</text>`;
   });
+  if(opts.area && opts.area.length){   /* shaded range between two curves: [[x, lo, hi], ...] */
+    const top=opts.area.map(p=>`${tx(p[0]).toFixed(1)},${ty(p[2]).toFixed(1)}`);
+    const bot=opts.area.slice().reverse().map(p=>`${tx(p[0]).toFixed(1)},${ty(p[1]).toFixed(1)}`);
+    s+=`<polygon points="${top.concat(bot).join(' ')}" fill="var(--path)" opacity="0.10"/>`;
+  }
   (opts.bands||[]).forEach(b=>{
     s+=`<rect x="${tx(b[0])}" y="${mt}" width="${Math.max(0,tx(b[1])-tx(b[0]))}" height="${H-mt-mb}" fill="${b[2]}" opacity="0.08"/>`;
   });
@@ -827,6 +877,10 @@ function normalisePlan(p){
   const out = {
     target:num(p.target), real_return:num(p.real_return), withdrawal_rate:num(p.withdrawal_rate),
     coast_full_age:num(p.coast_full_age),
+    volatility:num(p.volatility,0.16),
+    target_mode:(p.target_mode==='spending'?'spending':'amount'),
+    annual_spending:num(p.annual_spending, num(p.target)*num(p.withdrawal_rate)),
+    pensions:normPensions(p.pensions||{}, num),
     phases:(p.phases||[]).map(x=>({ _k:'k'+(KEYSEQ++), id:String(x.id), label:String(x.label),
       s:ym2m(x.start), e:(x.end==null?null:ym2m(x.end)),
       monthly_income:num(x.monthly_income), saving_mode:(x.saving_mode==='fixed'?'fixed':'rate'),
@@ -838,7 +892,19 @@ function normalisePlan(p){
   const bad = !out.target || out.phases.some(q=>!Number.isFinite(q.s) || (q.e!==null && !Number.isFinite(q.e)))
            || out.events.some(e=>!Number.isFinite(e.m));
   if(bad) throw new Error('unusable plan');
+  if(out.target_mode==='spending' && out.withdrawal_rate>0) out.target=out.annual_spending/out.withdrawal_rate;
   return out;
+}
+function normPensions(q, num){
+  const pot=(o,unlock)=>({ balance:num((o||{}).balance), yearly_contribution:num((o||{}).yearly_contribution),
+    real_return:num((o||{}).real_return,0.01), unlock_age:num((o||{}).unlock_age,unlock) });
+  return { enabled:!!q.enabled, pillar2:pot(q.pillar2,65), pillar3a:pot(q.pillar3a,60),
+    ahv:{ yearly_amount:num((q.ahv||{}).yearly_amount), start_age:num((q.ahv||{}).start_age,65) } };
+}
+function canonPensions(q){
+  const pot=o=>({ balance:r6(o.balance), yearly_contribution:r6(o.yearly_contribution), real_return:r6(o.real_return), unlock_age:r6(o.unlock_age) });
+  return { enabled:q.enabled, pillar2:pot(q.pillar2), pillar3a:pot(q.pillar3a),
+    ahv:{ yearly_amount:r6(q.ahv.yearly_amount), start_age:r6(q.ahv.start_age) } };
 }
 
 /* Canonical form: what gets stored, compared and exported. Fixed key order and
@@ -850,7 +916,9 @@ function evOrder(a,b){ return (a.m-b.m) || String(a.label).localeCompare(String(
 function canon(pl){
   return {
     target:r6(pl.target), real_return:r6(pl.real_return), withdrawal_rate:r6(pl.withdrawal_rate),
-    coast_full_age:r6(pl.coast_full_age),
+    coast_full_age:r6(pl.coast_full_age), volatility:r6(pl.volatility),
+    target_mode:pl.target_mode, annual_spending:r6(pl.annual_spending),
+    pensions:canonPensions(pl.pensions),
     phases:pl.phases.slice().sort((a,b)=>a.s-b.s).map(p=>({ id:p.id, label:p.label, start:m2ym(p.s),
       end:(p.e===null?null:m2ym(p.e)), monthly_income:r6(p.monthly_income), saving_mode:p.saving_mode,
       savings_rate:r6(p.savings_rate), monthly_saving:r6(p.monthly_saving), income_growth:r6(p.income_growth) })),
@@ -871,8 +939,17 @@ let planStatus = 'config';     /* 'config' | 'edited' | 'conflict' */
 let state = null;
 (function loadPlan(){
   const s = store.get();
+  /* Re-canonicalise what was stored: a version saved before the plan gained
+     fields must compare equal once those fields take their defaults, or every
+     upgrade would look like a conflict. */
+  const fromConfig = {volatility:D.plan.volatility, target_mode:D.plan.target_mode,
+                      annual_spending:D.plan.annual_spending, pensions:D.plan.pensions};
+  const recanon = x => { try{ const o=typeof x==='string'?JSON.parse(x):x;
+    return JSON.stringify(canon(normalisePlan(Object.assign({}, fromConfig, o)))); }catch(e){ return null; } };
   if(s && s.v===1 && s.plan){
-    if(JSON.stringify(s.plan)===CONFIG_CANON){ store.clear(); }      /* edits were exported into config.json */
+    s.plan = JSON.parse(recanon(s.plan) || 'null'); s.base = recanon(s.base) || s.base;
+    if(!s.plan){ store.clear(); }
+    else if(JSON.stringify(s.plan)===CONFIG_CANON){ store.clear(); }      /* edits were exported into config.json */
     else {
       try{
         state = normalisePlan(s.plan);
@@ -897,7 +974,7 @@ function savePlan(){
 }
 
 /* ---- the plan model ---- */
-const planEndAge = () => Math.max(state.coast_full_age+7, 62);
+const planEndAge = () => Math.max(state.coast_full_age+7, D.plan.plan_to_age||95);
 const spanMonths = () => Math.max(12, Math.round((planEndAge()-D.age_now)*12));
 const spanEnd = () => M0 + spanMonths();
 const byKey = k => state.phases.find(p=>p._k===k);
@@ -919,34 +996,109 @@ function uniqueId(prefix){
    Month by month from now: growth on last month's balance, then that month's
    saving, then any one-off event. The same order as before, so nothing moves
    for a plan without the new features. */
-function project(){
-  const r=state.real_return, m=Math.pow(1+r,1/12)-1;
-  const T=state.target, fullAge=state.coast_full_age;
+/* Income and saving per month don't depend on returns, so they're worked out
+   once per redraw and shared by every Monte Carlo path. */
+let FLOWS=null;
+function monthFlows(){
+  const N=spanMonths(), inc=new Float64Array(N), sav=new Float64Array(N), ev=new Float64Array(N);
+  for(let t=0;t<N;t++){ const p=phaseAt(M0+t); if(p){ inc[t]=incomeAt(p,M0+t); sav[t]=savingAt(p,M0+t); } }
+  state.events.forEach(e=>{ if(e.m>=M0 && e.m<M0+N) ev[e.m-M0]+=e.amount; });
+  return {N, inc, sav, ev};
+}
+
+/* Options: rets   - monthly returns to use instead of the constant one (Monte Carlo)
+            r      - a different real return (sensitivity grid, fee comparison)
+            saveMul- scale every phase's saving (sensitivity grid)
+            shock  - fall applied to the portfolio the month you retire (stress test)
+            keepSaving - never retire (comparisons that must not start withdrawing)
+            lite   - skip the per-month rows; keep year-start balances only */
+function project(opt){
+  opt=opt||{};
+  const F=FLOWS||monthFlows();
+  const r=opt.r!=null?opt.r:state.real_return, m=Math.pow(1+r,1/12)-1;
+  const T=state.target, fullAge=state.coast_full_age, saveMul=opt.saveMul!=null?opt.saveMul:1;
   const coastAt = a => a>=fullAge ? T : T/Math.pow(1+r, fullAge-a);
-  const N=spanMonths();
-  const evBy={};
-  state.events.forEach(e=>{ if(e.m>=M0 && e.m<M0+N) evBy[e.m]=(evBy[e.m]||0)+e.amount; });
-  let bal=D.summary.net_liquidation, contributed=0, coastAge=null, fireAge=null;
-  const rows=[], years=[]; let yr=null;
+  const N=F.N;
+  /* After the target is reached the plan stops saving and starts living on it:
+     the withdrawal is what the target was sized to pay, less any AHV pension. */
+  const spendM=T*state.withdrawal_rate/12;
+  const pc=state.pensions && state.pensions.enabled ? state.pensions : null;
+  const pots = pc ? [['Pillar 2',pc.pillar2],['Pillar 3a',pc.pillar3a]].filter(x=>x[1].balance>0||x[1].yearly_contribution>0)
+    .map(([label,x])=>({label, bal:x.balance, add:x.yearly_contribution/12, g:Math.pow(1+x.real_return,1/12)-1, unlock:x.unlock_age, paid:false})) : [];
+  const ahvM = pc ? pc.ahv.yearly_amount/12 : 0, ahvAge = pc ? pc.ahv.start_age : Infinity;
+  let bal=D.summary.net_liquidation, contributed=0, coastAge=null, fireAge=null, retired=false, lastsTo=null;
+  const rows=opt.lite?null:[], years=[], yb=opt.lite?[]:null; let yr=null;
   for(let t=0;t<=N;t++){
     const n=M0+t, a=ageAt(n);
     if(coastAge===null && bal>=coastAt(a)) coastAge=a;
-    if(fireAge===null && bal>=T) fireAge=a;
-    rows.push({age:a, m:n, bal, coast:coastAt(a), contributed});
+    if(fireAge===null && bal>=T){ fireAge=a; retired=!opt.keepSaving; if(opt.shock) bal*=1-opt.shock; }
+    if(rows) rows.push({age:a, m:n, bal, coast:coastAt(a), contributed});
+    if(t%12===0 && yb) yb.push(bal);
     if(t===N) break;
-    if(t%12===0){ yr={m0:n, age:a, income:0, saved:0, ret:0, events:0, months:0, endBal:bal}; years.push(yr); }
-    const p=phaseAt(n);
-    const inc=p?incomeAt(p,n):0, c=p?savingAt(p,n):0, g=bal*m, ev=evBy[n]||0;
-    bal += g + c + ev; contributed += c;
-    yr.income+=inc; yr.saved+=c; yr.ret+=g; yr.events+=ev; yr.months++; yr.endBal=bal;
+    if(!opt.lite && t%12===0){ yr={m0:n, age:a, retired, income:0, saved:0, ret:0, events:0, withdrawn:0, ahv:0, pension:0, months:0, endBal:bal}; years.push(yr); }
+    const g=bal*(opt.rets?opt.rets[t]:m), ev=F.ev[t];
+    const inc=retired?0:F.inc[t], c=retired?0:F.sav[t]*saveMul;
+    const ahv=a>=ahvAge?ahvM:0, w=retired?Math.max(0,spendM-ahv):0;
+    let pin=0;
+    for(const p of pots){
+      if(p.paid) continue;
+      if(a>=p.unlock){ pin+=p.bal; p.paid=true; p.bal=0; }
+      else p.bal = p.bal*(1+p.g) + (retired?0:p.add);
+    }
+    bal += g + c + ev - w + pin; contributed += c;
+    if(retired && bal<=0){ if(lastsTo===null) lastsTo=a; bal=0; }
+    if(yr){ yr.income+=inc; yr.saved+=c; yr.ret+=g; yr.events+=ev; yr.withdrawn+=w; yr.ahv+=retired?ahv:0; yr.pension+=pin; yr.months++; yr.endBal=bal; }
   }
+  if(opt.lite) return {yb, fireAge, lastsTo, N};
   const full=years.filter(y=>y.months===12);
   /* Crossover = the first year from which the portfolio out-earns your saving
-     every year after. Requiring it to *stay* ahead stops a career break (saving
-     nothing) from counting as the moment your money took over. */
+     every year after, while you are still saving. Requiring it to *stay* ahead
+     stops a career break (saving nothing) from counting as the moment your
+     money took over; retirement years are left out because saving stops. */
+  const working=full.filter(y=>!y.retired);
   let cross=null;
-  for(let i=full.length-1;i>=0;i--){ if(full[i].ret>full[i].saved) cross=full[i]; else break; }
-  return {rows, years:full, cross, coastAge, fireAge, N};
+  for(let i=working.length-1;i>=0;i--){ if(working[i].ret>working[i].saved) cross=working[i]; else break; }
+  return {rows, years:full, cross, coastAge, fireAge, lastsTo, N, pots:pots.map(p=>({label:p.label, unlock:p.unlock}))};
+}
+
+/* ---- Monte Carlo: the same plan under random returns ----
+   Monthly log-returns are normal with mean ln(1+r)/12, so the median path
+   compounds at r - the deterministic line - and volatility only adds spread.
+   Seeded, so the band doesn't shimmer between redraws. */
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const MC_PATHS=500;
+let MC=null, mcKey='', mcTimer=0;
+function monteCarlo(){
+  const N=FLOWS.N, sd=state.volatility/Math.sqrt(12), mu=Math.log(1+state.real_return)/12;
+  const rnd=mulberry32(20260601), rets=new Float64Array(N);
+  const nY=Math.floor(N/12)+1, cols=Array.from({length:nY},()=>new Float64Array(MC_PATHS));
+  const fire=[], lasts=[];
+  for(let k=0;k<MC_PATHS;k++){
+    for(let t=0;t<N;t+=2){   /* Box-Muller gives two normals per draw */
+      const u=1-rnd(), v=rnd(), R=Math.sqrt(-2*Math.log(u));
+      rets[t]=Math.exp(mu+sd*R*Math.cos(2*Math.PI*v))-1;
+      if(t+1<N) rets[t+1]=Math.exp(mu+sd*R*Math.sin(2*Math.PI*v))-1;
+    }
+    const o=project({rets, lite:true});
+    for(let i=0;i<nY;i++) cols[i][k]=o.yb[i];
+    fire.push(o.fireAge); lasts.push(o.lastsTo);
+  }
+  const q=(arr,p)=>{ const s=Array.from(arr).sort((a,b)=>a-b); return s[Math.min(s.length-1,Math.floor(p*(s.length-1)+0.5))]; };
+  const band=cols.map((c,i)=>({age:ageAt(M0+i*12), p10:q(c,0.1), p50:q(c,0.5), p90:q(c,0.9)}));
+  const reached=fire.filter(x=>x!==null).sort((a,b)=>a-b);
+  const ageAtShare=s=>{ const i=Math.ceil(s*MC_PATHS)-1; return i<reached.length?reached[i]:null; };
+  return { band, paths:MC_PATHS,
+    reachedShare:reached.length/MC_PATHS, age50:ageAtShare(0.5), age90:ageAtShare(0.9),
+    /* of the paths that retire, the share whose money lasts to the end of the plan */
+    lastsShare: reached.length ? lasts.filter((x,i)=>fire[i]!==null && x===null).length/reached.length : null };
+}
+function scheduleMC(){
+  const key=JSON.stringify(canon(state));
+  if(key===mcKey) return;
+  clearTimeout(mcTimer);
+  /* waits for a pause, so dragging a slider stays smooth and the band settles on release */
+  mcTimer=setTimeout(()=>{ FLOWS=monthFlows(); MC=monteCarlo(); mcKey=key; drawProjection(); }, 180);
 }
 
 /* ---- yearly flow chart ---- */
@@ -964,7 +1116,7 @@ function drawFlows(P){
      squash thirty years of yearly bars into a sliver. Their markers are pinned
      inside the plot and labelled with the amount instead. */
   let hi=Math.max(1, ...Y.map(y=>Math.max(y.income, y.saved, y.ret)));
-  let lo=Math.min(0, ...Y.map(y=>Math.min(y.ret, y.saved)));
+  let lo=Math.min(0, ...Y.map(y=>Math.min(y.ret, y.saved, -y.withdrawn)));
   const step=niceStep((hi-lo)/4);
   hi=Math.ceil(hi*1.04/step)*step; lo=Math.floor(lo/step)*step;
   const pw=W-ml-mr, slot=pw/Y.length;
@@ -981,13 +1133,15 @@ function drawFlows(P){
     const x=x0(i);
     s+=bar(x, y.income, bw, 'var(--rule)');          /* what you earn */
     s+=bar(x, y.saved, bw, 'var(--coast)');           /* the part of it you keep */
+    if(y.withdrawn) s+=bar(x, -y.withdrawn, bw, 'var(--warn)', 0.8);   /* what you live on */
     s+=bar(x+bw+gapIn, y.ret, bw, 'var(--path)');     /* what the portfolio earns */
-    if(y.events){
-      const cx=x+bw+gapIn/2, raw=ty(y.events), cy=Math.min(Math.max(raw, mt+6), H-mb-6);
-      const col=y.events<0?'var(--warn)':'var(--fire)', off=raw!==cy;
+    const lump=y.events+y.pension;
+    if(lump){
+      const cx=x+bw+gapIn/2, raw=ty(lump), cy=Math.min(Math.max(raw, mt+6), H-mb-6);
+      const col=lump<0?'var(--warn)':(y.pension?'var(--coast)':'var(--fire)'), off=raw!==cy;
       s+=`<line x1="${cx}" y1="${ty(0)}" x2="${cx}" y2="${cy}" stroke="${col}" stroke-width="1.4"${off?' stroke-dasharray="3 2"':''}/>`;
       s+=`<rect x="${cx-4}" y="${cy-4}" width="8" height="8" fill="${col}" transform="rotate(45 ${cx} ${cy})"/>`;
-      s+=`<text class="axl" x="${cx+7}" y="${cy+(y.events<0?-4:10)}" fill="${col}">${y.events<0?'':'+'}${kfmt(y.events)}</text>`;
+      s+=`<text class="axl" x="${cx+7}" y="${cy+(lump<0?-4:10)}" fill="${col}">${lump<0?'':'+'}${kfmt(lump)}</text>`;
     }
   });
   if(lo<0) s+=`<line x1="${ml}" y1="${ty(0)}" x2="${W-mr}" y2="${ty(0)}" stroke="var(--muted)" stroke-width="1"/>`;
@@ -1016,6 +1170,9 @@ function drawFlows(P){
       + row('var(--muted)','Income',money(y.income))
       + row('var(--coast)','Saved',money(y.saved)+(y.income>0?` (${Math.round(y.saved/y.income*100)}%)`:''))
       + row('var(--path)','Investment return',money(y.ret))
+      + (y.withdrawn?row('var(--warn)','Withdrawn to live on',money(y.withdrawn)):'')
+      + (y.ahv?row('var(--coast)','AHV pension (not withdrawn)',money(y.ahv)):'')
+      + (y.pension?row('var(--coast)','Pension pot paid in',money(y.pension)):'')
       + (y.events?row(y.events<0?'var(--warn)':'var(--fire)','One-off',signedMoney(y.events)):'')
       + row('var(--ink)','Portfolio at year end',money(y.endBal));
     tip.style.opacity=1;
@@ -1220,17 +1377,33 @@ function applyDrag(m){
 
 /* ---- drawing everything that depends on the plan ---- */
 function drawProjection(){
+  if(state.target_mode==='spending' && state.withdrawal_rate>0) state.target=state.annual_spending/state.withdrawal_rate;
+  FLOWS = monthFlows();
   const P = project();
   const T = state.target;
+  const endAge = ageAt(M0+P.N);
+  const mc = (MC && mcKey===JSON.stringify(canon(state))) ? MC : null;
+  scheduleMC();
 
   const stat=(l,v,s,c)=>`<div class="stat" style="border-color:${c}"><div class="lab">${l}</div><div class="val" style="color:${c}">${v}</div><div class="sub">${s}</div></div>`;
+  const lasts = o => !o.fireAge ? '—' : o.lastsTo===null ? `past ${Math.floor(endAge)}` : 'age '+o.lastsTo.toFixed(0);
+  const S = P.fireAge ? project({shock:0.3}) : null;
   document.getElementById('crossstats').innerHTML =
     stat('Coast FIRE reached', P.coastAge?('age '+P.coastAge.toFixed(1)):'not reached',
       P.coastAge?`stop saving here, still hit ${money(T)} at ${state.coast_full_age}`:'raise saving or lower the bar','var(--coast)') +
     stat('Full FIRE reached', P.fireAge?('age '+P.fireAge.toFixed(1)):'not reached',
       P.fireAge?`${money(T)} in today's money`:'not on this path','var(--fire)') +
     stat('Crossover', P.cross?('age '+Math.floor(P.cross.age)):'not reached',
-      P.cross?'portfolio out-earns your saving from here on':'saving stays the bigger engine','var(--ink)');
+      P.cross?'portfolio out-earns your saving from here on':'saving stays the bigger engine','var(--ink)') +
+    stat('Money lasts to', lasts(P),
+      P.fireAge?`withdrawing ${money(T*state.withdrawal_rate)}/yr from age ${P.fireAge.toFixed(0)}`
+        +(state.pensions.enabled&&state.pensions.ahv.yearly_amount>0?`, less AHV from ${state.pensions.ahv.start_age}`:''):'retirement not reached','var(--path)') +
+    stat('If markets fall 30% as you retire', S?lasts(S):'—',
+      S?(S.lastsTo===null?'still lasts &mdash; a bad first year is the classic way plans fail':'a bad first year is the classic way plans fail'):'retirement not reached','var(--warn)');
+
+  drawUncertainty(P, mc, endAge);
+  drawSensitivity(P);
+  drawFees(P);
 
   const cur=phaseAt(M0);
   const nowSave=cur?savingAt(cur,M0):0;
@@ -1251,8 +1424,12 @@ function drawProjection(){
 
   drawFlows(P);
 
-  const maxY = Math.max(T*1.12, ...P.rows.map(r=>r.bal));
+  /* The 90th percentile 60 years out is enormous; letting it set the scale
+     would flatten everything that matters. The band is clipped instead. */
+  const detMax = Math.max(...P.rows.map(r=>r.bal));
+  const maxY = Math.max(T*1.12, detMax*1.15);
   const minY = Math.min(0, ...P.rows.map(r=>r.bal));
+  const clip = v => Math.min(maxY, Math.max(minY, v));
   const ageMin=Math.floor(D.age_now), ageMax=Math.ceil(ageAt(M0+P.N));
   const yt=[]; const stepY=(maxY-minY)/5;
   for(let i=0;i<=5;i++) yt.push(minY+stepY*i);
@@ -1261,25 +1438,104 @@ function drawProjection(){
   if(P.coastAge){const r=P.rows.find(x=>x.age>=P.coastAge); if(r)dots.push([r.age,r.bal,'var(--coast)']);}
   if(P.fireAge){const r=P.rows.find(x=>x.age>=P.fireAge); if(r)dots.push([r.age,r.bal,'var(--fire)']);}
   const vl = activePhases().filter(p=>p.s>M0).map(p=>[ageAt(p.s), esc(p.label), 'var(--muted)'])
-    .concat(state.events.filter(e=>e.m>=M0 && e.m<M0+P.N).map(e=>[ageAt(e.m), (e.amount<0?'':'+')+kfmt(e.amount), e.amount<0?'var(--warn)':'var(--fire)']));
+    .concat(state.events.filter(e=>e.m>=M0 && e.m<M0+P.N).map(e=>[ageAt(e.m), (e.amount<0?'':'+')+kfmt(e.amount), e.amount<0?'var(--warn)':'var(--fire)']))
+    .concat(P.pots.filter(p=>p.unlock<=endAge).map(p=>[p.unlock, esc(p.label), 'var(--coast)']));
+  if(P.fireAge) vl.push([P.fireAge,'retire','var(--fire)']);
 
+  const series=[
+    {name:'Target',data:P.rows.map(r=>[r.age,T]),color:'var(--fire)',w:2},
+    {name:'Coast threshold',data:P.rows.map(r=>[r.age,r.coast]),color:'var(--coast)',w:1.6,dash:'6 4'},
+    {name:'Portfolio',data:P.rows.map(r=>[r.age,r.bal]),color:'var(--path)',w:2.6}
+  ];
+  if(mc){
+    series.push({name:'Bad markets (10th pct)',data:mc.band.map(b=>[b.age,b.p10]),color:'var(--warn)',w:1,dash:'2 3'});
+    series.push({name:'Good markets (90th pct)',data:mc.band.map(b=>[b.age,b.p90>maxY?null:b.p90]),color:'var(--path)',w:1,dash:'2 3'});
+  }
   chart(document.getElementById('projchart'),{
     height:340, xmin:ageMin, xmax:ageMax, ymin:minY, ymax:maxY, yticks:yt, xticks:xt,
     yfmt:v=> kfmt(v), xfmt:v=> v.toFixed(0),
     aria:'portfolio projection against the target and coast threshold',
     vlines:vl,
+    area: mc ? mc.band.map(b=>[b.age, clip(b.p10), clip(b.p90)]) : null,
     tip:{fmt:v=>money(v), xfmt:v=>'age '+v.toFixed(1)},
-    series:[
-      {name:'Target',data:P.rows.map(r=>[r.age,T]),color:'var(--fire)',w:2},
-      {name:'Coast threshold',data:P.rows.map(r=>[r.age,r.coast]),color:'var(--coast)',w:1.6,dash:'6 4'},
-      {name:'Portfolio',data:P.rows.map(r=>[r.age,r.bal]),color:'var(--path)',w:2.6}
-    ],
+    series:series,
     dots:dots
   });
 
   drawMilestones(P);
   drawHero(P);
   refreshHeader();
+}
+
+function drawUncertainty(P, mc, endAge){
+  const host=document.getElementById('mcnote'); if(!host) return;
+  if(!mc){ host.innerHTML=`<span class="note">Working out ${MC_PATHS} market paths&hellip;</span>`; return; }
+  const v=(state.volatility*100).toFixed(0);
+  const pct=x=>Math.round(x*100)+'%';
+  host.innerHTML = `<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px">
+    <div><div class="lab">Target reached in</div><div class="mcv">${pct(mc.reachedShare)}</div>
+      <div class="note" style="margin:0">of ${mc.paths} paths by age ${Math.floor(endAge)}</div></div>
+    <div><div class="lab">Half of paths by</div><div class="mcv">${mc.age50?'age '+mc.age50.toFixed(0):'—'}</div>
+      <div class="note" style="margin:0">the solid line assumes steady returns</div></div>
+    <div><div class="lab">9 in 10 paths by</div><div class="mcv">${mc.age90?'age '+mc.age90.toFixed(0):'not by '+Math.floor(endAge)}</div>
+      <div class="note" style="margin:0">a cautious date to plan around</div></div>
+    <div><div class="lab">Money lasts to ${Math.floor(endAge)}</div><div class="mcv">${mc.lastsShare===null?'—':pct(mc.lastsShare)}</div>
+      <div class="note" style="margin:0">of the paths that retire</div></div></div>
+    <div class="note" style="margin:10px 0 0">Shaded: the middle 80% of ${mc.paths} simulated markets at ${v}% yearly volatility around
+      ${(state.real_return*100).toFixed(2)}% real. Returns are random but independent month to month, which is kinder than real
+      markets in long slumps.</div>`;
+}
+
+/* Years to target across return and saving assumptions: how much each lever matters. */
+function drawSensitivity(P){
+  const host=document.getElementById('sensgrid'); if(!host) return;
+  const rs=[0.03,0.04,0.05,0.06,0.07], ms=[0.5,0.75,1,1.25,1.5];
+  const curR=state.real_return;
+  let h=`<table class="sens"><thead><tr><th class="l">Real return &darr; · saving &rarr;</th>${ms.map(m=>`<th${m===1?' class="cur"':''}>${m===1?'as planned':(m>1?'+':'−')+Math.round(Math.abs(m-1)*100)+'%'}</th>`).join('')}</tr></thead><tbody>`;
+  const nearest=rs.reduce((a,b)=>Math.abs(b-curR)<Math.abs(a-curR)?b:a);
+  rs.forEach(r=>{
+    const near=r===nearest;
+    h+=`<tr><th class="l${near?' cur':''}">${(r*100).toFixed(0)}%</th>`;
+    ms.forEach(m=>{
+      const o=project({r, saveMul:m, lite:true});
+      const y=o.fireAge===null?null:o.fireAge-D.age_now;
+      const shade = y===null ? 'var(--rule)' : `rgba(27,77,62,${Math.max(0.06,Math.min(0.55,0.6-y/60)).toFixed(2)})`;
+      h+=`<td style="background:${shade}"${near&&m===1?' class="cur"':''}>${y===null?'—':y.toFixed(0)+' yr'}</td>`;
+    });
+    h+='</tr>';
+  });
+  host.innerHTML=h+'</tbody></table>';
+}
+
+/* Fee drag. The real return you enter is already after fees, so this does not
+   deduct anything a second time: it shows what the same plan would reach if
+   the funds were free, which is what the fees cost you. */
+function drawFees(P){
+  const host=document.getElementById('feepanel'); if(!host) return;
+  const T=D.ters||{}, pos=D.positions||[];
+  const tot=pos.reduce((s,p)=>s+p.market_value,0);
+  const known=pos.filter(p=>T[p.ticker]!=null), kv=known.reduce((s,p)=>s+p.market_value,0);
+  if(!tot || !known.length){ document.getElementById('feesection').hidden=true; return; }
+  document.getElementById('feesection').hidden=false; document.getElementById('risksection').hidden=false;
+  const ter=known.reduce((s,p)=>s+p.market_value*T[p.ticker],0)/kv;
+  const yearly=ter*D.summary.net_liquidation;
+  const atAge = P.fireAge || ageAt(M0+P.N);
+  const balAt = (rows,a)=>{ const r=rows.find(x=>x.age>=a-1e-9); return r?r.bal:rows[rows.length-1].bal; };
+  /* neither side retires here: the fee-free plan would hit the target sooner and
+     start withdrawing, which would hide most of the cost */
+  const free=project({r:state.real_return+ter, keepSaving:true}), paid=project({keepSaving:true});
+  const cost=balAt(free.rows,atAge)-balAt(paid.rows,atAge);
+  const fig=(l,v,s)=>`<div class="stat" style="border-color:var(--warn)"><div class="lab">${l}</div><div class="val">${v}</div><div class="sub">${s}</div></div>`;
+  host.innerHTML = `<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:12px">`
+    + fig('Weighted expense ratio', (ter*100).toFixed(3)+'%', `across ${known.length} of ${pos.length} holdings`)
+    + fig('Cost this year', money(yearly), 'on today’s portfolio')
+    + fig(P.fireAge?'Cost by retirement':'Cost by age '+Math.floor(atAge), money(cost), `compounded, age ${atAge.toFixed(0)}`)
+    + `</div><table><thead><tr><th class="l">Fund</th><th>Weight</th><th>Expense ratio</th><th>Per year</th></tr></thead><tbody>`
+    + pos.slice().sort((a,b)=>b.market_value-a.market_value).map(p=>{ const t=T[p.ticker];
+        return `<tr><td class="l">${esc(p.ticker)}</td><td>${(p.market_value/tot*100).toFixed(1)}%</td>
+          <td>${t==null?'<span class="role">not in config</span>':(t*100).toFixed(2)+'%'}</td><td>${t==null?'—':money(p.market_value*t)}</td></tr>`; }).join('')
+    + `</tbody></table><div class="note" style="margin-top:10px">Your real-return assumption is already after fees, so nothing is
+      deducted twice. &ldquo;Cost by retirement&rdquo; compares your plan with the same plan in fee-free funds.</div>`;
 }
 
 let rafId=0;
@@ -1464,6 +1720,8 @@ function slider(id,label,val,min,max,step,fmt,note,onIn){
 }
 
 function refreshDerived(){
+  const tn=document.querySelector('[data-tgtnote]');
+  if(tn) tn.textContent=`→ target ${money(state.target)} at ${(state.withdrawal_rate*100).toFixed(2)}% withdrawal`;
   activePhases().forEach(p=>{
     const d=document.querySelector(`[data-deriv="${p._k}"]`);
     if(d) d.textContent = `→ saving ${money(savingAt(p,Math.max(p.s,M0)))}/mo`
@@ -1474,6 +1732,34 @@ function refreshDerived(){
         + (len?` · ${len>=24?(len/12).toFixed(1)+' yr':len+' mo'}`:''); }
   });
   state.events.forEach(e=>{ const t=document.querySelector(`[data-evdate="${e._k}"]`); if(t) t.textContent=mlabel(e.m); });
+}
+
+function pensionBlock(){
+  const q=state.pensions;
+  const d=el(`<details class="pen"${q.enabled?' open':''}><summary>Swiss pensions (optional)</summary>
+    <div class="note" style="margin:8px 0">Pillar 2 and 3a pots grow on their own and are paid into the portfolio at their unlock
+      age. AHV is a yearly pension that cuts what the portfolio has to pay out. Today&rsquo;s money throughout. Your figures are on
+      your pension statements.</div>
+    <label style="display:flex;gap:8px;align-items:center;font-size:12.5px"><input type="checkbox" data-pen="enabled"${q.enabled?' checked':''}> Include pensions</label>
+    <div class="pengrid"></div></details>`);
+  const grid=d.querySelector('.pengrid');
+  const field=(path,label,step)=>{ const [a,b]=path.split('.'); const v=q[a][b];
+    const f=el(`<label>${label}<input type="number" step="${step}" value="${v}"${q.enabled?'':' disabled'}></label>`);
+    const inp=f.querySelector('input');
+    inp.addEventListener('input',()=>{ const x=parseFloat(inp.value); if(Number.isFinite(x)){ q[a][b]=x; scheduleRedraw(); } });
+    inp.addEventListener('change',()=>savePlan());
+    grid.appendChild(f); };
+  const head=t=>grid.appendChild(el(`<div class="h">${t}</div>`));
+  head('Pillar 2 (pension fund)');
+  field('pillar2.balance','Balance',1000); field('pillar2.yearly_contribution','Paid in per year',500);
+  field('pillar2.real_return','Real return',0.005); field('pillar2.unlock_age','Paid out at age',1);
+  head('Pillar 3a');
+  field('pillar3a.balance','Balance',1000); field('pillar3a.yearly_contribution','Paid in per year',500);
+  field('pillar3a.real_return','Real return',0.005); field('pillar3a.unlock_age','Paid out at age',1);
+  head('AHV');
+  field('ahv.yearly_amount','Pension per year',500); field('ahv.start_age','From age',1);
+  d.querySelector('[data-pen="enabled"]').addEventListener('change',e=>{ q.enabled=e.target.checked; rebuildPlan(); savePlan(); });
+  return d;
 }
 
 function phaseBlock(p){
@@ -1551,15 +1837,34 @@ function buildControls(){
   host.appendChild(evs);
 
   const g=el(`<div style="border-top:1px solid var(--rule);padding-top:20px;margin-top:4px"></div>`);
-  g.appendChild(slider('tgt','Target',state.target,250000,5000000,50000,
-    v=>money(v),'The number you are aiming at.',v=>{state.target=v;}));
+  const tm=el(`<div class="ctl"><div class="row"><label>Set the target by</label></div><div class="seg" role="group" aria-label="How the target is set">
+      <button type="button" data-tm="amount" class="${state.target_mode==='amount'?'on':''}" aria-pressed="${state.target_mode==='amount'}">Amount</button>
+      <button type="button" data-tm="spending" class="${state.target_mode==='spending'?'on':''}" aria-pressed="${state.target_mode==='spending'}">Yearly spending</button></div></div>`);
+  tm.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    if(state.target_mode===b.dataset.tm) return;
+    /* switching keeps the target where it is */
+    if(b.dataset.tm==='spending') state.annual_spending=state.target*state.withdrawal_rate;
+    state.target_mode=b.dataset.tm; rebuildPlan(); savePlan();
+  }));
+  g.appendChild(tm);
+  if(state.target_mode==='spending'){
+    g.appendChild(slider('spd','Yearly spending',state.annual_spending,10000,250000,1000,
+      v=>money(v),null,v=>{state.annual_spending=v; state.target=v/state.withdrawal_rate;}));
+    g.appendChild(el(`<div class="note" data-tgtnote style="margin:-6px 0 14px"></div>`));
+  } else {
+    g.appendChild(slider('tgt','Target',state.target,250000,5000000,50000,
+      v=>money(v),'The number you are aiming at.',v=>{state.target=v;}));
+  }
   g.appendChild(slider('ret','Real return',state.real_return,0.02,0.08,0.0025,
     v=>(v*100).toFixed(2)+'%','After inflation and fees. 5% is a fair global-equity base case.',v=>{state.real_return=v;}));
   g.appendChild(slider('swr','Withdrawal rate',state.withdrawal_rate,0.025,0.05,0.0005,
     v=>(v*100).toFixed(2)+'%','Sets the income the target funds. 3.25–3.75% suits a 50-year retirement.',v=>{state.withdrawal_rate=v;}));
   g.appendChild(slider('cfa','Coast target age',state.coast_full_age,50,65,1,
     v=>String(v),'The age the coast portfolio must reach the target by, unaided.',v=>{state.coast_full_age=v;}));
+  g.appendChild(slider('vol','Market volatility',state.volatility,0,0.3,0.01,
+    v=>(v*100).toFixed(0)+'%/yr','Only widens the shaded band. 16% is roughly a global stock index; 0 removes the band.',v=>{state.volatility=v;}));
   host.appendChild(g);
+  host.appendChild(pensionBlock());
   refreshDerived();
 }
 
@@ -1594,7 +1899,8 @@ document.getElementById('planbar').addEventListener('click',ev=>{
 function exportText(){
   const c=canon(state);
   const goal=Object.assign({target:c.target}, D.plan.goal_extra||{},
-    {coast_full_age:c.coast_full_age, real_return:c.real_return, withdrawal_rate:c.withdrawal_rate});
+    {coast_full_age:c.coast_full_age, real_return:c.real_return, withdrawal_rate:c.withdrawal_rate,
+     volatility:c.volatility, target_mode:c.target_mode, annual_spending:c.annual_spending});
   const phases=c.phases.map(p=>{
     const o={id:p.id, label:p.label, start:p.start, end:p.end, monthly_income:p.monthly_income,
              savings_rate:p.savings_rate, income_growth:p.income_growth};
@@ -1602,14 +1908,14 @@ function exportText(){
     return o;
   });
   const events=c.events.map(e=>({date:e.date, label:e.label, amount:e.amount}));
-  return JSON.stringify({goal, phases, events}, null, 2);
+  return JSON.stringify({goal, phases, events, pensions:c.pensions}, null, 2);
 }
 function showExport(){
   const txt=exportText();
   const m=el(`<div class="modal" role="dialog" aria-modal="true" aria-label="Copy plan as config"><div class="box">
     <div class="eyebrow" style="margin:0">Copy as config</div>
     <p style="margin:0;font-size:12.5px;line-height:1.55;color:#3C464C">In <code>config.json</code>, replace the
-      <code>"goal"</code>, <code>"phases"</code> and <code>"events"</code> entries with these. Everything else in the
+      <code>"goal"</code>, <code>"phases"</code>, <code>"events"</code> and <code>"pensions"</code> entries with these. Everything else in the
       file stays as it is. Phases that have already ended are included, so nothing is lost.</p>
     <textarea readonly spellcheck="false"></textarea>
     <div style="display:flex;gap:8px;justify-content:flex-end;align-items:center"><span class="note" data-ok style="margin:0"></span>
@@ -1629,6 +1935,74 @@ function showExport(){
   document.body.appendChild(m);
   ta.focus(); ta.select();
 }
+
+/* ---------- risk: from the time-weighted series, so deposits never look like gains ---------- */
+const RISK = (function(){
+  const S=(D.series||[]).filter(p=>p.cps!=null);
+  if(S.length<20) return null;
+  const I=S.map(p=>1+p.cps), T=S.map(p=>p.t);
+  const r=[]; for(let i=1;i<I.length;i++) r.push(I[i]/I[i-1]-1);
+  const years=(T[T.length-1]-T[0])/(365.25*864e5);
+  const ppy=r.length/years;                          /* observations per year, whatever the calendar */
+  const mean=r.reduce((s,x)=>s+x,0)/r.length;
+  const sd=Math.sqrt(r.reduce((s,x)=>s+(x-mean)*(x-mean),0)/(r.length-1));
+  let peak=I[0], peakT=T[0], mdd=0, mddPeakT=T[0], mddT=T[0];
+  const dd=I.map((v,i)=>{ if(v>peak){peak=v; peakT=T[i];} const d=v/peak-1;
+    if(d<mdd){ mdd=d; mddT=T[i]; mddPeakT=peakT; } return d; });
+  /* recovery: first point after the trough back at the old high */
+  let recT=null; const iT=T.indexOf(mddT), lvl=I[T.indexOf(mddPeakT)];
+  for(let i=iT+1;i<I.length;i++) if(I[i]>=lvl){ recT=T[i]; break; }
+  /* month-end to month-end; the first and the current month are partial */
+  const mon=new Map();
+  S.forEach((p,i)=>{ const d=new Date(p.t), k=d.getFullYear()*12+d.getMonth(); mon.set(k,i); });
+  const keys=[...mon.keys()].sort((a,b)=>a-b), months=[];
+  keys.forEach((k,j)=>{ const end=I[mon.get(k)], start=j===0?I[0]:I[mon.get(keys[j-1])];
+    months.push({k, y:Math.floor(k/12), m:k%12, r:end/start-1, part:j===0||j===keys.length-1}); });
+  return { vol:sd*Math.sqrt(ppy), mdd, mddT, mddPeakT, recT, cur:dd[dd.length-1], dd:T.map((t,i)=>[t,dd[i]]), months, years };
+})();
+(function drawRisk(){
+  if(!RISK){ document.getElementById('riskbody').hidden=true; return; }
+  document.getElementById('risksection').hidden=false;
+  const fd=t=>new Date(t).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const full=RISK.months.filter(m=>!m.part);
+  const best=full.length?full.reduce((a,b)=>b.r>a.r?b:a):null, worst=full.length?full.reduce((a,b)=>b.r<a.r?b:a):null;
+  const ml=m=>new Date(m.y,m.m,1).toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+  const st=(l,v,s,c)=>`<div class="stat" style="border-color:${c}"><div class="lab">${l}</div><div class="val" style="color:${c}">${v}</div><div class="sub">${s}</div></div>`;
+  document.getElementById('riskk').textContent = `${RISK.years<1?Math.round(RISK.years*12)+' months':RISK.years.toFixed(1)+' years'} of history`;
+  document.getElementById('riskstats').innerHTML =
+    st('Volatility', (RISK.vol*100).toFixed(1)+'%', 'yearly, from daily moves'+(RISK.years<1?' &middot; short history':''), 'var(--ink)') +
+    st('Worst fall', pc(RISK.mdd), `${fd(RISK.mddPeakT)} &rarr; ${fd(RISK.mddT)}`+(RISK.recT?` &middot; recovered ${fd(RISK.recT)}`:' &middot; not yet recovered'), 'var(--warn)') +
+    st('Below last high now', RISK.cur>-0.0005?'at a high':pc(RISK.cur), 'drawdown today', RISK.cur>-0.0005?'var(--path)':'var(--warn)') +
+    st('Best month', best?pc(best.r):'—', best?ml(best):'needs a full month', 'var(--path)') +
+    st('Worst month', worst?pc(worst.r):'—', worst?ml(worst):'needs a full month', 'var(--warn)');
+
+  const lo=Math.min(-0.01, RISK.mdd*1.15), t0=RISK.dd[0][0], t1=RISK.dd[RISK.dd.length-1][0];
+  const yt=[]; const step=niceStep(-lo/4); for(let v=0; v>=lo-1e-9; v-=step) yt.push(v);
+  const xt=[]; const span=t1-t0; for(let i=0;i<=4;i++) xt.push(t0+span*i/4);
+  chart(document.getElementById('ddchart'),{ height:220, xmin:t0, xmax:t1, ymin:Math.min(lo,yt[yt.length-1]), ymax:0.002,
+    yticks:yt, xticks:xt, yfmt:v=>(v*100).toFixed(0)+'%',
+    xfmt:v=>new Date(v).toLocaleDateString('en-GB',{month:'short',year:'2-digit'}),
+    aria:'drawdown from the previous high over time',
+    area:RISK.dd.map(p=>[p[0],p[1],0]),
+    tip:{fmt:v=>pc(v), xfmt:v=>fd(v)},
+    series:[{name:'Below high',data:RISK.dd,color:'var(--warn)',w:1.6}] });
+
+  const ys=[...new Set(RISK.months.map(m=>m.y))];
+  const mx=Math.max(0.01,...RISK.months.map(m=>Math.abs(m.r)));
+  const MN=['J','F','M','A','M','J','J','A','S','O','N','D'];
+  let h=`<table class="heat"><thead><tr><th class="l"></th>${MN.map(x=>`<th>${x}</th>`).join('')}<th>Year</th></tr></thead><tbody>`;
+  ys.forEach(y=>{
+    const row=RISK.months.filter(m=>m.y===y);
+    const yr=row.reduce((p,m)=>p*(1+m.r),1)-1;
+    h+=`<tr><th class="l">${y}</th>`;
+    for(let k=0;k<12;k++){ const m=row.find(x=>x.m===k);
+      if(!m){ h+='<td></td>'; continue; }
+      const a=Math.min(0.75,0.12+Math.abs(m.r)/mx*0.6), bg=m.r>=0?`rgba(27,77,62,${a.toFixed(2)})`:`rgba(168,64,43,${a.toFixed(2)})`;
+      h+=`<td class="${m.part?'part':''}" style="background:${bg};color:${a>0.45?'#fff':'inherit'}" title="${ml(m)}${m.part?' (partial)':''}: ${pc(m.r)}">${(m.r*100).toFixed(1)}</td>`; }
+    h+=`<td style="font-weight:600">${(yr*100).toFixed(1)}%</td></tr>`;
+  });
+  document.getElementById('heatmap').innerHTML=h+'</tbody></table>';
+})();
 
 buildControls();
 renderZoom();

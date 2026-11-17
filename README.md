@@ -23,9 +23,10 @@ no account involved.
 | 02 Drift from target | Target vs actual weights, plus a **buy-only** allocator that points your next contribution at whatever has fallen furthest behind |
 | 03 Saved vs market | Your deposits against total value — how much of your wealth is savings rather than returns |
 | 04 Money-weighted returns | XIRR over standard windows, from cash flows reconstructed out of the NAV and TWR series |
-| 05 Currency | Splits return into asset performance vs exchange-rate movement, with look-through to the currencies actually inside your funds |
-| 06 Milestones | Real crossing dates for milestones you've passed, projected dates for the rest |
-| 07 The two finish lines | Coast FIRE and full FIRE on an editable life plan: a draggable timeline of phases and one-off events, a yearly chart of income, saving and investment return, and the crossover year when your portfolio starts out-earning your saving |
+| 05 Risk and costs | Volatility, worst fall and recovery, an underwater chart, a monthly-returns heatmap, and what your funds' expense ratios cost you by retirement |
+| 06 Currency | Splits return into asset performance vs exchange-rate movement, with look-through to the currencies actually inside your funds |
+| 07 Milestones | Real crossing dates for milestones you've passed, projected dates for the rest |
+| 08 The two finish lines | Coast FIRE and full FIRE on an editable life plan: a draggable timeline of phases and one-off events, a yearly chart of income, saving, withdrawals and investment return, the crossover year, life after retirement (how long the money lasts, and after a −30% crash), an uncertainty band from 500 simulated markets, optional Swiss pensions, and a grid of years-to-target across return and saving assumptions |
 
 Charts have hover readouts. The output is one HTML file with no external dependencies, so
 you can email it to yourself or open it offline.
@@ -65,11 +66,16 @@ Copy `config.example.json` to `config.json`, then edit it:
 | `goal.real_return` | yes | Assumed return after inflation and fees |
 | `goal.withdrawal_rate` | yes | Sets the income your target funds |
 | `goal.coast_full_age` | yes | Age the coast portfolio must reach the target by, unaided |
+| `goal.target_mode` | no | `amount` (default) uses `target`; `spending` sets target = `annual_spending` ÷ `withdrawal_rate` |
+| `goal.annual_spending` | no | Yearly spending in retirement, for `spending` mode |
+| `goal.volatility` | no | Yearly volatility for the uncertainty band. Default 0.16 |
+| `goal.plan_to_age` | no | How far the projection runs. Default 95 |
 | `goal.milestones` | no | Explicit milestone ladder. Omit it and one is generated to fit your target |
 | `phases[]` | yes | Your savings timeline — see below |
 | `events[]` | no | One-off lump sums: a bonus, an inheritance, or a purchase (negative) |
 | `targets` | no | Intended allocation. Must sum to 1. Omit to hide the drift section |
-| `lookthrough` | no | Regional split inside each fund, from its factsheet |
+| `lookthrough` | no | Regional split inside each fund, from its factsheet, plus `ter` (expense ratio) for the fee comparison |
+| `pensions` | no | Swiss pillar 2 / 3a pots and AHV — see below. Off by default |
 | `currency_basket` | no | Currencies held *inside* each fund — not the one it's priced in |
 | `currency.enabled` | no | Set false if your funds report in the currency you spend |
 | `account.display_currency` | yes | The currency your figures are shown in — see the note below |
@@ -124,6 +130,40 @@ shows as starting "now".
 ]
 ```
 
+### Life after retirement
+
+When the portfolio reaches the target the plan stops saving and starts withdrawing what the
+target was sized to pay (`target × withdrawal_rate` a year, in today's money). The dashboard
+shows how long that lasts, and how long it lasts if markets fall 30% in the month you retire —
+the sequence-of-returns risk a steady-return line hides.
+
+### Uncertainty band
+
+The shaded band is the middle 80% of 500 simulated markets: random monthly returns with your
+real return as the median and `goal.volatility` as the spread. It also gives the age by which
+half, and nine in ten, of those markets reach the target, and how often the money lasts to
+`plan_to_age`. The simulation is seeded, so the band is the same every time you load the page.
+Months are independent, which is kinder than real markets in long slumps.
+
+### Swiss pensions
+
+Optional and off by default:
+
+```json
+"pensions": {
+  "enabled": true,
+  "pillar2":  { "balance": 30000, "yearly_contribution": 6000, "real_return": 0.01, "unlock_age": 65 },
+  "pillar3a": { "balance": 10000, "yearly_contribution": 7000, "real_return": 0.03, "unlock_age": 60 },
+  "ahv":      { "yearly_amount": 22000, "start_age": 65 }
+}
+```
+
+Pillar 2 and 3a pots grow at their own real return, take contributions until you retire, and are
+paid into the portfolio at `unlock_age` (3a can be drawn from five years before the AHV reference
+age of 65). AHV is a yearly pension from `start_age` that reduces what the portfolio has to pay
+out. Take the figures from your own pension statements; the dashboard does not model tax or
+annuity conversion.
+
 ### Editing the plan on the dashboard
 
 You don't have to edit JSON. In section 07:
@@ -138,7 +178,7 @@ You don't have to edit JSON. In section 07:
 - **One-off events** are diamonds on the timeline; drag them, or edit name and amount below.
 
 Changes are kept in your browser across reloads. They don't touch `config.json` until you
-choose to: **Copy as config** gives you the `goal`, `phases` and `events` blocks to paste in,
+choose to: **Copy as config** gives you the `goal`, `phases`, `events` and `pensions` blocks to paste in,
 and **Reset to config** throws the browser edits away. If `config.json` changes while you
 have browser edits, the page tells you and lets you pick which to keep, rather than silently
 choosing one.
@@ -224,9 +264,11 @@ reaches back about a year — the 3- and 5-year windows fill in on their own ove
 - `--no-open` skips launching the browser; `-v` gives verbose logging.
 - Windows-only launcher. The Python side is cross-platform; on macOS/Linux run
   `bin/run.sh root/conf.yaml` and `python src/main.py` yourself.
-- Projections are deterministic: a constant real return every month, ignoring
-  sequence-of-returns risk, tax, and any local pension system. They show the shape of the
-  problem, not a forecast.
+- The main projection line uses a constant real return; the band and the crash test show
+  how much that matters. Nothing models tax. They show the shape of the problem, not a
+  forecast.
+- Risk figures come from the time-weighted series, so deposits never count as gains. With a
+  short history they are indicative only.
 
 **Not investment advice.** The allocator does arithmetic against targets *you* set; it
 never suggests selling, and it knows nothing about your circumstances.

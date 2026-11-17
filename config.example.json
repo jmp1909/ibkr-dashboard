@@ -22,7 +22,10 @@
       500000,
       750000
     ],
-    "_milestones_note": "Optional. Delete this list and the dashboard generates a ladder scaled to your target."
+    "_milestones_note": "Optional. Delete this list and the dashboard generates a ladder scaled to your target.",
+    "volatility": 0.16,
+    "plan_to_age": 95,
+    "_goal_note": "volatility is yearly, used only for the uncertainty band (16% is roughly a global equity index). target_mode 'spending' derives the target from annual_spending / withdrawal_rate instead of using target. plan_to_age is how far the projection runs."
   },
   "currency": {
     "_note": "Splits reported return into asset performance and exchange-rate movement. Only useful when your funds report in a different currency from the one you spend. Set enabled=true and asset_currency accordingly.",
@@ -100,42 +103,48 @@
       "dev": 0.26,
       "em": 0.12,
       "tilt": 0,
-      "role": "Core - whole global market"
+      "role": "Core - whole global market",
+      "ter": 0.0006
     },
     "AVUV": {
       "us": 1.0,
       "dev": 0.0,
       "em": 0.0,
       "tilt": 1,
-      "role": "Tilt - US small value"
+      "role": "Tilt - US small value",
+      "ter": 0.0025
     },
     "AVLV": {
       "us": 1.0,
       "dev": 0.0,
       "em": 0.0,
       "tilt": 1,
-      "role": "Tilt - US large value"
+      "role": "Tilt - US large value",
+      "ter": 0.0015
     },
     "AVIV": {
       "us": 0.0,
       "dev": 1.0,
       "em": 0.0,
       "tilt": 1,
-      "role": "Tilt - developed ex-US large value"
+      "role": "Tilt - developed ex-US large value",
+      "ter": 0.0025
     },
     "AVDV": {
       "us": 0.0,
       "dev": 1.0,
       "em": 0.0,
       "tilt": 1,
-      "role": "Tilt - developed ex-US small value"
+      "role": "Tilt - developed ex-US small value",
+      "ter": 0.0036
     },
     "AVES": {
       "us": 0.0,
       "dev": 0.0,
       "em": 1.0,
       "tilt": 1,
-      "role": "Tilt - emerging markets value"
+      "role": "Tilt - emerging markets value",
+      "ter": 0.0036
     }
   },
   "_basket_note": "Approximate currency of the assets INSIDE each fund. USD is only the fund's reporting currency - VT holds euros and yen too. Update from fund factsheets.",
@@ -180,5 +189,26 @@
     "html_path": "dashboard.html",
     "history_path": "data/nav_history.json",
     "open_browser": true
+  },
+  "_lookthrough_ter_note": "ter = the fund's expense ratio as a fraction (0.0006 = 0.06%). From each fund's own site, early 2026 - check yours. Used only for the fee comparison.",
+  "pensions": {
+    "_note": "Optional, off by default. Swiss pension pots, all in today's money. pillar2/pillar3a grow at their own real_return and are paid into the portfolio at unlock_age (3a can be drawn from 5 years before the AHV reference age of 65). AHV is a yearly pension from start_age that reduces what the portfolio must pay out. Put real balances only in your own config.json.",
+    "enabled": false,
+    "pillar2": {
+      "balance": 0,
+      "yearly_contribution": 0,
+      "real_return": 0.01,
+      "unlock_age": 65
+    },
+    "pillar3a": {
+      "balance": 0,
+      "yearly_contribution": 0,
+      "real_return": 0.03,
+      "unlock_age": 60
+    },
+    "ahv": {
+      "yearly_amount": 0,
+      "start_age": 65
+    }
   }
 }

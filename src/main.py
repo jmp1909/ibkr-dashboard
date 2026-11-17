@@ -81,7 +81,50 @@ def _ym(value: Any, where: str) -> str:
 
 # Goal keys the dashboard lets you edit; everything else in "goal" is carried
 # through untouched so an export from the page can't drop it.
-_EDITABLE_GOAL = ("target", "real_return", "withdrawal_rate", "coast_full_age")
+_EDITABLE_GOAL = (
+    "target", "real_return", "withdrawal_rate", "coast_full_age",
+    "volatility", "target_mode", "annual_spending",
+)
+
+
+def _num(v: Any, where: str, lo: float | None = None, hi: float | None = None) -> float:
+    try:
+        x = float(v)
+    except (TypeError, ValueError) as exc:
+        raise SystemExit(f"config.json: {where} must be a number, got {v!r}.") from exc
+    if (lo is not None and x < lo) or (hi is not None and x > hi):
+        raise SystemExit(f"config.json: {where} = {x} is outside {lo}..{hi}.")
+    return x
+
+
+def build_pensions(cfg: dict[str, Any]) -> dict[str, Any]:
+    """
+    Optional Swiss pension pots. Off unless config says otherwise.
+
+    Pillar 2 and 3a are pots that grow on their own and land in the portfolio at
+    their unlock age; AHV is a yearly income from its start age that reduces what
+    the portfolio has to pay out. All amounts are real, in today's money.
+    """
+    raw = cfg.get("pensions") or {}
+    def pot(key: str, unlock: float) -> dict[str, float]:
+        b = raw.get(key) or {}
+        w = f"pensions.{key}"
+        return {
+            "balance": _num(b.get("balance", 0), w + ".balance", 0),
+            "yearly_contribution": _num(b.get("yearly_contribution", 0), w + ".yearly_contribution", 0),
+            "real_return": _num(b.get("real_return", 0.01), w + ".real_return", -0.05, 0.15),
+            "unlock_age": _num(b.get("unlock_age", unlock), w + ".unlock_age", 40, 75),
+        }
+    a = raw.get("ahv") or {}
+    return {
+        "enabled": bool(raw.get("enabled", False)),
+        "pillar2": pot("pillar2", 65),
+        "pillar3a": pot("pillar3a", 60),
+        "ahv": {
+            "yearly_amount": _num(a.get("yearly_amount", 0), "pensions.ahv.yearly_amount", 0),
+            "start_age": _num(a.get("start_age", 65), "pensions.ahv.start_age", 58, 75),
+        },
+    }
 
 
 def build_plan(cfg: dict[str, Any], today: date) -> dict[str, Any]:
@@ -152,11 +195,24 @@ def build_plan(cfg: dict[str, Any], today: date) -> dict[str, Any]:
         )
     events.sort(key=lambda e: month_index(e["date"]))
 
+    mode = goal.get("target_mode", "amount")
+    if mode not in ("amount", "spending"):
+        raise SystemExit(f"config.json: goal.target_mode must be 'amount' or 'spending', got {mode!r}.")
+    wr = _num(goal["withdrawal_rate"], "goal.withdrawal_rate", 0.005, 0.2)
+    spending = goal.get("annual_spending")
+    spending = float(goal["target"]) * wr if spending is None else _num(spending, "goal.annual_spending", 0)
+    target = spending / wr if mode == "spending" else _num(goal["target"], "goal.target", 1)
+
     return {
         "anchor": anchor,
-        "target": float(goal["target"]),
+        "target": target,
+        "target_mode": mode,
+        "annual_spending": spending,
+        "volatility": _num(goal.get("volatility", 0.16), "goal.volatility", 0, 0.6),
+        "plan_to_age": _num(goal.get("plan_to_age", 95), "goal.plan_to_age", 60, 110),
+        "pensions": build_pensions(cfg),
         "real_return": float(goal["real_return"]),
-        "withdrawal_rate": float(goal["withdrawal_rate"]),
+        "withdrawal_rate": wr,
         "coast_full_age": float(goal["coast_full_age"]),
         # Optional. Absent means the dashboard generates a ladder scaled to the target.
         "milestones": [float(m) for m in goal.get("milestones", [])],
@@ -455,6 +511,8 @@ def main(argv: list[str] | None = None) -> int:
             "thousands_separator": out_cfg.get("thousands_separator", ","),
         },
         "lookthrough_keys": list(lookthrough.keys()),
+        # Expense ratios from config, keyed by ticker. Missing means unknown, not zero.
+        "ters": {k: float(v["ter"]) for k, v in lookthrough.items() if isinstance(v, dict) and "ter" in v},
         "lede": build_lede(
             summary["net_liquidation"], plan["target"], ccy, plan,
             out_cfg.get("thousands_separator", ","),
