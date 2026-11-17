@@ -3,11 +3,11 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Portfolio &amp; FIRE &mdash; 30 July 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--fn:'Schibsted Grotesk',system-ui,sans-serif;
---ground:#EDF1EF;--panel:#FFFFFF;--ink:#14211C;--muted:#5E6D67;--rule:#D6DED9;
---path:#1E5B46;--fire:#A87414;--coast:#3D5B78;--warn:#B3261E;--soft:#F5F8F6;}
+:root{--fn:'Inter Tight','Helvetica Neue',Helvetica,Arial,sans-serif;
+--ground:#FFFFFF;--panel:#FFFFFF;--ink:#000000;--muted:#6E6E6E;--rule:#DCDCDC;
+--path:#2D327D;--fire:#EB0000;--coast:#8A8A8A;--warn:#A20013;--soft:#F4F4F4;}
 *{box-sizing:border-box}
 body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--fn);-webkit-font-smoothing:antialiased}
 .wrap{max-width:1120px;margin:0 auto;padding:40px 24px 80px}
@@ -139,72 +139,91 @@ svg{display:block;width:100%;height:auto}
 footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:var(--muted);line-height:1.65;max-width:760px}
 .warnbox{background:#F6E9E4;border-left:3px solid var(--warn);padding:12px 16px;font-size:12.5px;line-height:1.5;margin-bottom:24px}
 
-/* ---- design layer: one family, sentence-case labels, soft surfaces ---- */
-body{font-family:var(--fn);font-size:15px;line-height:1.5}
-.wrap{max-width:1140px;padding:44px 28px 96px;overflow-x:clip}
-h1{font-weight:800;letter-spacing:-.04em;line-height:.98}
+/* ---- design layer: Swiss railway timetable ----
+   White ground, black type, one red for the destination, SBB blue for your
+   money. Square corners; each section opens under a heavy rule like a
+   platform sign. The departure board in the hero is the one loud element. */
+body{font-family:var(--fn);font-size:15px;line-height:1.5;background:#fff}
+.wrap{max-width:1160px;padding:40px 32px 96px;overflow-x:clip}
+h1{font-weight:800;letter-spacing:-.045em;line-height:.95;font-size:clamp(34px,6vw,64px)}
 h1 #h1Target{color:var(--fire)!important}
-h2{font-size:24px;font-weight:700;letter-spacing:-.02em}
-.eyebrow{font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:10px}
+h2{font-size:26px;font-weight:800;letter-spacing:-.03em}
+.eyebrow{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px}
 header .eyebrow{font-weight:500;color:var(--muted)}
-.lede{color:#33433D;font-size:16px;max-width:620px}
-section{margin-bottom:72px;scroll-margin-top:64px}
-.shead{border-bottom:0;padding-bottom:0;margin-bottom:18px;gap:12px}
+.lede{color:#2B2B2B;font-size:16px;max-width:620px}
+section{margin-bottom:80px;scroll-margin-top:60px}
+.shead{border-top:6px solid var(--ink);border-bottom:0;padding:12px 0 0;margin-bottom:22px;gap:12px}
 .shead .n{display:none}
 .shead .k{font-size:13px}
-.panel{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 24px}
-.dark{border-radius:12px}
-table{font-size:13.5px}
-th{font-size:12px;font-weight:600;color:var(--muted);padding:8px 10px}
+.panel{background:#fff;border:1px solid var(--rule);border-radius:0;padding:22px 24px}
+.dark{border-radius:0}
+table{font-size:14px}
+th{font-size:12.5px;font-weight:700;color:var(--ink);padding:8px 10px;border-bottom:2px solid var(--ink)}
 td{padding:11px 10px}
 tbody tr:hover td{background:var(--soft)}
-.stat{border-left-width:3px;padding-left:14px}
-.stat .lab{font-size:12.5px;font-weight:500}
-.stat .val{font-weight:700;letter-spacing:-.025em}
+.stat{border-left:4px solid var(--rule);padding-left:14px}
+.stat .lab{font-size:13px;font-weight:600;color:var(--muted)}
+.stat .val{font-weight:800;letter-spacing:-.03em}
 .stat .sub{font-size:12px}
 .legend{font-size:12.5px}
 .note{font-size:12px}
 .axl{font-size:11px}
-.tk{font-size:17px;font-weight:600;letter-spacing:-.01em;line-height:1.4;max-width:680px}
-.glance{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:20px 24px;margin:0 0 56px}
-.glance li{font-size:15.5px;padding:8px 0}
-.secnav{position:sticky;top:0;z-index:20;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:0 -28px 28px;padding:10px 28px;
-  background:rgba(237,241,239,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
+.tk{font-size:18px;font-weight:700;letter-spacing:-.015em;line-height:1.35;max-width:700px}
+.tk b{color:var(--path)} .tk b.neg{color:var(--warn)}
+.glance{background:var(--soft);border:0;border-left:6px solid var(--fire);border-radius:0;padding:20px 24px;margin:0 0 64px}
+.glance .eyebrow{font-size:14px}
+.glance li{font-size:16px;padding:8px 0;border-top-color:#E2E2E2}
+.secnav{position:sticky;top:0;z-index:20;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;margin:0 -32px 30px;padding:0 32px;
+  background:var(--ink);border:0}
 .secnav::-webkit-scrollbar{display:none}
-.secnav a{flex:none;font-size:13.5px;font-weight:500;color:var(--muted);text-decoration:none;padding:6px 11px;border-radius:999px}
-.secnav a:hover{color:var(--ink);background:var(--panel)}
-.secnav a:focus-visible{outline:2px solid var(--path);outline-offset:1px}
-/* the one loud element: the run to the target */
-.hero{--path:#74C7A0;--coast:#9DBBD8;--fire:#E5B04F;--warn:#F2958B;border:0;background:var(--ink);color:#E9EFEC;border-radius:16px;padding:30px 30px 26px;margin:30px 0 22px}
-.hero .fig .lab{font-size:12.5px;color:#9DB0A8}
-.hero .fig .num{font-size:27px;color:#fff}
-.hero .fig .sub{font-size:12px;color:#9DB0A8}
-.hero > div[style*="font-size:10.5px"]{color:#9DB0A8!important;font-size:12px!important}
+.secnav a{flex:none;font-size:14px;font-weight:600;color:#fff;text-decoration:none;padding:11px 14px;border-radius:0}
+.secnav a:hover{background:var(--fire);color:#fff}
+.secnav a:focus-visible{outline:2px solid #fff;outline-offset:-4px}
+/* hero: the departure board */
+.hero{--path:#8A92E6;--coast:#BDBDBD;--fire:#FF4A4A;--warn:#FF7B7B;border:0;background:#000;color:#fff;border-radius:0;padding:26px 30px 26px;margin:0 0 24px}
+.board{width:100%;border-collapse:collapse;margin:0 0 26px;font-variant-numeric:tabular-nums}
+.board th{color:#9A9A9A;font-size:12px;font-weight:600;text-align:left;border-bottom:1px solid #333;padding:0 12px 8px 0}
+.board th.r,.board td.r{text-align:right}
+.board td{border-bottom:1px solid #2A2A2A;padding:12px 12px 12px 0;font-size:20px;font-weight:700;color:#fff;text-align:left;white-space:nowrap}
+.board td.dest{font-weight:600;white-space:normal}
+.board td .sm{display:block;font-size:12px;font-weight:500;color:#9A9A9A;margin-top:2px}
+.board tr:hover td{background:transparent}
+.st{display:inline-block;font-size:13px;font-weight:700;padding:3px 8px;background:#1F1F1F;color:#fff}
+.st.late{background:#FFDE15;color:#000}
+.st.early{background:#fff;color:#000}
+.st.gone{background:var(--fire);color:#fff}
+.hero .fig .lab{font-size:12.5px;color:#9A9A9A}
+.hero .fig .num{font-size:26px;color:#fff;font-weight:800}
+.hero .fig .sub{font-size:12px;color:#9A9A9A}
+.hero > div[style*="font-size:10.5px"]{color:#9A9A9A!important;font-size:12px!important}
 .track{height:34px}
-.track .rail{top:10px;height:14px;border-radius:7px;background:#2C3B35}
-.track .fill{top:10px;height:14px;border-radius:7px;background:linear-gradient(90deg,#2E7A5E,#5FB08C)}
-.track .tick{background:var(--ink);top:8px;height:18px}
-.track .tick span{top:26px;font-size:11px;color:#9DB0A8}
-.track .pin{top:4px;height:26px;width:3px;border-radius:2px;background:var(--fire)}
-.btn{font-size:13px;font-weight:600;border-radius:8px;padding:8px 14px}
-.seg{border-radius:8px;overflow:hidden}
-.seg button{font-size:12.5px;padding:6px 11px}
-.ctl label{font-size:12.5px}
+.track .rail{top:12px;height:10px;border-radius:0;background:#333}
+.track .fill{top:12px;height:10px;border-radius:0;background:#fff}
+.track .tick{background:#000;top:10px;height:14px;width:2px}
+.track .tick span{top:26px;font-size:11px;color:#9A9A9A}
+.track .pin{top:4px;height:26px;width:4px;border-radius:0;background:var(--fire)}
+.btn{font-size:13px;font-weight:700;border-radius:0;padding:8px 14px;border-width:2px}
+.seg{border-radius:0;border:2px solid var(--ink)}
+.seg button{font-size:12.5px;font-weight:600;padding:6px 11px;color:var(--ink)}
+.ctl label{font-size:12.5px;font-weight:600;color:var(--ink)}
 .ctl .v{font-size:15px}
-.phname{font-size:13px}
-.evrow input,.pengrid input{border-radius:6px}
-.tipbox{border-radius:8px;font-size:12.5px}
+.phname{font-size:13.5px;font-weight:700}
+.evrow input,.pengrid input{border-radius:0}
+.tipbox{border-radius:0;font-size:12.5px;background:#000}
 .tipbox .tt{font-size:11.5px}
-.tl .blk{border-radius:6px}
-.warnbox{border-radius:8px}
-.modal .box{border-radius:12px}
+.tl .blk{border-radius:0}
+.warnbox{border-radius:0}
+.modal .box{border-radius:0}
+input[type=range]{accent-color:var(--fire)}
 @media(max-width:640px){
-  .wrap{padding:28px 16px 72px}
-  .secnav{margin:0 -16px 22px;padding:10px 16px}
-  .hero{padding:22px 18px 20px;border-radius:12px}
+  .wrap{padding:24px 16px 72px}
+  .secnav{margin:0 -16px 22px;padding:0 16px}
+  .hero{padding:20px 16px}
+  .board td{font-size:16px}
+  .board .hide-s{display:none}
   .panel{padding:18px 16px}
-  .tk{font-size:16px}
-  h2{font-size:21px}
+  .tk{font-size:16.5px}
+  h2{font-size:22px}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 html{scroll-behavior:smooth}
@@ -217,10 +236,10 @@ html{scroll-behavior:smooth}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="description" content="Interactive demo of an open-source Interactive Brokers portfolio and FIRE dashboard, running on sample data.">
 </head><body>
-<div style="background:#14181A;color:#F6F7F4;padding:11px 20px;font-family:'IBM Plex Mono',monospace;
+<div style="background:#EB0000;color:#fff;padding:10px 20px;font-family:'Inter Tight',Helvetica,Arial,sans-serif;
             font-size:12.5px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center">
   <span><b>Live demo</b> &mdash; sample data, not a real account.</span>
-  <a href="https://github.com/jmp1909/ibkr-dashboard" style="color:#7FBFA5">Source on GitHub &rarr;</a>
+  <a href="https://github.com/jmp1909/ibkr-dashboard" style="color:#fff;font-weight:700">Source on GitHub</a>
 </div>
 <div class="wrap">
 
@@ -237,6 +256,9 @@ html{scroll-behavior:smooth}
 <div id="staleness"></div>
 
 <div class="hero">
+  <table class="board" aria-label="When you arrive at each stop on the plan">
+    <thead><tr><th>Stop</th><th class="r">Age</th><th class="r hide-s">Year</th><th class="r">Against config.json</th></tr></thead>
+    <tbody id="board"></tbody></table>
   <div class="track" id="herotrack" title="progress toward the target"></div>
   <div style="font-size:10.5px;color:var(--muted);margin:22px 0 20px;font-family:var(--fn)">
     Milestones are evenly spaced, not to scale. Your position within the current step is exact.</div>
@@ -1799,8 +1821,47 @@ function refreshHeader(){
     + 'it is only as good as what you put in it.';
 }
 
+/* ---------- departure board ----------
+   Each stop on the plan with its age and year, and how far the browser edits
+   have moved it compared with the plan in config.json - like a timetable. */
+let BASEPLAN=null;
+function baselinePlan(){
+  if(BASEPLAN) return BASEPLAN;
+  const keep=state, fl=FLOWS;
+  try{ state=normalisePlan(D.plan); FLOWS=monthFlows(); BASEPLAN=project(); }
+  finally{ state=keep; FLOWS=fl; }
+  return BASEPLAN;
+}
+function drawBoard(P){
+  const tb=document.getElementById('board'); if(!tb) return;
+  const B=baselinePlan(), end=ageAt(M0+P.N);
+  const yr=a=>new Date(MS_NOW.getTime()+(a-D.age_now)*365.25*864e5).getFullYear();
+  /* later is bad for the first three, good for the last */
+  const status=(a,b,laterIsGood)=>{
+    if(a==null && b==null) return '<span class="st">&mdash;</span>';
+    if(a==null) return laterIsGood?'<span class="st early">Beyond the plan</span>':'<span class="st gone">Cancelled</span>';
+    if(b==null) return '<span class="st early">New stop</span>';
+    const d=a-b;
+    if(Math.abs(d)<0.05) return '<span class="st">On time</span>';
+    const good = laterIsGood ? d>0 : d<0;
+    const txt = laterIsGood ? (d>0?`${d.toFixed(1)} yr longer`:`${(-d).toFixed(1)} yr shorter`)
+                            : (d>0?`Delayed ${d.toFixed(1)} yr`:`${(-d).toFixed(1)} yr early`);
+    return `<span class="st ${good?'early':'late'}">${txt}</span>`;
+  };
+  const row=(dest,sub,a,b,good)=>`<tr><td class="dest">${dest}<span class="sm">${sub}</span></td>
+    <td class="r">${a==null?'&mdash;':(good&&a>=end-0.01?Math.floor(end)+'+':a.toFixed(1))}</td><td class="r hide-s">${a==null?'&mdash;':(good&&a>=end-0.01?yr(end)+'+':yr(a))}</td><td class="r">${status(a,b,good)}</td></tr>`;
+  const T=state.target;
+  tb.innerHTML =
+    row('Coast FIRE', `could stop saving and still reach ${money(T)} by ${state.coast_full_age}`, P.coastAge, B.coastAge, false) +
+    row('Crossover', 'the portfolio out-earns your saving', P.cross?P.cross.age:null, B.cross?B.cross.age:null, false) +
+    row('Full FIRE', `${money(T)} reached, saving stops`, P.fireAge, B.fireAge, false) +
+    row('Money lasts to', P.fireAge?`withdrawing ${money(T*state.withdrawal_rate)} a year`:'once retired',
+        P.fireAge?(P.lastsTo===null?end:P.lastsTo):null, B.fireAge?(B.lastsTo===null?end:B.lastsTo):null, true);
+}
+
 /* ---------- hero band ---------- */
 function drawHero(P){
+  drawBoard(P);
   const net=D.summary.net_liquidation, target=state.target;
   const levels=milestoneLadder(target);
   const F=D.flows||[];
