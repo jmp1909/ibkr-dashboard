@@ -39,7 +39,7 @@
     "AVIV": 0.07,
     "AVES": 0.09
   },
-  "_phases_note": "Your savings timeline. Have as many phases as you like, in any order of size - study, part-time, career breaks, a sabbatical, retirement run-up. monthly_saving = monthly_income * savings_rate. end=null means open-ended, and gaps between phases are allowed (nothing is saved during them). Amounts are real, in today's money.",
+  "_phases_note": "Your savings timeline. As many phases as you like - study, jobs, a promotion, a career break. Each phase saves either a share of its income (saving_mode 'rate', the default, using savings_rate) or a fixed amount (saving_mode 'fixed', using monthly_saving). end=null means open-ended; phases may not overlap; gaps save nothing. income_growth is real yearly growth within the phase. Amounts are real, in today's money. You can also edit all of this on the dashboard and copy it back here.",
   "phases": [
     {
       "id": "study",
@@ -48,7 +48,9 @@
       "end": "2027-08",
       "monthly_income": 1400,
       "savings_rate": 0.2,
-      "income_growth": 0.0
+      "income_growth": 0.0,
+      "saving_mode": "fixed",
+      "monthly_saving": 250
     },
     {
       "id": "first_job",
@@ -76,6 +78,19 @@
       "monthly_income": 8000,
       "savings_rate": 0.38,
       "income_growth": 0.01
+    }
+  ],
+  "_events_note": "Optional one-off lump sums: a bonus or inheritance (positive) or a big purchase (negative). date is 'YYYY-MM'.",
+  "events": [
+    {
+      "date": "2030-06",
+      "label": "Inheritance",
+      "amount": 20000
+    },
+    {
+      "date": "2035-03",
+      "label": "Flat deposit",
+      "amount": -60000
     }
   ],
   "_lookthrough_note": "Regional split inside each fund. Update when the funds publish new factsheets. tilt=1 marks a deliberate factor fund.",

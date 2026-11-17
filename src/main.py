@@ -59,50 +59,126 @@ def age_on(birth: date, when: date) -> float:
     return (when - birth).days / 365.25
 
 
-def months_between(anchor: date, ym: str) -> int:
-    """Whole months from the anchor date to the first of the given YYYY-MM."""
+def month_index(ym: str) -> int:
+    """'YYYY-MM' as a single integer month count, so months can be compared and subtracted."""
     y, m = (int(x) for x in ym.split("-"))
-    return (y - anchor.year) * 12 + (m - anchor.month)
+    return y * 12 + (m - 1)
+
+
+def _ym(value: Any, where: str) -> str:
+    """Validate a 'YYYY-MM' string from config, failing with the offending key named."""
+    ok = isinstance(value, str) and len(value) == 7 and value[4] == "-"
+    if ok:
+        try:
+            y, m = int(value[:4]), int(value[5:])
+            ok = 1900 <= y <= 2200 and 1 <= m <= 12
+        except ValueError:
+            ok = False
+    if not ok:
+        raise SystemExit(f"config.json: {where} must look like 'YYYY-MM', got {value!r}.")
+    return value
+
+
+# Goal keys the dashboard lets you edit; everything else in "goal" is carried
+# through untouched so an export from the page can't drop it.
+_EDITABLE_GOAL = ("target", "real_return", "withdrawal_rate", "coast_full_age")
 
 
 def build_plan(cfg: dict[str, Any], today: date) -> dict[str, Any]:
     """
-    Convert the config's calendar phases into month offsets from today.
+    Pass the life plan to the dashboard with real calendar dates.
 
-    Phases that ended in the past are dropped; a phase already under way is
-    clipped to start now, so the projection always begins from the present.
+    Every phase is passed through, including ones that have already ended: the
+    page ignores those for the projection but keeps them, so a plan exported
+    from the browser never silently loses history. Dates stay as 'YYYY-MM' -
+    the page works out where "now" falls from `anchor`, the month of the latest
+    data, which is what keeps the projection starting at the present.
     """
     goal = cfg["goal"]
+    anchor = f"{today.year:04d}-{today.month:02d}"
+    now = month_index(anchor)
+
     phases = []
-    for p in cfg["phases"]:
-        start = max(0, months_between(today, p["start"]))
-        end = None if p.get("end") in (None, "") else months_between(today, p["end"])
-        if end is not None and end < 0:
-            continue  # wholly in the past
+    for i, p in enumerate(cfg.get("phases", [])):
+        where = f"phases[{i}]"
+        start = _ym(p.get("start"), f"{where}.start")
+        end = p.get("end")
+        end = None if end in (None, "") else _ym(end, f"{where}.end")
+        if end is not None and month_index(end) < month_index(start):
+            raise SystemExit(f"config.json: {where} ends before it starts ({start} to {end}).")
+        mode = p.get("saving_mode", "rate")
+        if mode not in ("rate", "fixed"):
+            raise SystemExit(f"config.json: {where}.saving_mode must be 'rate' or 'fixed', got {mode!r}.")
         phases.append(
             {
-                "id": p["id"],
-                "label": p["label"],
-                "range_label": f"{p['start']} \u2192 {p.get('end') or 'open-ended'}",
-                "start_month": start,
-                "end_month": end,
-                "monthly_income": float(p["monthly_income"]),
-                "savings_rate": float(p["savings_rate"]),
+                "id": str(p.get("id") or f"phase{i + 1}"),
+                "label": str(p.get("label") or f"Phase {i + 1}"),
+                "start": start,
+                "end": end,
+                "monthly_income": float(p.get("monthly_income", 0.0)),
+                "saving_mode": mode,
+                "savings_rate": float(p.get("savings_rate", 0.0)),
+                "monthly_saving": float(p.get("monthly_saving", 0.0)),
                 "income_growth": float(p.get("income_growth", 0.0)),
             }
         )
-    if not phases:
-        raise SystemExit("No future phases in config.json - nothing to project.")
+    phases.sort(key=lambda p: month_index(p["start"]))
+
+    # Each month belongs to at most one phase. Overlaps used to be resolved
+    # silently (the later entry won); now they're an explicit error, because the
+    # page's timeline can't represent them and a silent winner hides a typo.
+    for a, b in zip(phases, phases[1:]):
+        if a["end"] is None or month_index(a["end"]) >= month_index(b["start"]):
+            raise SystemExit(
+                f"config.json: phases '{a['label']}' and '{b['label']}' overlap. "
+                "Each month can belong to only one phase - end one before the next starts."
+            )
+    if not any(p["end"] is None or month_index(p["end"]) >= now for p in phases):
+        raise SystemExit("No current or future phases in config.json - nothing to project.")
+
+    events = []
+    for i, e in enumerate(cfg.get("events", [])):
+        try:
+            amount = float(e["amount"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise SystemExit(f"config.json: events[{i}].amount must be a number.") from exc
+        events.append(
+            {
+                "id": str(e.get("id") or f"event{i + 1}"),
+                "label": str(e.get("label") or "Event"),
+                "date": _ym(e.get("date"), f"events[{i}].date"),
+                "amount": amount,
+            }
+        )
+    events.sort(key=lambda e: month_index(e["date"]))
 
     return {
+        "anchor": anchor,
         "target": float(goal["target"]),
         "real_return": float(goal["real_return"]),
         "withdrawal_rate": float(goal["withdrawal_rate"]),
         "coast_full_age": float(goal["coast_full_age"]),
         # Optional. Absent means the dashboard generates a ladder scaled to the target.
         "milestones": [float(m) for m in goal.get("milestones", [])],
+        "goal_extra": {k: v for k, v in goal.items() if k not in _EDITABLE_GOAL},
         "phases": phases,
+        "events": events,
     }
+
+
+def monthly_saving(p: dict[str, Any]) -> float:
+    """What a phase puts away per month at its starting income."""
+    if p.get("saving_mode") == "fixed":
+        return p["monthly_saving"]
+    return p["monthly_income"] * p["savings_rate"]
+
+
+def current_phase(plan: dict[str, Any]) -> tuple[dict[str, Any], bool]:
+    """The phase covering this month, or the next one; and whether it is still to come."""
+    now = month_index(plan["anchor"])
+    live = [p for p in plan["phases"] if p["end"] is None or month_index(p["end"]) >= now]
+    first = live[0]
+    return first, month_index(first["start"]) > now
 
 
 def compute_exposure(positions: list[dict[str, Any]], lookthrough: dict[str, Any]) -> dict[str, float]:
@@ -219,11 +295,11 @@ def build_lede(net: float, target: float, ccy: str, plan: dict[str, Any], sep: s
         # "target' currently"), which is how this read before.
         return f"{ccy} {v:,.0f}".replace(",", sep)
 
-    first = plan["phases"][0]
-    saving = first["monthly_income"] * first["savings_rate"]
+    first, upcoming = current_phase(plan)
+    saving = monthly_saving(first)
     # The first remaining phase may not have started yet: don't claim someone is
     # saving that amount "right now" when it begins next year.
-    if first["start_month"] > 0:
+    if upcoming:
         opening = (
             f"Saving starts at {amount(saving)} a month in the "
             f"{first['label'].lower()} phase, against a {amount(target)} target"

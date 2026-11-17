@@ -25,7 +25,7 @@ no account involved.
 | 04 Money-weighted returns | XIRR over standard windows, from cash flows reconstructed out of the NAV and TWR series |
 | 05 Currency | Splits return into asset performance vs exchange-rate movement, with look-through to the currencies actually inside your funds |
 | 06 Milestones | Real crossing dates for milestones you've passed, projected dates for the rest |
-| 07 The two finish lines | Coast FIRE and full FIRE, with every input as a slider |
+| 07 The two finish lines | Coast FIRE and full FIRE on an editable life plan: a draggable timeline of phases and one-off events, a yearly chart of income, saving and investment return, and the crossover year when your portfolio starts out-earning your saving |
 
 Charts have hover readouts. The output is one HTML file with no external dependencies, so
 you can email it to yourself or open it offline.
@@ -67,6 +67,7 @@ Copy `config.example.json` to `config.json`, then edit it:
 | `goal.coast_full_age` | yes | Age the coast portfolio must reach the target by, unaided |
 | `goal.milestones` | no | Explicit milestone ladder. Omit it and one is generated to fit your target |
 | `phases[]` | yes | Your savings timeline — see below |
+| `events[]` | no | One-off lump sums: a bonus, an inheritance, or a purchase (negative) |
 | `targets` | no | Intended allocation. Must sum to 1. Omit to hide the drift section |
 | `lookthrough` | no | Regional split inside each fund, from its factsheet |
 | `currency_basket` | no | Currencies held *inside* each fund — not the one it's priced in |
@@ -89,18 +90,58 @@ investments did and what the exchange rate did.
 
 ### Phases
 
-`phases[]` is a list of any length. Each entry is a period with its own income and savings
-rate, so it fits whatever your life actually looks like — not a fixed student → career
-template. Gaps between phases are allowed and simply save nothing.
+`phases[]` is a list of any length. Each entry is a period with its own income and saving,
+so it fits whatever your life actually looks like — not a fixed student → career
+template. A promotion, a lower savings rate, a career break: each is just another phase.
 
 ```json
 { "id": "break", "label": "Career break", "start": "2032-01", "end": "2032-12",
   "monthly_income": 0, "savings_rate": 0.0, "income_growth": 0.0 }
 ```
 
-`monthly_saving = monthly_income * savings_rate`. `end: null` means open-ended, and
-`income_growth` is real annual growth above inflation. Phases entirely in the past are
-dropped automatically, so you can leave old ones in place as a record.
+A phase saves either a share of its income (the default: `monthly_income * savings_rate`)
+or a fixed amount regardless of income:
+
+```json
+{ "id": "masters", "label": "Master's", "start": "2027-09", "end": "2029-06",
+  "monthly_income": 900, "saving_mode": "fixed", "monthly_saving": 250 }
+```
+
+`end: null` means open-ended. `income_growth` is real annual growth above inflation, counted
+from the later of the phase's start and today. Phases **can't overlap** — each month
+belongs to at most one — and a gap between phases simply saves nothing. Phases that have
+already ended are ignored by the projection but kept, so you can leave them as a record.
+
+The projection always starts from the month of your latest data. A phase that began earlier
+shows as starting "now".
+
+### One-off events
+
+```json
+"events": [
+  { "date": "2030-06", "label": "Inheritance", "amount": 20000 },
+  { "date": "2035-03", "label": "Flat deposit", "amount": -60000 }
+]
+```
+
+### Editing the plan on the dashboard
+
+You don't have to edit JSON. In section 07:
+
+- **Drag** a phase's edges to change when it starts and ends, or drag the middle to move it.
+  Where two phases touch, the shared edge moves both; nothing can be moved into the past.
+  Arrow keys work too (Shift moves a year). The timeline shows the next 10 years by default
+  so short phases are wide enough to grab — switch to 5, 20 or all.
+- **Add phase** splits the open-ended last phase; **×** removes one and lets its neighbour
+  take over the freed months. Each phase can be renamed and switched between "% of income"
+  and "fixed amount" without its current saving jumping.
+- **One-off events** are diamonds on the timeline; drag them, or edit name and amount below.
+
+Changes are kept in your browser across reloads. They don't touch `config.json` until you
+choose to: **Copy as config** gives you the `goal`, `phases` and `events` blocks to paste in,
+and **Reset to config** throws the browser edits away. If `config.json` changes while you
+have browser edits, the page tells you and lets you pick which to keep, rather than silently
+choosing one.
 
 ### Sections that disable themselves
 
