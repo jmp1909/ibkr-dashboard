@@ -19,16 +19,19 @@ no account involved.
 | Section | |
 |---|---|
 | Hero band | Portfolio value, contributions, growth, return, years to target |
-| 01 Holdings | Positions with cost basis, dividend income (by quarter and fund, with estimated withholding), and fund look-through to real regional exposure |
-| 02 Drift from target | Target vs actual weights, plus a **buy-only** allocator that points your next contribution at whatever has fallen furthest behind |
-| 03 Saved vs market | Your deposits against total value — how much of your wealth is savings rather than returns |
-| 04 Money-weighted returns | XIRR over standard windows, from cash flows reconstructed out of the NAV and TWR series, plus your time-weighted return against a total-return benchmark (VT by default) |
-| 05 Risk and costs | Volatility, worst fall and recovery, an underwater chart, a monthly-returns heatmap, and what your funds' expense ratios cost you by retirement |
-| 06 Currency | Splits return into asset performance vs exchange-rate movement, with look-through to the currencies actually inside your funds |
-| 07 Milestones | Real crossing dates for milestones you've passed, projected dates for the rest |
-| 08 The two finish lines | Coast FIRE and full FIRE on an editable life plan: a draggable timeline of phases and one-off events, a yearly chart of income, saving, withdrawals and investment return, the crossover year, life after retirement (how long the money lasts, and after a −30% crash), an uncertainty band from 500 simulated markets, optional Swiss pensions, and a grid of years-to-target across return and saving assumptions |
+| Holdings | Positions with cost basis, dividend income (by quarter and fund, with estimated withholding), and fund look-through to real regional exposure |
+| Drift from target | Target vs actual weights, plus a **buy-only** allocator that points your next contribution at whatever has fallen furthest behind |
+| Saved vs market | Your deposits against total value — how much of your wealth is savings rather than returns |
+| Money-weighted returns | XIRR over standard windows, from cash flows reconstructed out of the NAV and TWR series, plus your time-weighted return against a total-return benchmark (VT by default) |
+| Risk and costs | Volatility, worst fall and recovery, an underwater chart, a monthly-returns heatmap, and what your funds' expense ratios cost you by retirement |
+| Currency | Splits return into asset performance vs exchange-rate movement, with look-through to the currencies actually inside your funds |
+| Milestones | Real crossing dates for milestones you've passed, projected dates for the rest |
+| The two finish lines | Coast FIRE and full FIRE on an editable life plan: a draggable timeline of phases and one-off events, a yearly chart of income, saving, withdrawals and investment return, the crossover year, life after retirement (how long the money lasts, and after a −30% crash), an uncertainty band from 500 simulated markets, optional Swiss pensions, and a grid of years-to-target across return and saving assumptions |
 
-Charts have hover readouts. The output is one HTML file with no external dependencies, so
+An **at a glance** box under the header sums up where you stand, whether you're on plan, and
+what changed since your last refresh. Every chart has a one-line headline saying what it shows,
+so the page can be read from the headlines alone; the two busiest plan charts have a
+**Simple / Detailed** switch, and your choice is remembered. Charts have hover readouts. The output is one HTML file with no external dependencies, so
 you can email it to yourself or open it offline.
 
 ## Requirements

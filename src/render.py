@@ -22,27 +22,28 @@ TEMPLATE = r"""<!DOCTYPE html>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Portfolio &amp; FIRE &mdash; __ASOF__</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--ground:#E4E6E1;--panel:#F6F7F4;--ink:#14181A;--muted:#79838B;--rule:#CBD0C9;
---path:#1B4D3E;--fire:#A8632B;--coast:#4C6272;--warn:#8C3A2E;}
+:root{--fn:'Schibsted Grotesk',system-ui,sans-serif;
+--ground:#EDF1EF;--panel:#FFFFFF;--ink:#14211C;--muted:#5E6D67;--rule:#D6DED9;
+--path:#1E5B46;--fire:#A87414;--coast:#3D5B78;--warn:#B3261E;--soft:#F5F8F6;}
 *{box-sizing:border-box}
-body{margin:0;background:var(--ground);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--fn);-webkit-font-smoothing:antialiased}
 .wrap{max-width:1120px;margin:0 auto;padding:40px 24px 80px}
-.mono{font-family:'IBM Plex Mono',monospace}
-h1{font-family:Archivo,sans-serif;font-weight:800;font-size:clamp(32px,5.6vw,56px);letter-spacing:-.035em;line-height:.99;margin:0}
-h2{font-family:Archivo,sans-serif;font-weight:700;font-size:20px;letter-spacing:-.01em;margin:0}
-.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.mono{font-family:var(--fn)}
+h1{font-family:var(--fn);font-weight:800;font-size:clamp(32px,5.6vw,56px);letter-spacing:-.035em;line-height:.99;margin:0}
+h2{font-family:var(--fn);font-weight:700;font-size:20px;letter-spacing:-.01em;margin:0}
+.eyebrow{font-family:var(--fn);font-size:11px;color:var(--muted);margin-bottom:10px}
 .lede{max-width:640px;margin-top:18px;font-size:15px;line-height:1.6;color:#3C464C}
 section{margin-bottom:56px}
 .shead{display:flex;gap:14px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:24px;flex-wrap:wrap}
-.shead .n{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)}
+.shead .n{font-family:var(--fn);font-size:12px;color:var(--muted)}
 .shead .k{font-size:12px;color:var(--muted);margin-left:auto;text-align:right}
-table{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:13px}
-th{text-align:right;padding:8px 10px;color:var(--muted);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:500;border-bottom:1px solid var(--rule)}
+table{width:100%;border-collapse:collapse;font-family:var(--fn);font-size:13px}
+th{text-align:right;padding:8px 10px;color:var(--muted);font-size:10.5px;font-weight:500;border-bottom:1px solid var(--rule)}
 th.l,td.l{text-align:left}
 td{text-align:right;padding:11px 10px;border-bottom:1px solid var(--rule)}
-td.role{color:var(--muted);font-size:11.5px;font-family:Inter,sans-serif}
+td.role{color:var(--muted);font-size:11.5px;font-family:var(--fn)}
 .pos{color:var(--path)}.neg{color:var(--warn)}
 .bar{display:inline-block;width:46px;height:5px;background:var(--rule);margin-right:8px;vertical-align:middle;position:relative}
 .bar i{position:absolute;inset:0;background:var(--path)}
@@ -51,53 +52,61 @@ td.role{color:var(--muted);font-size:11.5px;font-family:Inter,sans-serif}
 .grid{display:grid;gap:20px}
 .g3{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
 .stat{border-left:2px solid var(--rule);padding-left:12px}
-.stat .lab{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:'IBM Plex Mono',monospace}
-.stat .val{font-family:Archivo,sans-serif;font-weight:700;font-size:26px;line-height:1.15;letter-spacing:-.02em;margin-top:3px}
+.stat .lab{font-size:10.5px;color:var(--muted);font-family:var(--fn)}
+.stat .val{font-family:var(--fn);font-weight:700;font-size:26px;line-height:1.15;letter-spacing:-.02em;margin-top:3px}
 .stat .sub{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4}
 .geo{display:flex;height:34px;border:1px solid var(--ink)}
-.geo div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600;font-family:'IBM Plex Mono',monospace}
+.geo div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600;font-family:var(--fn)}
 .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:11.5px;color:var(--muted)}
 .cols{display:grid;grid-template-columns:minmax(250px,320px) minmax(0,1fr);gap:34px;align-items:start}
 @media(max-width:860px){.cols{grid-template-columns:1fr}}
+.tk{font-family:var(--fn);font-weight:600;font-size:15.5px;line-height:1.38;margin:0 6px 12px;color:var(--ink);max-width:720px}
+.tk b{color:var(--path)} .tk b.neg{color:var(--warn)}
+.glance{border:1px solid var(--rule);background:var(--panel);padding:18px 22px;margin:0 0 40px}
+.glance ul{margin:8px 0 0;padding:0;list-style:none}
+.glance li{font-size:14.5px;line-height:1.5;padding:5px 0;border-top:1px solid var(--rule)}
+.glance li:first-child{border-top:0}
+.glance li b{font-weight:600}
+.plansimple [data-detail]{display:none!important}
 .cols2{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;align-items:start}
 @media(max-width:860px){.cols2{grid-template-columns:1fr}}
-.mcv{font-family:Archivo;font-weight:700;font-size:21px;margin:2px 0}
+.mcv{font-family:var(--fn);font-weight:700;font-size:21px;margin:2px 0}
 table.sens td,table.sens th{text-align:center;padding:7px 6px;font-size:12px}
 table.sens th.l{text-align:left;white-space:nowrap}
 table.sens .cur{outline:2px solid var(--ink);outline-offset:-2px;font-weight:700}
 table.heat td{text-align:center;padding:5px 3px;font-size:11px;min-width:38px}
 table.heat td.part{font-style:italic;opacity:.75}
 details.pen{border-top:1px solid var(--rule);padding-top:14px;margin-top:6px}
-details.pen summary{cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+details.pen summary{cursor:pointer;font-family:var(--fn);font-size:10.5px;font-weight:600}
 .pengrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin-top:10px}
 .pengrid label{font-size:11.5px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
 .pengrid input{font:inherit;font-size:13px;padding:5px 7px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:3px;width:100%;box-sizing:border-box}
 .pengrid .h{grid-column:1/-1;font-weight:600;color:var(--ink);font-size:12px;margin-top:6px}
 .phase{border-left:2px solid var(--path);padding-left:12px;margin-bottom:24px}
-.phase .ph{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:2px}
+.phase .ph{font-family:var(--fn);font-size:10.5px;font-weight:600;margin-bottom:2px}
 .phase .pd{font-size:11px;color:var(--muted);margin-bottom:12px}
 .ctl{margin-bottom:18px}
 .ctl .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
-.ctl label{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-family:'IBM Plex Mono',monospace}
-.ctl .v{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600}
+.ctl label{font-size:11.5px;color:var(--muted);font-family:var(--fn)}
+.ctl .v{font-family:var(--fn);font-size:14px;font-weight:600}
 input[type=range]{width:100%;height:4px;accent-color:var(--path);background:var(--rule);border-radius:2px;-webkit-appearance:none}
 input[type=range]:focus-visible{outline:2px solid var(--path);outline-offset:4px}
-.derived{font-size:11px;color:var(--path);font-family:'IBM Plex Mono',monospace;margin-top:5px}
+.derived{font-size:11px;color:var(--path);font-family:var(--fn);margin-top:5px}
 .note{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.45}
 svg{display:block;width:100%;height:auto}
 .hero{border-top:2px solid var(--ink);border-bottom:1px solid var(--rule);padding:22px 0 20px;margin:34px 0 46px}
 .hero .figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:22px 26px}
-.hero .fig .lab{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
-.hero .fig .num{font-family:Archivo,sans-serif;font-weight:700;font-size:23px;letter-spacing:-.02em;margin-top:4px;line-height:1.1}
+.hero .fig .lab{font-family:var(--fn);font-size:10px;color:var(--muted)}
+.hero .fig .num{font-family:var(--fn);font-weight:700;font-size:23px;letter-spacing:-.02em;margin-top:4px;line-height:1.1}
 .hero .fig .sub{font-size:11px;color:var(--muted);margin-top:2px}
 .track{position:relative;height:26px;margin-bottom:20px}
 .track .rail{position:absolute;top:9px;left:0;right:0;height:8px;background:var(--rule)}
 .track .fill{position:absolute;top:9px;left:0;height:8px;background:var(--path)}
 .track .tick{position:absolute;top:4px;width:1px;height:18px;background:var(--ground)}
-.track .tick span{position:absolute;top:20px;left:0;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;
+.track .tick span{position:absolute;top:20px;left:0;transform:translateX(-50%);font-family:var(--fn);
   font-size:9px;color:var(--muted);white-space:nowrap}
 .track .pin{position:absolute;top:2px;width:2px;height:22px;background:var(--ink)}
-.btn{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.03em;background:transparent;border:1px solid var(--ink);color:var(--ink);padding:7px 12px;cursor:pointer;border-radius:2px}
+.btn{font-family:var(--fn);font-size:11.5px;background:transparent;border:1px solid var(--ink);color:var(--ink);padding:7px 12px;cursor:pointer;border-radius:2px}
 .btn:hover{background:var(--ink);color:var(--panel)}
 .btn.ghost{border-color:var(--rule);color:#3C464C}
 .btn.ghost:hover{background:var(--rule);color:var(--ink)}
@@ -105,17 +114,17 @@ svg{display:block;width:100%;height:auto}
 .btnrow{margin:4px 0 20px}
 .planbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--muted);margin:-8px 0 16px;line-height:1.5}
 .phhead{display:flex;align-items:center;gap:4px;margin-bottom:2px}
-.phname{flex:1;min-width:0;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;border:0;border-bottom:1px dashed transparent;background:transparent;color:var(--ink);padding:3px 0}
+.phname{flex:1;min-width:0;font-family:var(--fn);font-size:10.5px;font-weight:600;border:0;border-bottom:1px dashed transparent;background:transparent;color:var(--ink);padding:3px 0}
 .phname:hover,.phname:focus{border-bottom-color:var(--muted);outline:none}
 .x{border:0;background:transparent;color:var(--muted);font-size:17px;line-height:1;cursor:pointer;padding:2px 6px}
 .x:hover{color:var(--warn)}
 .seg{display:inline-flex;border:1px solid var(--rule);margin:2px 0 14px}
-.seg button{font-family:'IBM Plex Mono',monospace;font-size:10.5px;border:0;background:transparent;padding:5px 9px;cursor:pointer;color:var(--muted)}
+.seg button{font-family:var(--fn);font-size:10.5px;border:0;background:transparent;padding:5px 9px;cursor:pointer;color:var(--muted)}
 .seg button.on{background:var(--ink);color:var(--panel)}
 .evsec{border-top:1px solid var(--rule);padding-top:18px;margin-top:2px}
 .evrow{display:grid;grid-template-columns:minmax(0,1fr) auto 92px auto;gap:8px;align-items:center;margin-top:10px}
-.evrow input{font-family:'IBM Plex Mono',monospace;font-size:12px;border:1px solid var(--rule);background:var(--ground);padding:5px 6px;min-width:0;color:var(--ink);border-radius:2px}
-.evdate{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);white-space:nowrap}
+.evrow input{font-family:var(--fn);font-size:12px;border:1px solid var(--rule);background:var(--ground);padding:5px 6px;min-width:0;color:var(--ink);border-radius:2px}
+.evdate{font-family:var(--fn);font-size:11px;color:var(--muted);white-space:nowrap}
 .tl{position:relative;height:104px;user-select:none;-webkit-user-select:none;touch-action:none}
 .tl .lane{position:absolute;left:0;right:0;top:4px;height:48px;border:1px dashed var(--rule);box-sizing:border-box;
   background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(121,131,139,.13) 6px 12px)}
@@ -123,49 +132,124 @@ svg{display:block;width:100%;height:auto}
   display:flex;flex-direction:column;justify-content:center;box-shadow:inset -1px 0 0 rgba(246,247,244,.55)}
 .tl .blk.started{cursor:default}
 .tl .blk .nm{font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
-.tl .blk .dt{font-family:'IBM Plex Mono',monospace;font-size:9.5px;opacity:.85;white-space:nowrap;overflow:hidden;pointer-events:none}
+.tl .blk .dt{font-family:var(--fn);font-size:9.5px;opacity:.85;white-space:nowrap;overflow:hidden;pointer-events:none}
 .tl .h{position:absolute;top:0;bottom:0;width:11px;cursor:ew-resize;z-index:2}
 .tl .h.l{left:0}.tl .h.r{right:0}
 .tl .h::after{content:'';position:absolute;top:14px;bottom:14px;left:4px;width:2px;background:rgba(255,255,255,.75)}
 .tl .ev{position:absolute;top:60px;width:12px;height:12px;margin-left:-6px;background:var(--fire);transform:rotate(45deg);cursor:grab;z-index:3}
 .tl .ev.neg{background:var(--warn)}
 .tl .axis{position:absolute;left:0;right:0;top:78px;height:24px}
-.tl .axis span{position:absolute;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--muted);white-space:nowrap;text-align:center;line-height:1.2}
+.tl .axis span{position:absolute;transform:translateX(-50%);font-family:var(--fn);font-size:9.5px;color:var(--muted);white-space:nowrap;text-align:center;line-height:1.2}
 .tl [data-act]:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
 .tl.dragging,.tl.dragging *{cursor:grabbing!important}
-.dtip{position:absolute;top:-24px;transform:translateX(-50%);background:var(--ink);color:var(--panel);font-family:'IBM Plex Mono',monospace;
+.dtip{position:absolute;top:-24px;transform:translateX(-50%);background:var(--ink);color:var(--panel);font-family:var(--fn);
   font-size:11px;padding:3px 8px;white-space:nowrap;pointer-events:none;z-index:5;border-radius:2px}
 .modal{position:fixed;inset:0;background:rgba(20,24,26,.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px}
 .modal .box{background:var(--panel);max-width:720px;width:100%;padding:22px 24px;max-height:90vh;display:flex;flex-direction:column;gap:12px;box-sizing:border-box}
-.modal textarea{width:100%;min-height:300px;flex:1;font-family:'IBM Plex Mono',monospace;font-size:11.5px;border:1px solid var(--rule);padding:10px;resize:vertical;box-sizing:border-box;background:var(--ground);color:var(--ink)}
+.modal textarea{width:100%;min-height:300px;flex:1;font-family:var(--fn);font-size:11.5px;border:1px solid var(--rule);padding:10px;resize:vertical;box-sizing:border-box;background:var(--ground);color:var(--ink)}
 .chartwrap{position:relative}
 .tipbox{position:absolute;pointer-events:none;opacity:0;transition:opacity .09s;background:var(--ink);color:var(--panel);
-  padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.5;white-space:nowrap;
+  padding:8px 10px;font-family:var(--fn);font-size:11.5px;line-height:1.5;white-space:nowrap;
   border-radius:2px;z-index:5;box-shadow:0 2px 10px rgba(0,0,0,.18)}
-.tipbox .tt{color:#9AA5AC;font-size:10px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:3px}
+.tipbox .tt{color:#9AA5AC;font-size:10px;display:block;margin-bottom:3px}
 .tipbox .tr{display:flex;gap:10px;justify-content:space-between}
 .tipbox .tr b{font-weight:600}
-.axl{font-family:'IBM Plex Mono',monospace;font-size:10px;fill:var(--muted)}
+.axl{font-family:var(--fn);font-size:10px;fill:var(--muted)}
 footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:var(--muted);line-height:1.65;max-width:760px}
 .warnbox{background:#F6E9E4;border-left:3px solid var(--warn);padding:12px 16px;font-size:12.5px;line-height:1.5;margin-bottom:24px}
+
+/* ---- design layer: one family, sentence-case labels, soft surfaces ---- */
+body{font-family:var(--fn);font-size:15px;line-height:1.5}
+.wrap{max-width:1140px;padding:44px 28px 96px;overflow-x:clip}
+h1{font-weight:800;letter-spacing:-.04em;line-height:.98}
+h1 #h1Target{color:var(--fire)!important}
+h2{font-size:24px;font-weight:700;letter-spacing:-.02em}
+.eyebrow{font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:10px}
+header .eyebrow{font-weight:500;color:var(--muted)}
+.lede{color:#33433D;font-size:16px;max-width:620px}
+section{margin-bottom:72px;scroll-margin-top:64px}
+.shead{border-bottom:0;padding-bottom:0;margin-bottom:18px;gap:12px}
+.shead .n{display:none}
+.shead .k{font-size:13px}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:22px 24px}
+.dark{border-radius:12px}
+table{font-size:13.5px}
+th{font-size:12px;font-weight:600;color:var(--muted);padding:8px 10px}
+td{padding:11px 10px}
+tbody tr:hover td{background:var(--soft)}
+.stat{border-left-width:3px;padding-left:14px}
+.stat .lab{font-size:12.5px;font-weight:500}
+.stat .val{font-weight:700;letter-spacing:-.025em}
+.stat .sub{font-size:12px}
+.legend{font-size:12.5px}
+.note{font-size:12px}
+.axl{font-size:11px}
+.tk{font-size:17px;font-weight:600;letter-spacing:-.01em;line-height:1.4;max-width:680px}
+.glance{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:20px 24px;margin:0 0 56px}
+.glance li{font-size:15.5px;padding:8px 0}
+.secnav{position:sticky;top:0;z-index:20;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:0 -28px 28px;padding:10px 28px;
+  background:rgba(237,241,239,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
+.secnav::-webkit-scrollbar{display:none}
+.secnav a{flex:none;font-size:13.5px;font-weight:500;color:var(--muted);text-decoration:none;padding:6px 11px;border-radius:999px}
+.secnav a:hover{color:var(--ink);background:var(--panel)}
+.secnav a:focus-visible{outline:2px solid var(--path);outline-offset:1px}
+/* the one loud element: the run to the target */
+.hero{--path:#74C7A0;--coast:#9DBBD8;--fire:#E5B04F;--warn:#F2958B;border:0;background:var(--ink);color:#E9EFEC;border-radius:16px;padding:30px 30px 26px;margin:30px 0 22px}
+.hero .fig .lab{font-size:12.5px;color:#9DB0A8}
+.hero .fig .num{font-size:27px;color:#fff}
+.hero .fig .sub{font-size:12px;color:#9DB0A8}
+.hero > div[style*="font-size:10.5px"]{color:#9DB0A8!important;font-size:12px!important}
+.track{height:34px}
+.track .rail{top:10px;height:14px;border-radius:7px;background:#2C3B35}
+.track .fill{top:10px;height:14px;border-radius:7px;background:linear-gradient(90deg,#2E7A5E,#5FB08C)}
+.track .tick{background:var(--ink);top:8px;height:18px}
+.track .tick span{top:26px;font-size:11px;color:#9DB0A8}
+.track .pin{top:4px;height:26px;width:3px;border-radius:2px;background:var(--fire)}
+.btn{font-size:13px;font-weight:600;border-radius:8px;padding:8px 14px}
+.seg{border-radius:8px;overflow:hidden}
+.seg button{font-size:12.5px;padding:6px 11px}
+.ctl label{font-size:12.5px}
+.ctl .v{font-size:15px}
+.phname{font-size:13px}
+.evrow input,.pengrid input{border-radius:6px}
+.tipbox{border-radius:8px;font-size:12.5px}
+.tipbox .tt{font-size:11.5px}
+.tl .blk{border-radius:6px}
+.warnbox{border-radius:8px}
+.modal .box{border-radius:12px}
+@media(max-width:640px){
+  .wrap{padding:28px 16px 72px}
+  .secnav{margin:0 -16px 22px;padding:10px 16px}
+  .hero{padding:22px 18px 20px;border-radius:12px}
+  .panel{padding:18px 16px}
+  .tk{font-size:16px}
+  h2{font-size:21px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
 </style></head><body><div class="wrap">
 
 <header style="margin-bottom:46px">
-  <div class="eyebrow">Interactive Brokers &middot; snapshot __ASOF__ &middot; base __CCY__ &middot; target <span id="ebTarget">__TARGETLBL__</span></div>
+  <div class="eyebrow">Interactive Brokers snapshot from __ASOF__, in __CCY__, aiming for <span id="ebTarget">__TARGETLBL__</span></div>
   <h1>__NETLIQLBL__ today.<br><span style="color:var(--path)" id="h1Target">__TARGETLBL__</span> is the line.</h1>
   <p class="lede" id="lede">__LEDE__</p>
 </header>
 
+<nav class="secnav" aria-label="Sections">
+  <a href="#holdings">Holdings</a><a href="#growthsection">Saved vs market</a><a href="#returns">Returns</a>
+  <a href="#risksection">Risk and costs</a><a href="#ccysection">Currency</a><a href="#milestones">Milestones</a><a href="#plansection">Plan</a>
+</nav>
 <div id="staleness"></div>
 
 <div class="hero">
   <div class="track" id="herotrack" title="progress toward the target"></div>
-  <div style="font-size:10.5px;color:var(--muted);margin:22px 0 20px;font-family:'IBM Plex Mono',monospace">
-    Milestones evenly spaced, not to scale &mdash; position within the current step is exact.</div>
+  <div style="font-size:10.5px;color:var(--muted);margin:22px 0 20px;font-family:var(--fn)">
+    Milestones are evenly spaced, not to scale. Your position within the current step is exact.</div>
   <div class="figs" id="herofigs"></div>
 </div>
+<div class="glance" id="glance"><div class="eyebrow" style="margin:0">At a glance</div><ul id="glancelist"></ul></div>
 
-<section>
+<section id="holdings">
   <div class="shead"><span class="n">01</span><h2>Holdings</h2><span class="k" id="hk"></span></div>
   <div style="overflow-x:auto"><table id="postbl">
     <thead><tr><th class="l">Ticker</th><th class="l">Role</th><th>Units</th><th>Price</th><th>Value</th><th>Weight</th>
@@ -240,7 +324,7 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
     <tbody></tbody></table></div>
 </section>
 
-<section>
+<section id="returns">
   <div class="shead"><span class="n">04</span><h2>Money-weighted returns</h2><span class="k">what your money earned, not what the funds did</span></div>
   <p style="font-size:12.5px;color:var(--muted);max-width:660px;margin:0 0 18px;line-height:1.55">
     IBKR reports this account as __MEASURE__. These figures are money-weighted: external transfers are
@@ -325,7 +409,7 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
   </div>
 </section>
 
-<section>
+<section id="milestones">
   <div class="shead"><span class="n">07</span><h2>Milestones</h2><span class="k" id="msk"></span></div>
   <p style="font-size:12.5px;color:var(--muted);max-width:660px;margin:0 0 22px;line-height:1.55">
     Dates in the past are real &mdash; the day your recorded NAV first closed above the line. Dates in
@@ -336,7 +420,7 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
     <tbody></tbody></table></div>
 </section>
 
-<section>
+<section id="plansection">
   <div class="shead"><span class="n">08</span><h2>The two finish lines</h2><span class="k">drag the timeline, change anything &mdash; it all recalculates</span></div>
   <div class="dark" style="margin-bottom:30px"><div class="grid g3" id="goalstats"></div></div>
   <div class="planbar" id="planbar"></div>
@@ -352,27 +436,29 @@ footer{border-top:1px solid var(--rule);padding-top:20px;font-size:11.5px;color:
   <div class="cols">
     <div class="panel" id="controls"></div>
     <div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px"><div class="seg" id="chartmode" role="group" aria-label="Chart detail" style="margin:0">
+        <button type="button" data-cm="simple">Simple charts</button><button type="button" data-cm="detailed">Detailed</button></div></div>
       <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:18px" id="crossstats"></div>
       <div class="panel" style="padding:16px 12px 8px;margin-bottom:18px">
         <div class="eyebrow" style="margin:0 0 6px 8px">Each year: what you earn, save, withdraw, and what the portfolio earns</div>
         <div id="flowchart"></div>
         <div class="legend" style="padding:6px 4px">
-          <span><b style="color:var(--rule)">&#9612;</b> Income</span>
+          <span data-detail><b style="color:var(--rule)">&#9612;</b> Income</span>
           <span><b style="color:var(--coast)">&#9612;</b> Saved</span>
           <span><b style="color:var(--path)">&#9612;</b> Investment return</span>
           <span><b style="color:var(--warn);opacity:.8">&#9612;</b> Withdrawn in retirement</span>
-          <span><b style="color:var(--fire)">&#9670;</b> One-off event</span>
-          <span><b style="color:var(--coast)">&#9670;</b> Pension pot</span>
+          <span data-detail><b style="color:var(--fire)">&#9670;</b> One-off event</span>
+          <span data-detail><b style="color:var(--coast)">&#9670;</b> Pension pot</span>
         </div>
         <div class="note" id="flownote" style="padding:0 6px 6px;font-size:12px;max-width:640px"></div>
       </div>
       <div class="panel" style="padding:16px 12px 8px"><div id="projchart"></div>
         <div class="legend" style="padding:6px 4px">
           <span><b style="color:var(--path)">&mdash;</b> Portfolio</span>
-          <span><b style="color:var(--coast)">- -</b> Coast threshold</span>
+          <span data-detail><b style="color:var(--coast)">- -</b> Coast threshold</span>
           <span><b style="color:var(--fire)">&mdash;</b> Target</span>
-          <span><b style="color:var(--path);opacity:.35">&#9608;</b> middle 80% of markets</span>
-          <span><b style="color:var(--muted)">&#9612;</b> phase, event or pension</span>
+          <span data-detail><b style="color:var(--path);opacity:.35">&#9608;</b> middle 80% of markets</span>
+          <span data-detail><b style="color:var(--muted)">&#9612;</b> phase, event or pension</span>
         </div>
         <div id="mcnote" style="padding:10px 8px 8px;border-top:1px solid var(--rule);margin-top:6px"></div>
       </div>
@@ -395,6 +481,24 @@ second pillar. They show the shape of the problem, not a forecast. Not investmen
 
 <script>
 const D = __DATA__;
+/* ---------- one-line takeaways above charts ----------
+   Each chart gets a sentence that says what it shows, so the page can be read
+   from the headlines alone and the chart is there for the detail. */
+function takeaway(hostId, html){
+  const host=document.getElementById(hostId); if(!host) return;
+  let t=document.getElementById(hostId+'_tk');
+  if(!t){ t=document.createElement('p'); t.className='tk'; t.id=hostId+'_tk'; host.parentNode.insertBefore(t, host); }
+  t.innerHTML=html;
+}
+const mag=(v,f)=>`<b class="${v<0?'neg':''}">${f(Math.abs(v))}</b>`;   /* size only: the verb carries the direction */
+const sgn=(v,f)=>`<b class="${v<0?'neg':''}">${v<0?'\u2212':'+'}${f(Math.abs(v))}</b>`;
+const monthName=t=>new Date(t).toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+const pts=v=>(v*100).toFixed(1)+' points';
+
+/* Simple / Detailed for the busy plan charts; remembered per browser */
+let chartMode='simple';
+try{ const m=localStorage.getItem('ibkr-fire-chartmode'); if(m==='detailed'||m==='simple') chartMode=m; }catch(e){}
+
 const LOCALE = (D.fmt && D.fmt.locale) || 'en-US';
 const nf = new Intl.NumberFormat(LOCALE,{maximumFractionDigits:0});
 const nf2 = new Intl.NumberFormat(LOCALE,{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -610,6 +714,8 @@ const el = h => { const t=document.createElement('template'); t.innerHTML=h.trim
   const hi=Math.max(finalNav, ...S.map(p=>p.nav))*1.08;
   const stepY=hi/5, yt=[]; for(let i=0;i<=5;i++) yt.push(stepY*i);
   const xt=[]; for(let i=0;i<=4;i++) xt.push(t0+(t1-t0)*i/4);
+  takeaway('growthchart', `Of the ${money(finalNav)} you have, ${money(totalIn)} is money you put in`
+    + ` and the market ${growth>=0?'added':'took away'} ${mag(growth,v=>money(v))}${everBelowCost?`; at the low on ${new Date(worstT).toLocaleDateString('en-GB',{day:'numeric',month:'short'})} it was worth ${money(-worst)} less than you had paid in`:''}.`);
   chart(document.getElementById('growthchart'),{
     height:260, xmin:t0, xmax:t1, ymin:0, ymax:hi, yticks:yt, xticks:xt,
     yfmt:v=> v>=1e6 ? (v/1e6).toFixed(1)+'M' : Math.round(v/1000)+'k',
@@ -642,7 +748,7 @@ const el = h => { const t=document.createElement('template'); t.innerHTML=h.trim
   D.returns.forEach(r=>{
     if(!r.available){
       tb.appendChild(el(`<tr><td class="l" style="font-weight:600">${r.label}</td>
-        <td colspan="5" class="l" style="color:var(--muted);font-family:Inter,sans-serif;font-size:12px">${r.note}</td></tr>`));
+        <td colspan="5" class="l" style="color:var(--muted);font-family:var(--fn);font-size:12px">${r.note}</td></tr>`));
       return;
     }
     const flag = r.extrapolated ? ' <span style="color:var(--muted);font-size:10px">extrapolated</span>' : '';
@@ -774,6 +880,12 @@ function chart(host, opts){
   const yt=[]; for(let v=Math.ceil(lo/step)*step; v<=hi; v+=step) yt.push(v);
   const xt=[]; const span=t1-t0;
   for(let i=0;i<=4;i++) xt.push(t0+span*i/4);
+  {
+    const lastP=S[S.length-1].cps; let pk=-Infinity, dd=0, ddT=null;
+    S.forEach(p=>{ pk=Math.max(pk,1+p.cps); const d=(1+p.cps)/pk-1; if(d<dd){dd=d; ddT=p.t;} });
+    takeaway('navchart', `Your investments are ${lastP>=0?'up':'down'} ${mag(lastP,v=>(v*100).toFixed(1)+'%')} since ${new Date(t0).toLocaleDateString('en-GB',{month:'long',year:'numeric'})}, not counting deposits`
+      + (dd<-0.03?`. The roughest patch was ${monthName(ddT)}, ${Math.abs(dd*100).toFixed(1)}% below the previous high.`:'.'));
+  }
   chart(document.getElementById('navchart'),{
     height:230, xmin:t0, xmax:t1, ymin:lo, ymax:hi, yticks:yt, xticks:xt,
     yfmt:v=>v.toFixed(0)+'%',
@@ -808,11 +920,16 @@ function chart(host, opts){
            Math.abs(share||0)>0.5 ? 'var(--warn)' : 'var(--coast)');
   }
 
+  if(main && F.rate_first && F.rate_last){
+    const mv=F.rate_last/F.rate_first-1;
+    takeaway('ratechart', `The ${F.asset_currency} ${mv<0?'fell':'rose'} ${Math.abs(mv*100).toFixed(1)}% against the ${F.display_currency} since ${main.label.toLowerCase().includes('since')?'you started':'the start of the window'},`
+      + ` which ${main.currency<0?'cost':'added'} you ${mag(main.currency,v=>(v*100).toFixed(1)+'%')} on top of what the funds did (${pc(main.asset)}).`);
+  }
   const tb=document.querySelector('#ccytbl tbody');
   F.splits.forEach(r=>{
     if(!r.available){
       tb.appendChild(el(`<tr><td class="l" style="font-weight:600">${r.label}</td>
-        <td colspan="5" class="l" style="color:var(--muted);font-family:Inter,sans-serif;font-size:12px">${r.note}</td></tr>`));
+        <td colspan="5" class="l" style="color:var(--muted);font-family:var(--fn);font-size:12px">${r.note}</td></tr>`));
       return;
     }
     const sh = r.currency_share===null ? '\u2014' : (r.currency_share*100).toFixed(0)+'%';
@@ -1121,13 +1238,13 @@ function niceStep(raw){
 }
 function drawFlows(P){
   const host=document.getElementById('flowchart');
-  const Y=P.years;
+  const Y=P.years, det=chartMode==='detailed';
   if(!Y.length){ host.innerHTML=''; return; }
   const W=760, H=250, ml=54, mr=14, mt=16, mb=28;
   /* One-off events don't set the scale: a single 60k purchase would otherwise
      squash thirty years of yearly bars into a sliver. Their markers are pinned
      inside the plot and labelled with the amount instead. */
-  let hi=Math.max(1, ...Y.map(y=>Math.max(y.income, y.saved, y.ret)));
+  let hi=Math.max(1, ...Y.map(y=>Math.max(det?y.income:0, y.saved, y.ret)));
   let lo=Math.min(0, ...Y.map(y=>Math.min(y.ret, y.saved, -y.withdrawn)));
   const step=niceStep((hi-lo)/4);
   hi=Math.ceil(hi*1.04/step)*step; lo=Math.floor(lo/step)*step;
@@ -1143,12 +1260,12 @@ function drawFlows(P){
     return `<rect x="${x.toFixed(1)}" y="${y1.toFixed(1)}" width="${w.toFixed(2)}" height="${Math.max(0,y2-y1).toFixed(1)}" fill="${fill}"${op?` opacity="${op}"`:''}/>`; };
   Y.forEach((y,i)=>{
     const x=x0(i);
-    s+=bar(x, y.income, bw, 'var(--rule)');          /* what you earn */
+    if(det) s+=bar(x, y.income, bw, 'var(--rule)');   /* what you earn */
     s+=bar(x, y.saved, bw, 'var(--coast)');           /* the part of it you keep */
     if(y.withdrawn) s+=bar(x, -y.withdrawn, bw, 'var(--warn)', 0.8);   /* what you live on */
     s+=bar(x+bw+gapIn, y.ret, bw, 'var(--path)');     /* what the portfolio earns */
     const lump=y.events+y.pension;
-    if(lump){
+    if(lump && det){
       const cx=x+bw+gapIn/2, raw=ty(lump), cy=Math.min(Math.max(raw, mt+6), H-mb-6);
       const col=lump<0?'var(--warn)':(y.pension?'var(--coast)':'var(--fire)'), off=raw!==cy;
       s+=`<line x1="${cx}" y1="${ty(0)}" x2="${cx}" y2="${cy}" stroke="${col}" stroke-width="1.4"${off?' stroke-dasharray="3 2"':''}/>`;
@@ -1411,7 +1528,8 @@ function drawProjection(){
       P.fireAge?`withdrawing ${money(T*state.withdrawal_rate)}/yr from age ${P.fireAge.toFixed(0)}`
         +(state.pensions.enabled&&state.pensions.ahv.yearly_amount>0?`, less AHV from ${state.pensions.ahv.start_age}`:''):'retirement not reached','var(--path)') +
     stat('If markets fall 30% as you retire', S?lasts(S):'—',
-      S?(S.lastsTo===null?'still lasts &mdash; a bad first year is the classic way plans fail':'a bad first year is the classic way plans fail'):'retirement not reached','var(--warn)');
+      S?(S.lastsTo===null?'still lasts &mdash; a bad first year is the classic way plans fail':'a bad first year is the classic way plans fail'):'retirement not reached',
+      S&&S.lastsTo===null?'var(--path)':'var(--warn)');
 
   drawUncertainty(P, mc, endAge);
   drawSensitivity(P);
@@ -1425,13 +1543,13 @@ function drawProjection(){
     : `${(cur.savings_rate*100).toFixed(0)}% of ${money(incomeAt(cur,M0))} income`;
   document.getElementById('goalstats').innerHTML = `
     <div><div class="lab" style="color:#8A959C">Annual income at target</div>
-      <div style="font-family:Archivo;font-weight:700;font-size:27px;margin-top:3px;color:#7FBFA5">${money(T*state.withdrawal_rate)}</div>
+      <div style="font-family:var(--fn);font-weight:700;font-size:27px;margin-top:3px;color:#7FBFA5">${money(T*state.withdrawal_rate)}</div>
       <div style="font-size:11.5px;color:#8A959C;margin-top:3px">${(state.withdrawal_rate*100).toFixed(2)}% withdrawal rate</div></div>
     <div><div class="lab" style="color:#8A959C">Saving right now</div>
-      <div style="font-family:Archivo;font-weight:700;font-size:27px;margin-top:3px">${money(nowSave)}<span style="font-size:14px">/mo</span></div>
+      <div style="font-family:var(--fn);font-weight:700;font-size:27px;margin-top:3px">${money(nowSave)}<span style="font-size:14px">/mo</span></div>
       <div style="font-size:11.5px;color:#8A959C;margin-top:3px">${saveSub}</div></div>
     <div><div class="lab" style="color:#8A959C">Years to target</div>
-      <div style="font-family:Archivo;font-weight:700;font-size:27px;margin-top:3px;color:#E8A05E">${yrsToFire?yrsToFire.toFixed(0):'—'}</div>
+      <div style="font-family:var(--fn);font-weight:700;font-size:27px;margin-top:3px;color:#E8A05E">${yrsToFire?yrsToFire.toFixed(0):'—'}</div>
       <div style="font-size:11.5px;color:#8A959C;margin-top:3px">${yrsToFire?('from today, age '+D.age_now.toFixed(0)):'unreachable on these inputs'}</div></div>`;
 
   drawFlows(P);
@@ -1443,8 +1561,8 @@ function drawProjection(){
   const minY = Math.min(0, ...P.rows.map(r=>r.bal));
   const clip = v => Math.min(maxY, Math.max(minY, v));
   const ageMin=Math.floor(D.age_now), ageMax=Math.ceil(ageAt(M0+P.N));
-  const yt=[]; const stepY=(maxY-minY)/5;
-  for(let i=0;i<=5;i++) yt.push(minY+stepY*i);
+  const stepY=niceStep((maxY-minY)/5), yt=[];
+  for(let v=Math.ceil(minY/stepY)*stepY; v<=maxY+1e-6; v+=stepY) yt.push(v);
   const xt=[]; for(let a=Math.ceil(ageMin/5)*5;a<=ageMax;a+=5) xt.push(a);
   const dots=[];
   if(P.coastAge){const r=P.rows.find(x=>x.age>=P.coastAge); if(r)dots.push([r.age,r.bal,'var(--coast)']);}
@@ -1454,12 +1572,14 @@ function drawProjection(){
     .concat(P.pots.filter(p=>p.unlock<=endAge).map(p=>[p.unlock, esc(p.label), 'var(--coast)']));
   if(P.fireAge) vl.push([P.fireAge,'retire','var(--fire)']);
 
+  const det=chartMode==='detailed';
   const series=[
     {name:'Target',data:P.rows.map(r=>[r.age,T]),color:'var(--fire)',w:2},
     {name:'Coast threshold',data:P.rows.map(r=>[r.age,r.coast]),color:'var(--coast)',w:1.6,dash:'6 4'},
     {name:'Portfolio',data:P.rows.map(r=>[r.age,r.bal]),color:'var(--path)',w:2.6}
   ];
-  if(mc){
+  if(!det){ series.splice(1,1); }
+  if(mc && det){
     series.push({name:'Bad markets (10th pct)',data:mc.band.map(b=>[b.age,b.p10]),color:'var(--warn)',w:1,dash:'2 3'});
     series.push({name:'Good markets (90th pct)',data:mc.band.map(b=>[b.age,b.p90>maxY?null:b.p90]),color:'var(--path)',w:1,dash:'2 3'});
   }
@@ -1467,12 +1587,28 @@ function drawProjection(){
     height:340, xmin:ageMin, xmax:ageMax, ymin:minY, ymax:maxY, yticks:yt, xticks:xt,
     yfmt:v=> kfmt(v), xfmt:v=> v.toFixed(0),
     aria:'portfolio projection against the target and coast threshold',
-    vlines:vl,
-    area: mc ? mc.band.map(b=>[b.age, clip(b.p10), clip(b.p90)]) : null,
+    vlines: det ? vl : vl.filter(v=>v[1]==='retire'),
+    area: mc && det ? mc.band.map(b=>[b.age, clip(b.p10), clip(b.p90)]) : null,
     tip:{fmt:v=>money(v), xfmt:v=>'age '+v.toFixed(1)},
     series:series,
-    dots:dots
+    dots: det ? dots : dots.filter(d=>d[2]==='var(--fire)')
   });
+
+  /* headlines for the plan charts, recomputed with every change */
+  const yr=a=>new Date(MS_NOW.getTime()+(a-D.age_now)*365.25*864e5).getFullYear();
+  takeaway('projchart', P.fireAge
+    ? `On this plan you reach ${money(T)} at <b>age ${P.fireAge.toFixed(0)}</b> (${yr(P.fireAge)})`
+      + (mc&&mc.age90?`, or by ${mc.age90.toFixed(0)} even if markets are poor`:'')
+      + `, and the money ${P.lastsTo===null?`lasts past ${Math.floor(endAge)}`:`runs out at ${P.lastsTo.toFixed(0)}`}.`
+    : `On this plan the portfolio doesn't reach ${money(T)} by ${Math.floor(endAge)}. Saving more or a lower target would change that.`);
+  {
+    const w=P.years.filter(y=>!y.retired);
+    const save=w.reduce((s,y)=>s+y.saved,0), ret=w.reduce((s,y)=>s+y.ret,0);
+    takeaway('flowchart', P.cross
+      ? `Saving does the heavy lifting until <b>age ${Math.floor(P.cross.age)}</b>; from then on the portfolio earns more each year than you put in.`
+      : `Your saving stays the bigger engine for the whole plan: ${money(save)} saved against ${money(ret)} of investment return.`);
+  }
+  drawGlance(P, mc);
 
   drawMilestones(P);
   drawHero(P);
@@ -1517,6 +1653,51 @@ function drawSensitivity(P){
     h+='</tr>';
   });
   host.innerHTML=h+'</tbody></table>';
+  if(P.fireAge){
+    const more=project({saveMul:1.25, lite:true}).fireAge, lower=project({r:state.real_return-0.01, lite:true}).fireAge;
+    const d1=more!==null?P.fireAge-more:null, d2=lower!==null?lower-P.fireAge:null;
+    takeaway('sensgrid', `Saving a quarter more brings the target ${d1!==null?`<b>${d1.toFixed(1)} years</b> closer`:'within reach'};`
+      + ` a return one point lower pushes it ${d2!==null?`<b class="neg">${d2.toFixed(1)} years</b> later`:'out of reach'}.`);
+  } else takeaway('sensgrid','The target is out of reach on the current plan; the grid shows which combinations get you there.');
+}
+
+/* ---------- at a glance: where you stand, whether you're on plan, what changed ---------- */
+const SEEN_KEY='ibkr-fire-lastseen:'+(D.demo?'demo':'live');
+const SEEN=(function(){
+  /* keeps the previous refresh, so "since last time" survives reloading the same snapshot */
+  const cur={asof:D.as_of, nav:D.summary.net_liquidation, contrib:(D.flows||[]).reduce((s,f)=>s+f.amount,0),
+             divs:((D.income||{}).dividends||[]).length};
+  let st=null; try{ st=JSON.parse(localStorage.getItem(SEEN_KEY)||'null'); }catch(e){}
+  if(!st || !st.cur) st={prev:null, cur};
+  else if(st.cur.asof!==cur.asof) st={prev:st.cur, cur};
+  try{ localStorage.setItem(SEEN_KEY, JSON.stringify(st)); }catch(e){}
+  return st;
+})();
+function drawGlance(P, mc){
+  const ul=document.getElementById('glancelist'); if(!ul) return;
+  const net=D.summary.net_liquidation, T=state.target, items=[];
+  items.push(`You have <b>${money(net)}</b>, ${(net/T*100).toFixed(1)}% of your ${money(T)} target.`);
+  const cur=phaseAt(M0);
+  items.push(P.fireAge
+    ? `On the current plan you reach it at <b>age ${P.fireAge.toFixed(0)}</b>`
+      + (P.coastAge?`; you could stop saving from age ${P.coastAge.toFixed(0)} and still get there by ${state.coast_full_age}`:'')
+      + (cur?`. You're saving ${money(savingAt(cur,M0))} a month now.`:'.')
+    : `The current plan doesn't reach the target by ${Math.floor(ageAt(M0+P.N))}; section 08 shows what would.`);
+  const S=D.series;
+  if(S.length>1){
+    const r=S[S.length-1].cps, B=(D.income||{}).benchmark;
+    let line=`Your investments are ${r>=0?'up':'down'} ${pc(r)} since ${new Date(S[0].t).toLocaleDateString('en-GB',{month:'short',year:'numeric'})}, deposits aside`;
+    if(B && B.cps[B.cps.length-1]!=null){ const g=(1+r)/(1+S[0].cps)-1-B.cps[B.cps.length-1];
+      line+=`, ${Math.abs(g*100).toFixed(1)} points ${g>=0?'ahead of':'behind'} ${B.ticker}`; }
+    items.push(line+'.');
+  }
+  const p=SEEN.prev;
+  if(p){
+    const dn=net-p.nav, dc=SEEN.cur.contrib-p.contrib, dm=dn-dc, nd=SEEN.cur.divs-p.divs;
+    items.push(`Since your last refresh (${esc(p.asof)}): ${sgn(dn,v=>money(v))} in value, ${money(Math.max(0,dc))} from deposits and ${sgn(dm,v=>money(v))} from the market`
+      + (nd>0?`, with ${nd} new dividend${nd>1?'s':''}.`:'.'));
+  } else if(!D.demo) items.push(`Next time you refresh, this line will say what changed since today (${esc(D.as_of)}).`);
+  ul.innerHTML=items.map(x=>`<li>${x}</li>`).join('');
 }
 
 /* Fee drag. The real return you enter is already after fees, so this does not
@@ -1840,7 +2021,7 @@ function buildControls(){
   });
   host.appendChild(add);
 
-  const evs=el(`<div class="evsec"><div class="ph" style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600">One-off events</div>
+  const evs=el(`<div class="evsec"><div class="ph" style="font-family:var(--fn);font-size:10.5px;font-weight:600">One-off events</div>
     <div class="note">Lump sums on a date &mdash; a bonus or inheritance, or a big purchase as a negative amount. Drag the diamonds on the timeline to move them.</div></div>`);
   state.events.filter(e=>e.m>=M0).forEach(e=>evs.appendChild(eventRow(e)));
   const addE=el(`<div class="btnrow"><button class="btn ghost" type="button">+ Add event</button></div>`);
@@ -1978,12 +2159,14 @@ function showExport(){
   const qs=[...q.entries()], mx=Math.max(...qs.map(x=>x[1]));
   document.getElementById('divq').innerHTML = '<div class="lab" style="margin-bottom:8px">By quarter, gross</div>' + qs.map(([k,v])=>
     `<div style="display:grid;grid-template-columns:62px 1fr 92px;gap:8px;align-items:center;font-size:12px;margin:5px 0">
-      <span style="font-family:'IBM Plex Mono',monospace">${k}</span>
+      <span style="font-family:var(--fn)">${k}</span>
       <span style="height:12px;background:var(--path);opacity:.8;width:${(v/mx*100).toFixed(1)}%"></span>
-      <span style="text-align:right;font-family:'IBM Plex Mono',monospace">${fm2(v)}</span></div>`).join('');
+      <span style="text-align:right;font-family:var(--fn)">${fm2(v)}</span></div>`).join('');
 
   /* by fund */
   const f=new Map(); L.forEach(d=>f.set(d.ticker,(f.get(d.ticker)||0)+amt(d)));
+  { const top=[...f.entries()].sort((a,b)=>b[1]-a[1])[0];
+    takeaway('divq', `Your funds have paid you ${fm(total)} in dividends, about ${fm(total*(1-wr))} after tax withheld; ${esc(top[0])} paid ${Math.round(top[1]/total*100)}% of it.`); }
   document.getElementById('divtbl').innerHTML = `<thead><tr><th class="l">Fund</th><th>Gross</th><th>Est. net</th><th>Share</th></tr></thead><tbody>`
     + [...f.entries()].sort((a,b)=>b[1]-a[1]).map(([t,v])=>`<tr><td class="l">${esc(t)}</td><td>${fm2(v)}</td><td>${fm2(v*(1-wr))}</td><td>${(v/total*100).toFixed(0)}%</td></tr>`).join('')
     + '</tbody>';
@@ -2010,6 +2193,16 @@ function showExport(){
     st('Your portfolio', pc(yEnd), 'time-weighted, as IBKR reports it','var(--path)') +
     st(B.ticker+' total return', pc(bEnd), `dividends reinvested${B.converted?', in '+B.currency:''}`,'var(--muted)') +
     st('Difference', (diff>=0?'+':'−')+Math.abs(diff*100).toFixed(2)+' pts', diff>=0?'ahead of the benchmark':'behind the benchmark', diff>=0?'var(--path)':'var(--warn)');
+  /* where the gap opened: the calendar month in which it moved most */
+  {
+    const byM=new Map();
+    S.forEach((p,i)=>{ if(B.cps[i]==null) return; const d=new Date(p.t), k=d.getFullYear()*12+d.getMonth();
+      byM.set(k,{t:p.t, gap:(1+p.cps)/c0-1-B.cps[i]}); });
+    const ms=[...byM.values()]; let big=null, prev=0;
+    ms.forEach(m=>{ const ch=m.gap-prev; if(!big || Math.abs(ch)>Math.abs(big.ch)) big={t:m.t, ch}; prev=m.gap; });
+    takeaway('benchchart', `You are ${mag(diff,v=>pts(v))} ${diff>=0?'ahead of':'behind'} ${B.ticker} since ${new Date(S[0].t).toLocaleDateString('en-GB',{month:'long'})}`
+      + (big&&Math.abs(big.ch)>0.002?`; most of the gap ${(big.ch<0)===(diff<0)?'opened':'closed'} in ${monthName(big.t)}.`:'.'));
+  }
   const all=you.concat(vt).map(x=>x[1]);
   let lo=Math.min(0,...all), hi=Math.max(0,...all);
   const step=niceStep((hi-lo)/4); lo=Math.floor(lo/step)*step; hi=Math.ceil(hi/step)*step;
@@ -2065,6 +2258,11 @@ const RISK = (function(){
     st('Best month', best?pc(best.r):'—', best?ml(best):'needs a full month', 'var(--path)') +
     st('Worst month', worst?pc(worst.r):'—', worst?ml(worst):'needs a full month', 'var(--warn)');
 
+  { const wk=t=>Math.max(1,Math.round(t/(7*864e5)));
+    takeaway('ddchart', `The worst fall was <b class="neg">${pc(RISK.mdd)}</b> in ${monthName(RISK.mddT)}`
+      + (RISK.recT?` and it was back at its high ${wk(RISK.recT-RISK.mddT)} weeks later.`:'; it has not fully recovered yet.')); }
+  { const up=full.filter(m=>m.r>0).length;
+    if(full.length) takeaway('heatmap', `${up} of ${full.length} full months were positive; the best was ${best?ml(best):''} at ${best?pc(best.r):''}.`); }
   const lo=Math.min(-0.01, RISK.mdd*1.15), t0=RISK.dd[0][0], t1=RISK.dd[RISK.dd.length-1][0];
   const yt=[]; const step=niceStep(-lo/4); for(let v=0; v>=lo-1e-9; v-=step) yt.push(v);
   const xt=[]; const span=t1-t0; for(let i=0;i<=4;i++) xt.push(t0+span*i/4);
@@ -2093,6 +2291,17 @@ const RISK = (function(){
   document.getElementById('heatmap').innerHTML=h+'</tbody></table>';
 })();
 
+function renderChartMode(){
+  document.getElementById('plansection').classList.toggle('plansimple', chartMode==='simple');
+  document.querySelectorAll('#chartmode button').forEach(b=>{ const on=b.dataset.cm===chartMode;
+    b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); });
+}
+document.getElementById('chartmode').addEventListener('click',ev=>{
+  const b=ev.target.closest('[data-cm]'); if(!b || b.dataset.cm===chartMode) return;
+  chartMode=b.dataset.cm; try{ localStorage.setItem('ibkr-fire-chartmode',chartMode); }catch(e){}
+  renderChartMode(); drawProjection();
+});
+renderChartMode();
 buildControls();
 renderZoom();
 renderTimeline();
