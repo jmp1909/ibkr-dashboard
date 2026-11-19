@@ -279,7 +279,10 @@ def resolve_lookthrough(
         cache = fund_data.load(wanted, root / fd_cfg.get("cache_path", "data/fund_data.json"),
                                int(fd_cfg.get("max_age_days", 7)))
         fetched = {k: v for k, v in cache.items() if k in {w.upper() for w in wanted}}
-    return fund_data.merge(fetched, cfg.get("lookthrough", {}))
+    scheme = str(fd_cfg.get("emerging", "msci")).lower()
+    if scheme not in fund_data.EMERGING:
+        raise SystemExit(f"config.json: fund_data.emerging must be 'msci' or 'ftse', got {scheme!r}.")
+    return fund_data.merge(fetched, cfg.get("lookthrough", {}), scheme)
 
 
 def compute_exposure(positions: list[dict[str, Any]], lookthrough: dict[str, Any]) -> dict[str, float]:

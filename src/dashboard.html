@@ -1393,7 +1393,7 @@ function ltSources(tks){
   const say=o=>Object.entries(o).map(([s,ks])=>`${ks.map(esc).join(', ')} from ${s==='config.json'?'<code>config.json</code>':esc(s)}`).join('; ');
   const a=say(g), b=say(f);
   return (a?`Regional split: ${a}. `:'')+(b?`Fees: ${b}.`:'')
-    +(a||b?' Fetched on each refresh (weekly cache) from Vanguard and Yahoo Finance; <code>lookthrough</code> in config.json overrides.':'');
+    +(a||b?' Fetched on each refresh (weekly cache) from Vanguard, iShares and Yahoo Finance; <code>lookthrough</code> in config.json overrides.':'');
 }
 const lsDel = k => { try{ localStorage.removeItem(k); }catch(e){} };
 /* A plan stored before the plan gained fields must compare equal once those

@@ -96,10 +96,12 @@
       "amount": -60000
     }
   ],
-  "_fund_data_note": "Each fund's regional split, factor tilt and expense ratio are fetched on every refresh (weekly cache) from Vanguard's public fund data and Yahoo Finance. Free, no account or key. Set enabled to false to rely on lookthrough below only; add tickers to extra to fetch funds you don't hold or target yet.",
+  "_fund_data_note": "Each fund's regional split, factor tilt and expense ratio are fetched on every refresh (weekly cache) from Vanguard's public fund data, iShares' holdings files and Yahoo Finance. Free, no account or key. Set enabled to false to rely on lookthrough below only; add tickers to extra to fetch funds you don't hold or target yet.",
   "fund_data": {
     "enabled": true,
     "max_age_days": 7,
+    "_emerging_note": "Which countries count as emerging markets when a fund's country list is grouped: msci (Korea and Poland emerging, the usual definition) or ftse (they count as developed; the index family Vanguard's global funds follow).",
+    "emerging": "msci",
     "extra": []
   },
   "_lookthrough_note": "Optional overrides on top of the fetched fund data. A fund's own us/dev/em here replaces its fetched split; tilt (1 = deliberate small/value fund), ter (0.0006 = 0.06%) and role override one by one. Leave a fund out to use only what is fetched.",
