@@ -322,6 +322,20 @@ table.heat2 tbody tr:hover td,table.sens2 tbody tr:hover td{background:none}
 .tgpre{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--mid)}
 .tgpre .btn{padding:5px 10px;font-size:12.5px}
 .tgadd{display:flex;gap:8px;padding:10px 16px 16px;border-top:1px solid var(--line)}
+.tginfo{border-top:1px solid var(--line)}
+.tginfo summary{display:flex;align-items:center;gap:8px;padding:11px 16px;cursor:pointer;list-style:none;font-size:12.5px;font-weight:500;color:var(--mid);border-radius:0 0 12px 12px}
+.tginfo summary::-webkit-details-marker{display:none}
+.tginfo summary:hover{color:var(--ink);background:var(--hover)}
+.tginfo summary:focus-visible{outline:2px solid var(--plan);outline-offset:-2px}
+.tginfo svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;flex:none}
+.tginfo .chev{margin-left:auto;width:14px;height:14px;transition:transform .15s}
+.tginfo[open] .chev{transform:rotate(90deg)}
+.tginfo[open] summary{color:var(--ink);border-radius:0}
+.tginfob{margin:0 16px 16px;padding:12px 14px;background:var(--hover);border:1px solid var(--line);border-radius:10px;font-size:12.5px;line-height:1.55;color:var(--ink2)}
+.tginfob p{margin:0 0 8px}
+.tginfob ol{margin:0 0 8px;padding-left:20px}.tginfob li{margin:3px 0}
+.tginfob .tgaside{margin:0;color:var(--mid)}
+@media (prefers-reduced-motion:reduce){.tginfo .chev{transition:none}}
 .tgadd input{flex:1;font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line2);border-radius:8px;background:var(--card);color:var(--ink)}
 .tgbars{display:grid;gap:8px;margin-bottom:6px}.tgbars small{font-size:11.5px;color:var(--mid)}
 .tgcmp{display:flex;gap:12px;align-items:baseline}.tgcmp small{color:var(--mid);font-size:12px}
@@ -473,7 +487,17 @@ table.heat2 tbody tr:hover td,table.sens2 tbody tr:hover td{background:none}
     <div class="card"><div class="cardh"><h2>Target weights</h2><span id="tgtotal"></span></div>
       <div class="rows" id="tgrows"></div>
       <div class="tgpre"><span>Start from</span><button type="button" class="btn ghost" data-tg="reset">config.json</button><button type="button" class="btn ghost" data-tg="held">What you hold now</button><button type="button" class="btn ghost" data-tg="equal">Equal weights</button></div>
-      <form class="tgadd" id="tgadd"><input id="tgnew" placeholder="Add a fund by ticker, e.g. VTI" aria-label="Ticker to add" maxlength="12"><button class="btn" type="submit">Add</button></form></div>
+      <form class="tgadd" id="tgadd"><input id="tgnew" placeholder="Add a fund by ticker, e.g. VTI" aria-label="Ticker to add" maxlength="12"><button class="btn" type="submit">Add</button></form>
+      <details class="tginfo" id="tginfo"><summary><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>How a new fund gets its data<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></summary>
+        <div class="tginfob">
+          <p>What a fund holds (its regions, currencies and fee) is fetched when the dashboard refreshes. The refresh reads <code>config.json</code>, not this page, so a fund you add here has no data until config.json knows about it. Its weight works straight away; only the regional split, currencies and fee are missing.</p>
+          <ol>
+            <li>Set the weights here until they add up to 100%.</li>
+            <li>Press <b>Copy as config</b> at the top of this page and paste it over the <code>"targets"</code> entry in config.json.</li>
+            <li>Refresh the dashboard. The fund&rsquo;s data is fetched, and kept up to date from then on.</li>
+          </ol>
+          <p class="tgaside">Only trying a fund out? Add its ticker to <code>"extra"</code> under <code>"fund_data"</code> in config.json instead. It is fetched at the next refresh without becoming a target.</p>
+        </div></details></div>
     <div class="side2">
       <div class="card"><div class="cardh"><h2>What this mix holds</h2><span>target, against today</span></div><div class="pad2" id="tgmix"></div></div>
       <div class="card"><div class="cardh"><h2>Getting there</h2><span>without selling anything</span></div><div class="rows" id="tgget"></div></div>
@@ -3306,7 +3330,7 @@ const RISK = (function(){
         +parts.map(([x,l,c])=>`<div class="lrow"><span><i style="background:${c}"></i>${l}</span><span class="tgcmp"><small>now ${(b[x]*100).toFixed(1)}%</small><b>${(a[x]*100).toFixed(1)}%</b></span></div>`).join('')
         +`<div class="lrow"><span><i style="background:var(--card);border:1px solid var(--line2)"></i>In factor funds (small cap, value)</span><span class="tgcmp"><small>now ${(b.tilt*100).toFixed(0)}%</small><b>${(a.tilt*100).toFixed(0)}%</b></span></div>`
         +`<div class="lrow"><span><i style="background:transparent"></i>Fund costs, weighted</span><span class="tgcmp"><small>now ${b.ter==null?'—':(b.ter*100).toFixed(3)+'%'}</small><b>${a.ter==null?'—':(a.ter*100).toFixed(3)+'%'}</b></span></div>`
-        +(sum()>0&&a.cov<sum()/100-0.001?`<div class="note">${((1-a.cov/(sum()/100))*100).toFixed(0)}% of the target is in funds without a regional split. A fund added here is fetched at the next refresh once it is in config.json's targets (Copy as config) or <code>fund_data.extra</code>.</div>`:'')
+        +(sum()>0&&a.cov<sum()/100-0.001?`<div class="note">${((1-a.cov/(sum()/100))*100).toFixed(0)}% of the target is in funds without a regional split yet. <button type="button" class="linkbtn" data-tginfo>How to get their data</button></div>`:'')
         +`<div class="note">${ltSources(Object.keys(draft).filter(k=>draft[k]>0))}</div>`;
       /* how far the mix is from what you hold, if you only ever buy */
       const ok=Math.abs(sum()-100)<0.05;
@@ -3325,6 +3349,8 @@ const RISK = (function(){
     host.addEventListener('input',e=>{ const r=e.target.closest('.tgrow'); if(!r) return; let v=Math.max(0,Math.min(100,+e.target.value||0));
       draft[r.dataset.k]=v; r.querySelectorAll('input').forEach(i=>{ if(i!==e.target) i.value=v; }); apply(); });
     host.addEventListener('click',e=>{ const b=e.target.closest('[data-del]'); if(!b||b.disabled) return; delete draft[b.dataset.del]; rows(); apply(); });
+    document.addEventListener('click',e=>{ if(!e.target.closest('[data-tginfo]')) return; const d=$('tginfo'); d.open=true;
+      d.scrollIntoView({behavior:'smooth',block:'nearest'}); d.querySelector('summary').focus({preventScroll:true}); });
     $('tgadd').addEventListener('submit',e=>{ e.preventDefault(); const i=$('tgnew'), k=(i.value||'').trim().toUpperCase().replace(/[^A-Z0-9.\-]/g,'').slice(0,12);
       if(k && !(k in draft)){ draft[k]=0; rows(); apply(); } i.value=''; });
     document.addEventListener('click',e=>{ const b=e.target.closest('[data-tg]'); if(!b) return;
