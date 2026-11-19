@@ -256,6 +256,32 @@ def current_phase(plan: dict[str, Any]) -> tuple[dict[str, Any], bool]:
     return first, month_index(first["start"]) > now
 
 
+def resolve_lookthrough(
+    cfg: dict[str, Any], positions: list[dict[str, Any]], root: Path, demo: bool = False
+) -> dict[str, dict[str, Any]]:
+    """
+    Each fund's regional split, tilt and expense ratio: fetched from Vanguard
+    and Yahoo (see fund_data.py), with config.json's "lookthrough" on top.
+
+    The demo never goes online; it uses a bundled copy of fetched data.
+    """
+    import fund_data
+
+    fd_cfg = cfg.get("fund_data") or {}
+    fetched: dict[str, dict[str, Any]] = {}
+    if demo:
+        from demo_data import DEMO_FUND_DATA
+
+        fetched = DEMO_FUND_DATA
+    elif fd_cfg.get("enabled", True):
+        wanted = [p["ticker"] for p in positions] + list(cfg.get("targets", {}))
+        wanted += benchmark_choices(cfg)[1] + list(fd_cfg.get("extra", []))
+        cache = fund_data.load(wanted, root / fd_cfg.get("cache_path", "data/fund_data.json"),
+                               int(fd_cfg.get("max_age_days", 7)))
+        fetched = {k: v for k, v in cache.items() if k in {w.upper() for w in wanted}}
+    return fund_data.merge(fetched, cfg.get("lookthrough", {}))
+
+
 def compute_exposure(positions: list[dict[str, Any]], lookthrough: dict[str, Any]) -> dict[str, float]:
     """Weight each fund's published regional split by its share of the portfolio."""
     total = sum(p["market_value"] for p in positions) or 1.0
@@ -264,7 +290,7 @@ def compute_exposure(positions: list[dict[str, Any]], lookthrough: dict[str, Any
     for p in positions:
         lt = lookthrough.get(p["ticker"])
         w = p["market_value"] / total
-        if not lt:
+        if not lt or "us" not in lt:
             unmapped.append(p["ticker"])
             out["us"] += w  # assume domestic rather than silently dropping it
             continue
@@ -273,7 +299,7 @@ def compute_exposure(positions: list[dict[str, Any]], lookthrough: dict[str, Any
         out["em"] += w * lt.get("em", 0.0)
         out["tilt"] += w * lt.get("tilt", 0.0)
     if unmapped:
-        log.warning("No look-through for %s - add them to config.json.", ", ".join(unmapped))
+        log.warning("No regional split for %s - none could be fetched; add it under lookthrough in config.json.", ", ".join(unmapped))
     return out
 
 
@@ -603,7 +629,7 @@ def main(argv: list[str] | None = None) -> int:
             ccy, reported_ccy, reported_ccy, ccy, reported_ccy,
         )
 
-    lookthrough = cfg.get("lookthrough", {})
+    lookthrough = resolve_lookthrough(cfg, positions, ROOT, demo=args.demo)
     for p in positions:
         p["role"] = lookthrough.get(p["ticker"], {}).get("role", "")
 
@@ -651,11 +677,11 @@ def main(argv: list[str] | None = None) -> int:
             "locale": out_cfg.get("locale", "en-US"),
             "thousands_separator": out_cfg.get("thousands_separator", ","),
         },
-        "lookthrough_keys": list(lookthrough.keys()),
+        "lookthrough_keys": [k for k, v in lookthrough.items() if "us" in v],
         # Each fund's published regional split and fees, so the Targets page can
         # show what a mix of funds holds. Fund facts, nothing personal.
         "lookthrough": {
-            k: {f: v[f] for f in ("us", "dev", "em", "tilt", "ter", "role") if f in v}
+            k: {f: v[f] for f in ("us", "dev", "em", "tilt", "ter", "role", "source", "ter_source") if f in v}
             for k, v in lookthrough.items() if isinstance(v, dict)
         },
         # Expense ratios from config, keyed by ticker. Missing means unknown, not zero.

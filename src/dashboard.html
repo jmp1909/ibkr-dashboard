@@ -482,7 +482,7 @@ table.heat2 tbody tr:hover td,table.sens2 tbody tr:hover td{background:none}
   </div>
   <div class="dgrid even">
     <div class="card"><div class="cardh"><h2>Saved vs what markets added</h2><span id="pflowsn"></span></div><div class="minis" id="pflowk"></div><div class="rows scrollrows" id="pflows"></div></div>
-    <div class="card" id="pcostcard"><div class="cardh"><h2>What the funds charge</h2><span>expense ratios from config</span></div><div class="rows" id="pcost"></div></div>
+    <div class="card" id="pcostcard"><div class="cardh"><h2>What the funds charge</h2><span>expense ratios, fetched weekly</span></div><div class="rows" id="pcost"></div></div>
   </div>
   <div class="dgrid even" id="pccy" hidden>
     <div class="card"><div class="cardh"><h2>Currency effect</h2><span id="pccyk"></span></div><div class="minis" id="pccyfig"></div><div class="rows" id="pccywin"></div></div>
@@ -1384,6 +1384,17 @@ const SC_KEY = 'ibkr-fire-scenarios:v1:' + (D.demo ? 'demo' : 'live');
 const OLD_KEY = 'ibkr-fire-plan:v1:' + (D.demo ? 'demo' : 'live');
 const lsGet = k => { try{ const s=localStorage.getItem(k); return s?JSON.parse(s):null; }catch(e){ return null; } };
 const lsSet = (k,v) => { try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} };
+/* "VT from Vanguard; AVUV, AVDV from the fund category" for the funds given */
+function ltSources(tks){
+  const LT=D.lookthrough||{}, g={}, f={};
+  tks.forEach(k=>{ const l=LT[k]; if(!l) return;
+    if(l.us!=null){ const s=l.source||'config.json'; (g[s]=g[s]||[]).push(k); }
+    if(l.ter!=null){ const s=l.ter_source||'config.json'; (f[s]=f[s]||[]).push(k); } });
+  const say=o=>Object.entries(o).map(([s,ks])=>`${ks.map(esc).join(', ')} from ${s==='config.json'?'<code>config.json</code>':esc(s)}`).join('; ');
+  const a=say(g), b=say(f);
+  return (a?`Regional split: ${a}. `:'')+(b?`Fees: ${b}.`:'')
+    +(a||b?' Fetched on each refresh (weekly cache) from Vanguard and Yahoo Finance; <code>lookthrough</code> in config.json overrides.':'');
+}
 const lsDel = k => { try{ localStorage.removeItem(k); }catch(e){} };
 /* A plan stored before the plan gained fields must compare equal once those
    fields take config.json's values, or every upgrade would look like a change. */
@@ -3069,7 +3080,7 @@ const RISK = (function(){
       $('hregion').innerHTML=`<div class="stack">${parts.map(([l,v,c])=>`<i style="width:${(v*100).toFixed(1)}%;background:${c}" title="${l} ${(v*100).toFixed(1)}%"></i>`).join('')}</div>`
         +parts.map(([l,v,c])=>`<div class="lrow"><span><i style="background:${c}"></i>${l}</span><b>${(v*100).toFixed(1)}%</b></div>`).join('')
         +(E.tilt!=null?`<div class="lrow"><span><i style="background:var(--card);border:1px solid var(--line2)"></i>Held in factor funds (small cap, value)</span><b>${(E.tilt*100).toFixed(0)}%</b></div>`:'')
-        +`<div class="note" style="margin-top:12px">IBKR files the account under United States because the funds are US-listed; this is what they hold inside, from the regional splits in config.json. Gain on cost is not total return: reinvested dividends raise the cost basis.</div>`; }
+        +`<div class="note" style="margin-top:12px">IBKR files the account under United States because the funds are US-listed; this is what they hold inside. ${ltSources(POS.map(p=>p.ticker))} Gain on cost is not total return: reinvested dividends raise the cost basis.</div>`; }
 
     const tick=Object.keys(T);
     if(!tick.length){ $('hbuycard').hidden=true; return; }
@@ -3163,7 +3174,7 @@ const RISK = (function(){
     const known=POS.filter(p=>TER[p.ticker]!=null);
     if(!known.length){ $('pcostcard').hidden=true; }
     else { const kv=known.reduce((s,p)=>s+p.market_value,0), ter=known.reduce((s,p)=>s+p.market_value*TER[p.ticker],0)/kv;
-      $('pcost').innerHTML=POS.map(p=>{ const t=TER[p.ticker]; return `<div class="hrow">${fundCell(p.ticker,'')}<div class="n"><small>${t==null?'not in config':(t*100).toFixed(2)+'% a year'}</small></div><div class="v"><b>${t==null?'—':n0(p.market_value*t)}</b><small style="color:var(--mid)">a year</small></div></div>`; }).join('')
+      $('pcost').innerHTML=POS.map(p=>{ const t=TER[p.ticker]; return `<div class="hrow">${fundCell(p.ticker,'')}<div class="n"><small>${t==null?'unknown':(t*100).toFixed(2)+'% a year'+((D.lookthrough||{})[p.ticker]&&D.lookthrough[p.ticker].ter_source?', '+esc(D.lookthrough[p.ticker].ter_source):'')}</small></div><div class="v"><b>${t==null?'—':n0(p.market_value*t)}</b><small style="color:var(--mid)">a year</small></div></div>`; }).join('')
         +`<div class="hrow total"><div class="n"><b>Weighted ${(ter*100).toFixed(3)}%</b><small>your real-return assumption is already after fees</small></div><div></div><div class="v"><b>${n0(ter*PTOT)}</b><small style="color:var(--mid)">a year</small></div></div>`
         +`<div class="hrow total"><div class="n"><b>Cost by retirement</b><small>your plan against the same plan in fee-free funds</small></div><div></div><div class="v"><b id="pcostret">—</b><small style="color:var(--mid)" id="pcostage"></small></div></div>`; }
 
@@ -3231,7 +3242,7 @@ const RISK = (function(){
 
     /* what a set of weights holds, from each fund's regional split in config.json */
     function mix(w){ const o={us:0,dev:0,em:0,tilt:0,ter:0,cov:0,terCov:0};
-      Object.entries(w).forEach(([k,v])=>{ const l=LT[k]; if(!l||!v) return; o.cov+=v; ['us','dev','em','tilt'].forEach(x=>{ o[x]+=v*(+l[x]||0); });
+      Object.entries(w).forEach(([k,v])=>{ const l=LT[k]; if(!l||!v) return; if(l.us!=null){ o.cov+=v; ['us','dev','em','tilt'].forEach(x=>{ o[x]+=v*(+l[x]||0); }); }
         if(l.ter!=null){ o.ter+=v*l.ter; o.terCov+=v; } });
       ['us','dev','em','tilt'].forEach(x=>{ o[x]=o.cov?o[x]/o.cov:0; }); o.ter=o.terCov?o.ter/o.terCov:null; return o; }
 
@@ -3264,14 +3275,15 @@ const RISK = (function(){
     function side(){
       const tw={}, cw={}; Object.entries(draft).forEach(([k,v])=>{ tw[k]=v/100; }); POS.forEach(p=>{ cw[p.ticker]=cur(p.ticker); });
       const a=mix(tw), b=mix(cw), parts=[['us','United States','#2563A6'],['dev','Developed outside the US','#8B6BC9'],['em','Emerging markets','#E3A33B']];
-      const any=Object.keys(LT).length>0;
-      $('tgmix').innerHTML=!any?'<div class="note">Add regional splits under <code>lookthrough</code> in config.json to see what a mix holds.</div>'
+      const any=Object.values(LT).some(l=>l.us!=null);
+      $('tgmix').innerHTML=!any?'<div class="note">No regional splits yet. They are fetched on the next refresh; you can also set them under <code>lookthrough</code> in config.json.</div>'
         :`<div class="tgbars"><div><small>Target</small><div class="stack">${parts.map(([x,,c])=>`<i style="width:${(a[x]*100).toFixed(1)}%;background:${c}"></i>`).join('')}</div></div>
            <div><small>Now</small><div class="stack" style="opacity:.55">${parts.map(([x,,c])=>`<i style="width:${(b[x]*100).toFixed(1)}%;background:${c}"></i>`).join('')}</div></div></div>`
         +parts.map(([x,l,c])=>`<div class="lrow"><span><i style="background:${c}"></i>${l}</span><span class="tgcmp"><small>now ${(b[x]*100).toFixed(1)}%</small><b>${(a[x]*100).toFixed(1)}%</b></span></div>`).join('')
         +`<div class="lrow"><span><i style="background:var(--card);border:1px solid var(--line2)"></i>In factor funds (small cap, value)</span><span class="tgcmp"><small>now ${(b.tilt*100).toFixed(0)}%</small><b>${(a.tilt*100).toFixed(0)}%</b></span></div>`
         +`<div class="lrow"><span><i style="background:transparent"></i>Fund costs, weighted</span><span class="tgcmp"><small>now ${b.ter==null?'—':(b.ter*100).toFixed(3)+'%'}</small><b>${a.ter==null?'—':(a.ter*100).toFixed(3)+'%'}</b></span></div>`
-        +(sum()>0&&a.cov<sum()/100-0.001?`<div class="note">${((1-a.cov/(sum()/100))*100).toFixed(0)}% of the target is in funds without a regional split in config.json.</div>`:'');
+        +(sum()>0&&a.cov<sum()/100-0.001?`<div class="note">${((1-a.cov/(sum()/100))*100).toFixed(0)}% of the target is in funds without a regional split. A fund added here is fetched at the next refresh once it is in config.json's targets (Copy as config) or <code>fund_data.extra</code>.</div>`:'')
+        +`<div class="note">${ltSources(Object.keys(draft).filter(k=>draft[k]>0))}</div>`;
       /* how far the mix is from what you hold, if you only ever buy */
       const ok=Math.abs(sum()-100)<0.05;
       if(!ok){ $('tgget').innerHTML='<div class="note" style="padding:8px">Shown once the targets add up to 100%.</div>'; return; }

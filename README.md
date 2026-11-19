@@ -77,7 +77,8 @@ Copy `config.example.json` to `config.json`, then edit it:
 | `phases[]` | yes | Your savings timeline — see below |
 | `events[]` | no | One-off lump sums: a bonus, an inheritance, or a purchase (negative) |
 | `targets` | no | Intended allocation, summing to 1. Can also be set on the Targets page |
-| `lookthrough` | no | Regional split inside each fund, from its factsheet, plus `ter` (expense ratio) for the fee comparison |
+| `fund_data` | no | Fetch each fund's regional split, factor tilt and expense ratio automatically (default on, weekly cache). `extra` lists funds to fetch that you neither hold nor target |
+| `lookthrough` | no | Overrides for the fetched fund data: `us`/`dev`/`em` split, `tilt`, `ter` (expense ratio), `role` |
 | `benchmark.ticker` | no | Benchmark on the Dashboard and Performance pages, as total return. Default VT; null hides it. Also on the Settings page |
 | `benchmark.choices` | no | Benchmarks fetched on each refresh so the Settings page can switch instantly. Default VT, ACWI, VTI, VXUS |
 | `dividends.withholding_rate` | no | Estimated tax withheld at source. Default 0.15. Also on the Settings page |
@@ -262,6 +263,25 @@ Leave that running, log in at `https://localhost:5000`, then:
 ```
 .venv\Scripts\python.exe src\main.py
 ```
+
+## Fund data
+
+IBKR's API files every US-listed ETF under "United States" and reports no expense ratios, so
+each refresh fetches what the funds actually hold from two free sources that need no account
+or key:
+
+- **Vanguard's public fund data** (what its website uses): the country-by-country split of
+  Vanguard funds, grouped into US, other developed and emerging markets the way FTSE, the
+  index provider behind Vanguard's global funds, classifies them.
+- **Yahoo Finance**, through the open-source `yfinance` package: every US-listed ETF's expense
+  ratio and Morningstar category. A single-region fund's category says which region it holds
+  ("Small Value" is US, "Foreign Large Value" developed outside the US, "Diversified Emerging
+  Mkts" emerging); "value" or "small" in the category or name marks a factor fund.
+
+Results are cached in `data/fund_data.json` for a week, and a failed fetch keeps the last good
+data. Neither source is an official API, so anything you set under `lookthrough` wins. A global
+fund from another provider (an iShares ACWI, say) gets its fee but no split; add one under
+`lookthrough`. The Holdings, Targets and Performance pages say where each figure came from.
 
 ## Dividends and the benchmark
 

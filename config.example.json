@@ -96,56 +96,20 @@
       "amount": -60000
     }
   ],
-  "_lookthrough_note": "Regional split inside each fund. Update when the funds publish new factsheets. tilt=1 marks a deliberate factor fund.",
+  "_fund_data_note": "Each fund's regional split, factor tilt and expense ratio are fetched on every refresh (weekly cache) from Vanguard's public fund data and Yahoo Finance. Free, no account or key. Set enabled to false to rely on lookthrough below only; add tickers to extra to fetch funds you don't hold or target yet.",
+  "fund_data": {
+    "enabled": true,
+    "max_age_days": 7,
+    "extra": []
+  },
+  "_lookthrough_note": "Optional overrides on top of the fetched fund data. A fund's own us/dev/em here replaces its fetched split; tilt (1 = deliberate small/value fund), ter (0.0006 = 0.06%) and role override one by one. Leave a fund out to use only what is fetched.",
   "lookthrough": {
-    "VT": {
-      "us": 0.62,
-      "dev": 0.26,
-      "em": 0.12,
-      "tilt": 0,
-      "role": "Core - whole global market",
-      "ter": 0.0006
-    },
-    "AVUV": {
-      "us": 1.0,
-      "dev": 0.0,
-      "em": 0.0,
-      "tilt": 1,
-      "role": "Tilt - US small value",
-      "ter": 0.0025
-    },
-    "AVLV": {
-      "us": 1.0,
-      "dev": 0.0,
-      "em": 0.0,
-      "tilt": 1,
-      "role": "Tilt - US large value",
-      "ter": 0.0015
-    },
-    "AVIV": {
-      "us": 0.0,
-      "dev": 1.0,
-      "em": 0.0,
-      "tilt": 1,
-      "role": "Tilt - developed ex-US large value",
-      "ter": 0.0025
-    },
-    "AVDV": {
-      "us": 0.0,
-      "dev": 1.0,
-      "em": 0.0,
-      "tilt": 1,
-      "role": "Tilt - developed ex-US small value",
-      "ter": 0.0036
-    },
-    "AVES": {
-      "us": 0.0,
-      "dev": 0.0,
-      "em": 1.0,
-      "tilt": 1,
-      "role": "Tilt - emerging markets value",
-      "ter": 0.0036
-    }
+    "VT": { "role": "Core - whole global market" },
+    "AVUV": { "role": "Tilt - US small value" },
+    "AVLV": { "role": "Tilt - US large value" },
+    "AVIV": { "role": "Tilt - developed ex-US large value" },
+    "AVDV": { "role": "Tilt - developed ex-US small value" },
+    "AVES": { "role": "Tilt - emerging markets value" }
   },
   "_basket_note": "Approximate currency of the assets INSIDE each fund. USD is only the fund's reporting currency - VT holds euros and yen too. Update from fund factsheets.",
   "currency_basket": {
@@ -190,7 +154,6 @@
     "history_path": "data/nav_history.json",
     "open_browser": true
   },
-  "_lookthrough_ter_note": "ter = the fund's expense ratio as a fraction (0.0006 = 0.06%). From each fund's own site, early 2026 - check yours. Used only for the fee comparison.",
   "pensions": {
     "_note": "Optional, off by default. Swiss pension pots, all in today's money. pillar2/pillar3a grow at their own real_return and are paid into the portfolio at unlock_age (3a can be drawn from 5 years before the AHV reference age of 65). AHV is a yearly pension from start_age that reduces what the portfolio must pay out. Put real balances only in your own config.json.",
     "enabled": false,
