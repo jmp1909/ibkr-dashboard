@@ -293,6 +293,23 @@ table.heat2 tbody tr:hover td,table.sens2 tbody tr:hover td{background:none}
 #controls>.btnrow{margin:0}
 #controls>.evsec,#controls>details.pen{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:0}
 .cc{color:var(--faint);font-weight:500}
+.tgrow{display:grid;grid-template-columns:minmax(150px,1.1fr) minmax(120px,1.6fr) 84px 64px 28px;gap:14px;align-items:center;padding:10px 8px;border-bottom:1px solid var(--line)}
+.tgrow:last-child{border-bottom:0}
+.tgrow input[type=range]{width:100%}
+.tgnum{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--mid)}
+.tgnum input{width:62px;font:inherit;font-size:13.5px;font-weight:600;text-align:right;padding:5px 6px;border:1px solid var(--line2);border-radius:8px;background:var(--card);color:var(--ink)}
+.tgcur{text-align:right;font-size:13px;color:var(--ink2)}.tgcur small{display:block;color:var(--mid);font-size:11px}
+.tgrow .x:disabled{opacity:.25;cursor:not-allowed}
+.tgrow>.fund{min-width:0}
+.tgrow .fund>span{min-width:0}
+.tgrow .fund small{max-width:100%}
+.tgpre{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--mid)}
+.tgpre .btn{padding:5px 10px;font-size:12.5px}
+.tgadd{display:flex;gap:8px;padding:10px 16px 16px;border-top:1px solid var(--line)}
+.tgadd input{flex:1;font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line2);border-radius:8px;background:var(--card);color:var(--ink)}
+.tgbars{display:grid;gap:8px;margin-bottom:6px}.tgbars small{font-size:11.5px;color:var(--mid)}
+.tgcmp{display:flex;gap:12px;align-items:baseline}.tgcmp small{color:var(--mid);font-size:12px}
+@media (max-width:700px){.tgrow{grid-template-columns:1fr 84px 28px}.tgrow input[type=range],.tgrow .tgcur{grid-column:1/-1}}
 .hrow.sp{grid-template-columns:auto minmax(0,1fr) auto auto}
 .hrow:has(>.n:first-child).sp{grid-template-columns:minmax(0,1fr) auto auto}
 .spark{display:block}
@@ -362,6 +379,7 @@ table.heat2 tbody tr:hover td,table.sens2 tbody tr:hover td{background:none}
   <nav class="nav" aria-label="Pages">
     <a href="#dashboard" data-p="dashboard"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3zM13 21h8V11h-8zM3 21h8v-6H3zM13 3v6h8V3z"/></svg>Dashboard</a>
     <a href="#holdings" data-p="holdings"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Holdings</a>
+    <a href="#targets" data-p="targets"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v8l6 4"/></svg>Targets</a>
     <a href="#performance" data-p="performance"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>Performance</a>
     <a href="#dividends" data-p="dividends"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v10M9.5 10c0-1 1-1.5 2.5-1.5s2.5.6 2.5 1.6-1 1.4-2.5 1.4-2.5.5-2.5 1.5 1 1.5 2.5 1.5 2.5-.5 2.5-1.5"/></svg>Dividends</a>
     <a href="#review" data-p="review"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Monthly review</a>
@@ -412,6 +430,22 @@ table.heat2 tbody tr:hover td,table.sens2 tbody tr:hover td{background:none}
   <div class="dgrid even">
     <div class="card" id="hregioncard"><div class="cardh"><h2>Where your money really is</h2><span>fund look-through</span></div><div class="pad2" id="hregion"></div></div>
     <div class="card" id="hbuycard"><div class="cardh"><h2>Next contribution</h2><span>buy-only, towards your targets</span></div><div id="hbuy"></div></div>
+  </div>
+</section>
+
+<!-- ======================= TARGETS ======================= -->
+<section class="page" id="p-targets">
+  <div class="top"><div class="crumb">Portfolio / <b>Targets</b></div><div class="crumb">used by the allocation, the buy planner and next purchase</div></div>
+  <div class="planbar" id="tgstat"></div>
+  <div class="dgrid" style="margin-top:0;align-items:start">
+    <div class="card"><div class="cardh"><h2>Target weights</h2><span id="tgtotal"></span></div>
+      <div class="rows" id="tgrows"></div>
+      <div class="tgpre"><span>Start from</span><button type="button" class="btn ghost" data-tg="reset">config.json</button><button type="button" class="btn ghost" data-tg="held">What you hold now</button><button type="button" class="btn ghost" data-tg="equal">Equal weights</button></div>
+      <form class="tgadd" id="tgadd"><input id="tgnew" placeholder="Add a fund by ticker, e.g. VTI" aria-label="Ticker to add" maxlength="12"><button class="btn" type="submit">Add</button></form></div>
+    <div class="side2">
+      <div class="card"><div class="cardh"><h2>What this mix holds</h2><span>target, against today</span></div><div class="pad2" id="tgmix"></div></div>
+      <div class="card"><div class="cardh"><h2>Getting there</h2><span>without selling anything</span></div><div class="rows" id="tgget"></div></div>
+    </div>
   </div>
 </section>
 
@@ -688,6 +722,14 @@ Not investment advice.</footer>
 
 <script>
 const D = __DATA__;
+/* Targets edited on the Targets page live in this browser and take over from
+   config.json's. D.targets stays one object for the whole page, so code that
+   holds on to it sees later edits. */
+D.targetsConfig = Object.assign({}, D.targets || {});
+D.targets = D.targets || {};
+(function(){ try{ const t=JSON.parse(localStorage.getItem('ibkr-fire-targets:v1:'+(D.demo?'demo':'live'))||'null');
+  if(t && t.v===1 && t.targets && typeof t.targets==='object'){ Object.keys(D.targets).forEach(k=>{ delete D.targets[k]; });
+    Object.entries(t.targets).forEach(([k,v])=>{ if(+v>0) D.targets[String(k)]=+v; }); } }catch(e){} })();
 /* ---------- one-line takeaways above charts ----------
    Each chart gets a sentence that says what it shows, so the page can be read
    from the headlines alone and the chart is there for the detail. */
@@ -2870,12 +2912,15 @@ const RISK = (function(){
         <div class="v"><b>${n0(p.market_value)}</b><small class="${p.unrealised_pnl>=0?'up':'dn'}">${sg(p.unrealised_pnl)}${g!==null?` (${pctS(g)})`:''}</small></div></div>`; }).join('');
     hr.addEventListener('pointerover',e=>{ const r=e.target.closest('.hrow'); if(r) focusFund(r.dataset.t); });
     hr.addEventListener('pointerleave',()=>focusFund(null));
+    window.renderAllocation=function(){
     const keys=POS.map(p=>p.ticker).concat(Object.keys(T).filter(k=>!POS.some(p=>p.ticker===k)));
     const scale=Math.max(0.5,...keys.map(k=>Math.max(T[k]||0,(POS.find(p=>p.ticker===k)||{market_value:0}).market_value/PTOT)))*1.05;
     document.getElementById('dalloc').innerHTML=keys.length&&Object.keys(T).length?keys.map((k,i)=>{ const p=POS.find(x=>x.ticker===k), w=p?p.market_value/PTOT:0, t=T[k]||0, dl=w-t;
       return `<div class="r"><i style="background:${PAL[i%PAL.length]}"></i><div>${esc(k)}<div class="abar"><i style="width:${(w/scale*100).toFixed(1)}%;background:${PAL[i%PAL.length]}"></i>${t?`<u style="left:${(t/scale*100).toFixed(1)}%"></u>`:''}</div></div>
         <b>${(w*100).toFixed(1)}%</b><span class="t ${Math.abs(dl)>0.03?(dl>0?'up':'dn'):''}">${t?((dl>=0?'+':'−')+Math.abs(dl*100).toFixed(1)+' pts'):'no target'}</span></div>`; }).join('')
-      :'<div class="note">Add <code>targets</code> to config.json to compare your allocation with a plan.</div>';
+      :'<div class="note">Choose targets on the <a href="#targets" data-go="targets" class="cardlink">Targets</a> page to compare your allocation with a plan.</div>';
+    };
+    renderAllocation();
   })();
 
   /* ---------- dividend and benchmark cards ---------- */
@@ -2935,7 +2980,8 @@ const RISK = (function(){
   }
 
   /* ---------------- HOLDINGS ---------------- */
-  (function(){
+  window.renderHoldings=function(){
+    $('hbuycard').hidden=false;
     const cost=POS.reduce((s,p)=>s+(p.cost_basis||0),0), pnl=POS.reduce((s,p)=>s+p.unrealised_pnl,0);
     const known=POS.filter(p=>TER[p.ticker]!=null), kv=known.reduce((s,p)=>s+p.market_value,0);
     const ter=kv?known.reduce((s,p)=>s+p.market_value*TER[p.ticker],0)/kv:null;
@@ -2989,7 +3035,8 @@ const RISK = (function(){
       const worst=Math.max(...tick.map(tk=>Math.abs(((held[tk]||0)+(alloc[tk]||0))/newTotal-T[tk])));
       $('hbuynote').innerHTML=`Largest gap to target after this buy: <b>${(worst*100).toFixed(1)} pts</b>. Never suggests selling. Defaults to your last transfer.`; };
     inp.addEventListener('input',draw); draw();
-  })();
+  };
+  renderHoldings();
 
   /* ---------------- PERFORMANCE ---------------- */
   (function(){
@@ -3093,14 +3140,114 @@ const RISK = (function(){
   })();
 
   /* ---------------- next purchase, on the dashboard ---------------- */
-  (function(){
-    const h=$('dnext'); if(!h || !window.allocateBuy) return;
+  window.renderNextBuy=function(){
+    const h=$('dnext'); if(!h || !window.allocateBuy) return; h.innerHTML='';
+    if(!Object.keys(T).length) return;
     const cur=phaseAt(M0), planned=cur?savingAt(cur,M0):0, lastFlow=flows.length?flows[flows.length-1].amount:0;
     const amt=Math.max(50,Math.round((lastFlow||planned)/50)*50), {alloc}=window.allocateBuy(amt);
     const ent=Object.entries(alloc).filter(([,v])=>v>0.5).sort((a,b)=>b[1]-a[1]).slice(0,3);
     if(!ent.length) return;
     h.innerHTML=`<div class="nextbuy"><div class="l">Next purchase, with ${ccWrap(PCCY+' '+n0(amt))}</div><div class="nbs">${ent.map(([tk,v])=>`<span class="nb"><i style="background:${colorOf(tk)}"></i>${esc(tk)} <b>${n0(v)}</b></span>`).join('')}</div><a href="#holdings" data-go="holdings">Change the amount</a></div>`;
+  };
+  renderNextBuy();
+  window.refreshTargets=()=>{ renderAllocation(); renderHoldings(); renderNextBuy(); };
+
+  /* ---------------- TARGETS: choose fund weights in the app ---------------- */
+  (function(){
+    if(!$('tgrows')) return;
+    const LT=D.lookthrough||{}, TGK='ibkr-fire-targets:v1:'+(D.demo?'demo':'live');
+    const cfgT=D.targetsConfig||{};
+    /* the working copy, in percent; held funds always appear, even at 0 */
+    let draft={}; Object.keys(T).forEach(k=>{ draft[k]=+(T[k]*100).toFixed(2); });
+    POS.forEach(p=>{ if(!(p.ticker in draft)) draft[p.ticker]=0; });
+    const sum=()=>Object.values(draft).reduce((s,v)=>s+(+v||0),0);
+    const asFrac=()=>{ const o={}; Object.entries(draft).forEach(([k,v])=>{ if(v>0) o[k]=+(v/100).toFixed(4); }); return o; };
+    const sameAs=(a,b)=>{ const ka=Object.keys(a).filter(k=>a[k]>0).sort(), kb=Object.keys(b).filter(k=>b[k]>0).sort();
+      return ka.join()===kb.join() && ka.every(k=>Math.abs(a[k]-b[k])<1e-4); };
+    const held={}; POS.forEach(p=>{ held[p.ticker]=(held[p.ticker]||0)+p.market_value; });
+    const cur=tk=>(held[tk]||0)/PTOT;
+
+    /* what a set of weights holds, from each fund's regional split in config.json */
+    function mix(w){ const o={us:0,dev:0,em:0,tilt:0,ter:0,cov:0,terCov:0};
+      Object.entries(w).forEach(([k,v])=>{ const l=LT[k]; if(!l||!v) return; o.cov+=v; ['us','dev','em','tilt'].forEach(x=>{ o[x]+=v*(+l[x]||0); });
+        if(l.ter!=null){ o.ter+=v*l.ter; o.terCov+=v; } });
+      ['us','dev','em','tilt'].forEach(x=>{ o[x]=o.cov?o[x]/o.cov:0; }); o.ter=o.terCov?o.ter/o.terCov:null; return o; }
+
+    function apply(){
+      const total=sum(), ok=Math.abs(total-100)<0.05, frac=asFrac();
+      if(ok){ /* other pages pick the new set up straight away */
+        Object.keys(D.targets).forEach(k=>{ delete D.targets[k]; }); Object.assign(D.targets,frac);
+        if(sameAs(frac,cfgT)) lsDel(TGK); else lsSet(TGK,{v:1,targets:frac,base:cfgT,saved:new Date().toISOString()});
+        window.refreshTargets && window.refreshTargets(); }
+      status(ok,total);
+      side();
+    }
+    function status(ok,total){
+      const edited=!sameAs(D.targets,cfgT);
+      $('tgstat').innerHTML=`<span>${edited?'<b style="color:var(--ink)">Edited in this browser.</b> config.json still has its own targets.':'Using the targets from config.json.'}</span>`
+        +`<span style="display:flex;gap:8px;flex-wrap:wrap">${edited?'<button type="button" class="btn ghost" data-tg="reset">Reset to config.json</button>':''}<button type="button" class="btn" data-tg="export">Copy as config</button></span>`;
+      $('tgtotal').innerHTML=ok?`<span class="up"><b>100%</b> allocated</span>`
+        :`<span class="dn"><b>${total.toFixed(1)}%</b> allocated, ${Math.abs(100-total).toFixed(1)} pts ${total<100?'left':'too many'}</span> <button type="button" class="linkbtn" data-tg="scale">Scale to 100%</button>`
+        +`<div class="note" style="margin:2px 0 0">The other pages keep the last set that added up to 100%.</div>`;
+    }
+    function rows(){
+      const keys=Object.keys(draft).sort((a,b)=>(draft[b]-draft[a])||(cur(b)-cur(a)));
+      $('tgrows').innerHTML=keys.map(k=>{ const l=LT[k]||{}, c=cur(k);
+        return `<div class="tgrow" data-k="${esc(k)}">${fundCell(k,l.role||(POS.find(p=>p.ticker===k)||{}).name||(held[k]?'':'not held yet'))}
+          <input type="range" min="0" max="100" step="0.5" value="${draft[k]}" aria-label="${esc(k)} target">
+          <label class="tgnum"><input type="number" min="0" max="100" step="0.5" value="${draft[k]}" aria-label="${esc(k)} target, percent">%</label>
+          <span class="tgcur"><small>now</small>${(c*100).toFixed(1)}%</span>
+          <button type="button" class="x" data-del="${esc(k)}" aria-label="Remove ${esc(k)}"${held[k]?' disabled title="You hold this fund; set it to 0% instead"':''}>×</button></div>`; }).join('');
+    }
+    function side(){
+      const tw={}, cw={}; Object.entries(draft).forEach(([k,v])=>{ tw[k]=v/100; }); POS.forEach(p=>{ cw[p.ticker]=cur(p.ticker); });
+      const a=mix(tw), b=mix(cw), parts=[['us','United States','#2563A6'],['dev','Developed outside the US','#8B6BC9'],['em','Emerging markets','#E3A33B']];
+      const any=Object.keys(LT).length>0;
+      $('tgmix').innerHTML=!any?'<div class="note">Add regional splits under <code>lookthrough</code> in config.json to see what a mix holds.</div>'
+        :`<div class="tgbars"><div><small>Target</small><div class="stack">${parts.map(([x,,c])=>`<i style="width:${(a[x]*100).toFixed(1)}%;background:${c}"></i>`).join('')}</div></div>
+           <div><small>Now</small><div class="stack" style="opacity:.55">${parts.map(([x,,c])=>`<i style="width:${(b[x]*100).toFixed(1)}%;background:${c}"></i>`).join('')}</div></div></div>`
+        +parts.map(([x,l,c])=>`<div class="lrow"><span><i style="background:${c}"></i>${l}</span><span class="tgcmp"><small>now ${(b[x]*100).toFixed(1)}%</small><b>${(a[x]*100).toFixed(1)}%</b></span></div>`).join('')
+        +`<div class="lrow"><span><i style="background:var(--card);border:1px solid var(--line2)"></i>In factor funds (small cap, value)</span><span class="tgcmp"><small>now ${(b.tilt*100).toFixed(0)}%</small><b>${(a.tilt*100).toFixed(0)}%</b></span></div>`
+        +`<div class="lrow"><span><i style="background:transparent"></i>Fund costs, weighted</span><span class="tgcmp"><small>now ${b.ter==null?'—':(b.ter*100).toFixed(3)+'%'}</small><b>${a.ter==null?'—':(a.ter*100).toFixed(3)+'%'}</b></span></div>`
+        +(sum()>0&&a.cov<sum()/100-0.001?`<div class="note">${((1-a.cov/(sum()/100))*100).toFixed(0)}% of the target is in funds without a regional split in config.json.</div>`:'');
+      /* how far the mix is from what you hold, if you only ever buy */
+      const ok=Math.abs(sum()-100)<0.05;
+      if(!ok){ $('tgget').innerHTML='<div class="note" style="padding:8px">Shown once the targets add up to 100%.</div>'; return; }
+      const zeroHeld=POS.filter(p=>(tw[p.ticker]||0)===0);
+      const need=Math.max(0,...POS.filter(p=>tw[p.ticker]>0).map(p=>p.market_value/tw[p.ticker]))-PTOT;
+      const curPh=phaseAt(M0), monthly=curPh?savingAt(curPh,M0):0;
+      const drift=Math.max(0,...Object.keys({...tw,...cw}).map(k=>Math.abs((tw[k]||0)-(cw[k]||0))));
+      $('tgget').innerHTML=[['Largest gap today',`${drift*100<0.05?'already on target':'between what you hold and the target'}`,`${(drift*100).toFixed(1)} pts`],
+        ['To get there by only buying',zeroHeld.length?`not possible while you hold ${zeroHeld.map(p=>p.ticker).join(', ')} at a 0% target`:'new money needed',zeroHeld.length?'—':PCCY+' '+n0(need)],
+        ['At your current saving',monthly>0&&!zeroHeld.length?`${mny(monthly)} a month`:'',monthly>0&&!zeroHeld.length?(need/monthly<1?'under a month':`${Math.ceil(need/monthly)} months`):'—']]
+        .map(([x,y,z])=>`<div class="hrow"><div class="n"><b>${x}</b><small>${y}</small></div><div></div><div class="v"><b>${z}</b></div></div>`).join('')
+        +`<div class="note" style="padding:6px 8px 4px">Next purchases follow these targets: see the Dashboard or the planner on Holdings.</div>`;
+    }
+    const host=$('tgrows');
+    host.addEventListener('input',e=>{ const r=e.target.closest('.tgrow'); if(!r) return; let v=Math.max(0,Math.min(100,+e.target.value||0));
+      draft[r.dataset.k]=v; r.querySelectorAll('input').forEach(i=>{ if(i!==e.target) i.value=v; }); apply(); });
+    host.addEventListener('click',e=>{ const b=e.target.closest('[data-del]'); if(!b||b.disabled) return; delete draft[b.dataset.del]; rows(); apply(); });
+    $('tgadd').addEventListener('submit',e=>{ e.preventDefault(); const i=$('tgnew'), k=(i.value||'').trim().toUpperCase().replace(/[^A-Z0-9.\-]/g,'').slice(0,12);
+      if(k && !(k in draft)){ draft[k]=0; rows(); apply(); } i.value=''; });
+    document.addEventListener('click',e=>{ const b=e.target.closest('[data-tg]'); if(!b) return;
+      if(b.dataset.tg==='scale'){ const t=sum(); if(t>0){ Object.keys(draft).forEach(k=>{ draft[k]=Math.round(draft[k]/t*1000)/10; });
+          const diff=+(100-sum()).toFixed(1), top=Object.keys(draft).sort((a,c)=>draft[c]-draft[a])[0]; if(top) draft[top]=+(draft[top]+diff).toFixed(1); } rows(); apply(); }
+      if(b.dataset.tg==='held'){ Object.keys(draft).forEach(k=>{ draft[k]=Math.round(cur(k)*1000)/10; }); const d=+(100-sum()).toFixed(1), top=Object.keys(draft).sort((a,c)=>draft[c]-draft[a])[0]; if(top) draft[top]=+(draft[top]+d).toFixed(1); rows(); apply(); }
+      if(b.dataset.tg==='equal'){ const ks=Object.keys(draft), e=Math.floor(1000/ks.length)/10; ks.forEach(k=>{ draft[k]=e; }); if(ks[0]) draft[ks[0]]=+(100-e*(ks.length-1)).toFixed(1); rows(); apply(); }
+      if(b.dataset.tg==='reset'){ draft={}; Object.keys(cfgT).forEach(k=>{ draft[k]=+(cfgT[k]*100).toFixed(2); }); POS.forEach(p=>{ if(!(p.ticker in draft)) draft[p.ticker]=0; }); rows(); apply(); }
+      if(b.dataset.tg==='export'){ const txt=JSON.stringify({targets:D.targets},null,2);
+        const m=el(`<div class="modal" role="dialog" aria-modal="true" aria-label="Copy targets as config"><div class="box"><b style="font-size:15px">Copy targets as config</b>
+          <p class="note" style="margin:0;font-size:12.5px">In config.json, replace the "targets" entry with this. Everything else stays as it is.</p>
+          <textarea readonly spellcheck="false" style="min-height:180px"></textarea><div style="display:flex;gap:8px;justify-content:flex-end;align-items:center"><span class="note" data-ok style="margin:0"></span>
+          <button class="btn" type="button" data-copy>Copy</button><button class="btn ghost" type="button" data-close>Close</button></div></div></div>`);
+        const ta=m.querySelector('textarea'); ta.value=txt;
+        m.addEventListener('click',ev=>{ if(ev.target===m||ev.target.closest('[data-close]')) m.remove(); });
+        m.querySelector('[data-copy]').addEventListener('click',async()=>{ const ok=m.querySelector('[data-ok]'); try{ await navigator.clipboard.writeText(txt); ok.textContent='Copied.'; }catch(_){ ta.select(); ok.textContent='Select the text and copy it.'; } });
+        document.body.appendChild(m); ta.focus(); ta.select(); } });
+    rows(); status(Math.abs(sum()-100)<0.05,sum()); side();
   })();
+
+
 
   /* ---------------- MONTHLY REVIEW ---------------- */
   (function(){
@@ -3298,7 +3445,7 @@ const RISK = (function(){
 
 
 /* ---------- pages ---------- */
-const PAGES=['dashboard','holdings','performance','dividends','review','plan','editor'];
+const PAGES=['dashboard','holdings','targets','performance','dividends','review','plan','editor'];
 document.addEventListener('click',e=>{ const a=e.target.closest('[data-go]'); if(a){ e.preventDefault(); showPage(a.dataset.go); } });
 document.addEventListener('click',e=>{ const r=e.target.closest('[data-sc-go]'); if(r) activate(r.dataset.scGo); });
 function showPage(p, fromHash){

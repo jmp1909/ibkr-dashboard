@@ -16,12 +16,13 @@ no account involved.
 
 ## What it shows
 
-An app with a side menu and seven pages:
+An app with a side menu and eight pages:
 
 | Page | |
 |---|---|
 | Dashboard | Portfolio value with a holdings donut, a chart of value, return vs VT, drawdown and dividends (range 1M to ALL), holdings with three-month trend lines, allocation against your targets, the next purchase, and your FIRE age |
 | Holdings | Every position with cost, gain, weight against target and fund cost; where the money really is after fund look-through; a buy-only planner for your next contribution |
+| Targets | Choose each fund's target weight with a slider or a number; see what the mix holds by region, factor tilt and fund cost against today, and how much new money it takes to get there without selling. Saved in your browser, with Copy as config |
 | Performance | Time- and money-weighted returns, you vs VT (total return), returns by window, a monthly heatmap with best and worst months and recovery, deposits, what fund fees cost you by retirement, and the currency split |
 | Dividends | Totals, yield, estimated withholding, per month, per fund and every payment |
 | Monthly review | Any month at a glance: what you paid in, what markets did, dividends, how far you got towards the target, and whether you saved what the plan said |
@@ -74,7 +75,7 @@ Copy `config.example.json` to `config.json`, then edit it:
 | `goal.milestones` | no | Explicit milestone ladder. Omit it and one is generated to fit your target |
 | `phases[]` | yes | Your savings timeline — see below |
 | `events[]` | no | One-off lump sums: a bonus, an inheritance, or a purchase (negative) |
-| `targets` | no | Intended allocation. Must sum to 1. Omit to hide the drift section |
+| `targets` | no | Intended allocation, summing to 1. Can also be set on the Targets page |
 | `lookthrough` | no | Regional split inside each fund, from its factsheet, plus `ter` (expense ratio) for the fee comparison |
 | `benchmark.ticker` | no | Benchmark on the Dashboard and Performance pages, as total return. Default VT; null hides it |
 | `dividends.withholding_rate` | no | Estimated tax withheld at source. Default 0.15 |

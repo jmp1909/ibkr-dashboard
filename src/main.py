@@ -627,6 +627,12 @@ def main(argv: list[str] | None = None) -> int:
             "thousands_separator": out_cfg.get("thousands_separator", ","),
         },
         "lookthrough_keys": list(lookthrough.keys()),
+        # Each fund's published regional split and fees, so the Targets page can
+        # show what a mix of funds holds. Fund facts, nothing personal.
+        "lookthrough": {
+            k: {f: v[f] for f in ("us", "dev", "em", "tilt", "ter", "role") if f in v}
+            for k, v in lookthrough.items() if isinstance(v, dict)
+        },
         # Expense ratios from config, keyed by ticker. Missing means unknown, not zero.
         "ters": {k: float(v["ter"]) for k, v in lookthrough.items() if isinstance(v, dict) and "ter" in v},
         "lede": build_lede(
