@@ -65,6 +65,14 @@ def _demo_extras() -> dict:
         for i, (d, c) in enumerate(zip(_DATES, _CPS))
     ]
     base = index[0][1]
+    # The other benchmarks the dashboard can switch to, each a little different.
+    variants = {"VT": (0.0, 0.0), "ACWI": (-0.00012, 0.9), "VTI": (0.0003, 1.6), "VXUS": (-0.0005, 3.1)}
+    indexes = {
+        tk: [(d, (v / base) * (1 + drift * i) + 0.004 * math.sin(i / 11 + ph) - 0.004 * math.sin(ph))
+             for i, (d, v) in enumerate(index)]
+        for tk, (drift, ph) in variants.items()
+    }
+    indexes["VT"] = [(d, v / base) for d, v in index]
     # Synthetic daily prices per fund, ending at each sample position's price,
     # so the demo can show its small trend lines. Invented, like the rest.
     shape = {"VT": (1.0, 0.0), "AVUV": (1.35, 1.3), "AVDV": (1.1, 2.4), "AVES": (0.8, 3.7)}
@@ -82,6 +90,7 @@ def _demo_extras() -> dict:
         "dividends": dividends,
         "benchmark_index": [(d, v / base) for d, v in index],
         "benchmark_ticker": "VT",
+        "benchmark_indexes": indexes,
     }
 
 

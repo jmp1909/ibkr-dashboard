@@ -434,7 +434,7 @@ def fetch_income(client: Any, cfg: dict[str, Any], base_ccy: str) -> dict[str, A
     import income
 
     extras: dict[str, Any] = {}
-    ticker = (cfg.get("benchmark") or {}).get("ticker", "VT")
+    ticker, choices = benchmark_choices(cfg)
     try:
         tickers = client.conids()
         raw = client.transactions(list(tickers), "USD")
@@ -452,16 +452,36 @@ def fetch_income(client: Any, cfg: dict[str, Any], base_ccy: str) -> dict[str, A
             log.warning("Price history for %s unavailable: %s", tk, exc)
     if history:
         extras["fund_history"] = history
-    if ticker:
+    # Every candidate benchmark is fetched, so the dashboard can switch
+    # between them without another refresh.
+    indexes: dict[str, Any] = {}
+    for tk in choices:
         try:
-            conid = next((c for c, t in tickers.items() if t == ticker), None) or client.search_conid(ticker)
+            conid = next((c for c, t in tickers.items() if t == tk), None) or client.search_conid(tk)
             if conid is None:
-                raise ValueError(f"no contract found for {ticker}")
-            extras["benchmark_index"] = income.total_return_index(client.price_history(conid))
-            extras["benchmark_ticker"] = ticker
+                raise ValueError(f"no contract found for {tk}")
+            indexes[tk] = income.total_return_index(client.price_history(conid))
+            time.sleep(0.25)
         except Exception as exc:  # noqa: BLE001
-            log.warning("Benchmark %s unavailable: %s", ticker, exc)
+            log.warning("Benchmark %s unavailable: %s", tk, exc)
+    if indexes:
+        extras["benchmark_indexes"] = indexes
+    if ticker in indexes:
+        extras["benchmark_index"] = indexes[ticker]
+        extras["benchmark_ticker"] = ticker
     return extras
+
+
+def benchmark_choices(cfg: dict[str, Any]) -> tuple[str | None, list[str]]:
+    """The default benchmark and every ticker the dashboard may switch to."""
+    b = cfg.get("benchmark") or {}
+    ticker = b.get("ticker", "VT")
+    out: list[str] = []
+    for tk in ([ticker] if ticker else []) + list(b.get("choices", ["VT", "ACWI", "VTI", "VXUS"])):
+        tk = str(tk).strip().upper()
+        if tk and tk not in out:
+            out.append(tk)
+    return (str(ticker).upper() if ticker else None), out[:8]
 
 
 # ----------------------------------------------------------------------
@@ -502,20 +522,25 @@ def build_income_section(
         divs.append({**d, "display_amount": d["amount"] * r if conv else d["amount"],
                      "display_currency": display if conv else d["currency"]})
 
-    bench = None
-    idx = extras.get("benchmark_index")
-    if idx:
-        cum = income.align_cumulative(dates, idx, rates)
-        bench = {
-            "ticker": extras.get("benchmark_ticker", "VT"),
+    def series(tk: str, idx: Any) -> dict[str, Any]:
+        return {
+            "ticker": tk,
             "currency": display if rates else asset_ccy,
             "converted": rates is not None,
-            "cps": cum,
+            "cps": income.align_cumulative(dates, idx, rates),
         }
+
+    benches = {tk: series(tk, idx) for tk, idx in (extras.get("benchmark_indexes") or {}).items() if idx}
+    idx = extras.get("benchmark_index")
+    tk = extras.get("benchmark_ticker", "VT")
+    bench = benches.get(tk) or (series(tk, idx) if idx else None)
+    if bench and tk not in benches:
+        benches[tk] = bench
     return {
         "dividends": divs,
         "withholding_rate": float((cfg.get("dividends") or {}).get("withholding_rate", 0.15)),
         "benchmark": bench,
+        "benchmarks": benches,
     }
 
 

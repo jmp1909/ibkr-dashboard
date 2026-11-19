@@ -213,7 +213,9 @@
   },
   "benchmark": {
     "_note": "Compared with your time-weighted return in section 04, as a total-return index (dividends reinvested), converted to display_currency when the currency section is on. Any ticker IBKR can find. Set ticker to null to hide.",
-    "ticker": "VT"
+    "ticker": "VT",
+    "_choices_note": "Benchmarks fetched on each refresh, so the Settings page can switch between them instantly.",
+    "choices": ["VT", "ACWI", "VTI", "VXUS"]
   },
   "dividends": {
     "_note": "IBKR's feed reports dividends gross; this rate estimates tax withheld at source. 0.15 = US treaty rate with a W-8BEN on file.",

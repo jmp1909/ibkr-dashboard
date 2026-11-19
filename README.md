@@ -16,7 +16,7 @@ no account involved.
 
 ## What it shows
 
-An app with a side menu and eight pages:
+An app with a side menu and nine pages:
 
 | Page | |
 |---|---|
@@ -28,6 +28,7 @@ An app with a side menu and eight pages:
 | Monthly review | Any month at a glance: what you paid in, what markets did, dividends, how far you got towards the target, and whether you saved what the plan said |
 | FIRE plan | The projection from your actual history into the future, with the range of 500 simulated markets, one-off events, coast FIRE and independence marked; key ages, simulation odds, yearly flows, a what-if grid and milestones |
 | Plan editor | A draggable timeline of life phases and one-off events, the phases, events and Swiss pensions, with the result updating beside it |
+| Settings | The benchmark (VT, ACWI, VTI, VXUS or none, each with its return next to yours), how long the plan runs, the dividend withholding rate, and your milestones. Saved in your browser, with Copy as config |
 
 Charts have hover readouts, legends double as switches, and the page remembers where you were.
 The output is one HTML file with no external dependencies beyond a web font, so you can email
@@ -71,14 +72,15 @@ Copy `config.example.json` to `config.json`, then edit it:
 | `goal.target_mode` | no | `amount` (default) uses `target`; `spending` sets target = `annual_spending` ÷ `withdrawal_rate` |
 | `goal.annual_spending` | no | Yearly spending in retirement, for `spending` mode |
 | `goal.volatility` | no | Yearly volatility for the uncertainty band. Default 0.16 |
-| `goal.plan_to_age` | no | How far the projection runs. Default 95 |
-| `goal.milestones` | no | Explicit milestone ladder. Omit it and one is generated to fit your target |
+| `goal.plan_to_age` | no | How far the projection runs. Default 95. Also on the Settings page |
+| `goal.milestones` | no | Explicit milestone ladder. Omit it and one is generated to fit your target. Also on the Settings page |
 | `phases[]` | yes | Your savings timeline — see below |
 | `events[]` | no | One-off lump sums: a bonus, an inheritance, or a purchase (negative) |
 | `targets` | no | Intended allocation, summing to 1. Can also be set on the Targets page |
 | `lookthrough` | no | Regional split inside each fund, from its factsheet, plus `ter` (expense ratio) for the fee comparison |
-| `benchmark.ticker` | no | Benchmark on the Dashboard and Performance pages, as total return. Default VT; null hides it |
-| `dividends.withholding_rate` | no | Estimated tax withheld at source. Default 0.15 |
+| `benchmark.ticker` | no | Benchmark on the Dashboard and Performance pages, as total return. Default VT; null hides it. Also on the Settings page |
+| `benchmark.choices` | no | Benchmarks fetched on each refresh so the Settings page can switch instantly. Default VT, ACWI, VTI, VXUS |
+| `dividends.withholding_rate` | no | Estimated tax withheld at source. Default 0.15. Also on the Settings page |
 | `scenarios` | no | Named what-ifs stored as changes from the plan, see Scenarios below |
 | `pensions` | no | Swiss pillar 2 / 3a pots and AHV — see below. Off by default |
 | `currency_basket` | no | Currencies held *inside* each fund — not the one it's priced in |
@@ -271,6 +273,8 @@ The benchmark is a **total-return** index: built from daily closes with each dis
 (which IBKR returns alongside the prices) reinvested on its ex-date. A price-only line would
 understate a fund like VT by its yield, roughly 2 points a year. When the currency section is
 on, it is converted with the same daily rates as your return, so both lines are in one currency.
+Every ticker in `benchmark.choices` is fetched on each refresh, so switching on the Settings
+page needs no new data.
 
 ## How the returns are computed
 

@@ -293,6 +293,22 @@ table.heat2 tbody tr:hover td,table.sens2 tbody tr:hover td{background:none}
 #controls>.btnrow{margin:0}
 #controls>.evsec,#controls>details.pen{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:0}
 .cc{color:var(--faint);font-weight:500}
+.btn.solid{background:var(--ink);border-color:var(--ink);color:#fff}.btn.solid:hover{background:var(--ink2)}
+.strow{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+.strow:hover,.strow.on{background:var(--hover)}
+.strow input{margin:0;accent-color:var(--plan)}
+.stn b,.stv b{font-size:13.5px;font-weight:600}.stn small,.stv small{display:block;color:var(--mid);font-size:11.5px;margin-top:2px}
+.stv{text-align:right}
+.stbig{font-size:30px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin:2px 0 8px}.stbig small{font-size:13px;font-weight:500;color:var(--mid);letter-spacing:0}
+.stscale{display:flex;justify-content:space-between;font-size:11px;color:var(--faint);margin:2px 0 8px}
+.stms{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:12px 18px 18px}
+.stms .chips{display:flex;flex-wrap:wrap;gap:8px}
+.stlbl{display:block;font-size:11.5px;color:var(--mid);margin:6px 0 10px}
+.stlad{display:flex;flex-wrap:wrap;gap:6px}
+.stlad span{font-size:12.5px;font-weight:500;padding:5px 10px;border-radius:8px;background:var(--hover);border:1px solid var(--line);font-variant-numeric:tabular-nums}
+.stlad span.t{background:var(--ink);color:#fff;border-color:var(--ink)}
+#p-settings .dgrid>.card{display:flex;flex-direction:column}#stbench{flex:1;display:flex;flex-direction:column}#stbench .strow{flex:1}
+@media (max-width:700px){.stms{grid-template-columns:1fr}}
 .tgrow{display:grid;grid-template-columns:minmax(150px,1.1fr) minmax(120px,1.6fr) 84px 64px 28px;gap:14px;align-items:center;padding:10px 8px;border-bottom:1px solid var(--line)}
 .tgrow:last-child{border-bottom:0}
 .tgrow input[type=range]{width:100%}
@@ -386,6 +402,8 @@ table.heat2 tbody tr:hover td,table.sens2 tbody tr:hover td{background:none}
     <div class="grp">Planning</div>
     <a href="#plan" data-p="plan"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>FIRE plan</a>
     <a href="#editor" data-p="editor"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Plan editor</a>
+    <div class="grp">App</div>
+    <a href="#settings" data-p="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings</a>
   </nav>
   <div class="next" id="next"></div>
   <div class="foot"><i></i>Data from <span id="upd"></span></div>
@@ -541,6 +559,37 @@ table.heat2 tbody tr:hover td,table.sens2 tbody tr:hover td{background:none}
       <div class="card"><div class="cardh"><h2>Goal</h2><a href="#plan" data-go="plan" class="cardlink">change on the FIRE plan</a></div><div class="rows" id="edgoal"></div></div>
     </div>
   </div>
+</section>
+
+<!-- ======================= SETTINGS ======================= -->
+<section class="page" id="p-settings">
+  <div class="top"><div class="crumb">App / <b>Settings</b></div><div class="crumb">kept in this browser; config.json stays the default</div></div>
+  <div class="planbar" id="ststat"></div>
+  <div class="dgrid" style="margin-top:0">
+    <div class="card"><div class="cardh"><h2>Benchmark</h2><span id="stbenchk"></span></div>
+      <div class="rows" id="stbench" role="radiogroup" aria-label="Benchmark"></div>
+      <div class="note" style="padding:4px 16px 14px">Each is a total-return index (dividends reinvested), in the same currency as your return. The list comes from <code>benchmark.choices</code> in config.json and is fetched on every refresh.</div></div>
+    <div class="side2">
+      <div class="card"><div class="cardh"><h2>Plan horizon</h2><span>how long the money must last</span></div>
+        <div class="pad2"><div class="stbig" id="sthorv"></div>
+          <input type="range" min="70" max="110" step="1" id="sthorr" aria-label="Plan to age" style="width:100%">
+          <div class="stscale"><span>70</span><span>90</span><span>110</span></div>
+          <div class="note" id="sthornote"></div></div></div>
+      <div class="card"><div class="cardh"><h2>Dividend tax withheld</h2><span>an estimate</span></div>
+        <div class="pad2"><div class="seg" id="sttaxseg" role="group" aria-label="Common rates"><button type="button" data-wr="0">None</button><button type="button" data-wr="0.15">15%, treaty with W-8BEN</button><button type="button" data-wr="0.3">30%, no W-8BEN</button></div>
+          <label class="tgnum" style="margin-bottom:6px">Or exactly <input type="number" min="0" max="60" step="0.5" id="sttaxn" aria-label="Withholding rate, percent">%</label>
+          <div id="sttaxrows"></div>
+          <div class="note">IBKR's feed reports dividends before tax, so this rate only estimates what was withheld. Your statement has the exact figure.</div></div></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px"><div class="cardh"><h2>Milestones</h2><span id="stladk"></span></div>
+    <div class="stms">
+      <div><div class="seg" id="stmode" role="group" aria-label="Milestones"><button type="button" data-ms="auto">Automatic ladder</button><button type="button" data-ms="own">My own list</button></div>
+        <div id="stmiles"></div>
+        <form class="tgadd" id="stmsadd" style="padding:10px 0 0;border:0;max-width:440px"><input id="stmsnew" placeholder="Add an amount, e.g. 150k or 1.5m" aria-label="Milestone amount" maxlength="20"><button class="btn" type="submit">Add</button></form>
+        <div class="note" id="stmserr" style="color:var(--loss)"></div></div>
+      <div><small class="stlbl">As the FIRE plan will show them</small><div class="stlad" id="stlad"></div></div>
+    </div></div>
 </section>
 
 <!-- Older renderers still compute into these; their output is not shown. -->
@@ -730,6 +779,19 @@ D.targets = D.targets || {};
 (function(){ try{ const t=JSON.parse(localStorage.getItem('ibkr-fire-targets:v1:'+(D.demo?'demo':'live'))||'null');
   if(t && t.v===1 && t.targets && typeof t.targets==='object'){ Object.keys(D.targets).forEach(k=>{ delete D.targets[k]; });
     Object.entries(t.targets).forEach(([k,v])=>{ if(+v>0) D.targets[String(k)]=+v; }); } }catch(e){} })();
+/* Same for the Settings page: benchmark, milestones, plan horizon, withholding. */
+D.plan = D.plan || {};
+D.settingsConfig = { benchmark: D.income && D.income.benchmark ? D.income.benchmark.ticker : null,
+  milestones: (D.plan.milestones||[]).slice(), plan_to_age: D.plan.plan_to_age||95,
+  withholding_rate: D.income && D.income.withholding_rate!=null ? D.income.withholding_rate : 0.15 };
+(function(){ try{ const t=JSON.parse(localStorage.getItem('ibkr-fire-settings:v1:'+(D.demo?'demo':'live'))||'null');
+  if(!t || t.v!==1 || !t.s || typeof t.s!=='object') return; const o=t.s;
+  if(Array.isArray(o.milestones)) D.plan.milestones=o.milestones.map(Number).filter(v=>v>0);
+  if(+o.plan_to_age>=60 && +o.plan_to_age<=110) D.plan.plan_to_age=+o.plan_to_age;
+  if(D.income){ if(+o.withholding_rate>=0 && +o.withholding_rate<=0.6) D.income.withholding_rate=+o.withholding_rate;
+    if(o.benchmark===null) D.income.benchmark=null;
+    else if(D.income.benchmarks && D.income.benchmarks[o.benchmark]) D.income.benchmark=D.income.benchmarks[o.benchmark]; }
+}catch(e){} })();
 /* ---------- one-line takeaways above charts ----------
    Each chart gets a sentence that says what it shows, so the page can be read
    from the headlines alone and the chart is there for the detail. */
@@ -2607,7 +2669,7 @@ function showExport(){
     + [...f.entries()].sort((a,b)=>b[1]-a[1]).map(([t,v])=>`<tr><td class="l">${esc(t)}</td><td>${fm2(v)}</td><td>${fm2(v*(1-wr))}</td><td>${(v/total*100).toFixed(0)}%</td></tr>`).join('')
     + '</tbody>';
   document.getElementById('divnote').innerHTML = `IBKR reports these gross. Tax withheld at source isn't in this feed, so the net column
-    assumes ${(wr*100).toFixed(0)}% (the US treaty rate with a W-8BEN on file; set <code>dividends.withholding_rate</code> in config).
+    assumes ${(wr*100).toFixed(0)}% (the US treaty rate with a W-8BEN on file; change it under Settings).
     Your account statement has the exact figure, and in Switzerland it can usually be reclaimed against your tax bill.
     ${mixed?'':(ccy!==L[0].currency?`Converted from ${L[0].currency} at the ECB rate on the payment day.`:'')}`;
 })();
@@ -3249,6 +3311,99 @@ const RISK = (function(){
 
 
 
+  /* ---------------- SETTINGS: the few config values worth changing in the app ---------------- */
+  (function(){
+    if(!$('stbench')) return;
+    const SK='ibkr-fire-settings:v1:'+(D.demo?'demo':'live'), C=D.settingsConfig, I=D.income||{}, BEN=I.benchmarks||{};
+    const NAMES={VT:'Vanguard Total World',ACWI:'iShares MSCI ACWI, the index most global funds track',VTI:'Vanguard Total US Market',VXUS:'Vanguard Total International, the world outside the US',
+      VOO:'Vanguard S&P 500',SPY:'SPDR S&P 500',VEA:'Vanguard Developed Markets',VWO:'Vanguard Emerging Markets'};
+    const norm=o=>({benchmark:o.benchmark||null, milestones:(o.milestones||[]).map(Number).filter(v=>v>0).sort((x,y)=>x-y),
+      plan_to_age:Math.round(+o.plan_to_age), withholding_rate:Math.round(+o.withholding_rate*1e4)/1e4});
+    const same=(a,b)=>JSON.stringify(norm(a))===JSON.stringify(norm(b));
+    const now=norm({benchmark:I.benchmark?I.benchmark.ticker:null, milestones:D.plan.milestones||[], plan_to_age:D.plan.plan_to_age||95,
+      withholding_rate:I.withholding_rate!=null?I.withholding_rate:0.15});
+    let draft=JSON.parse(JSON.stringify(now));
+    const pct=v=>(v>=0?'+':'−')+Math.abs(v*100).toFixed(1)+'%';
+    const S=D.series, s0=S.length?S[0]:null, you=S.length>1?(1+S[S.length-1].cps)/(1+S[0].cps)-1:null;
+    const goalT=()=>(typeof state!=='undefined'&&state&&state.target)||D.plan.target;
+    const short=v=>v>=1e6?(+(v/1e6).toFixed(2))+'M':v>=1e3?(+(v/1e3).toFixed(1))+'k':String(Math.round(v));
+    const parseAmt=t=>{ const m=String(t).trim().replace(/[ ',_]/g,'').match(/^(\d+(?:\.\d+)?)([kKmM]?)$/); if(!m) return null;
+      const u=m[2].toLowerCase(); return +m[1]*(u==='k'?1e3:u==='m'?1e6:1); };
+    const ladderFor=list=>{ const keep=D.plan.milestones; D.plan.milestones=list; const out=milestoneLadder(goalT()); D.plan.milestones=keep; return out; };
+
+    function bench(){
+      const tks=Object.keys(BEN);
+      if(!tks.length){ $('stbench').innerHTML='<div class="note" style="padding:12px 16px">No benchmark data in this snapshot. Refresh once with IBKR logged in; the candidates are listed under <code>benchmark.choices</code> in config.json.</div>'; return; }
+      const row=(tk,name,val,sub)=>`<label class="strow${draft.benchmark===tk?' on':''}"><input type="radio" name="stb" value="${esc(tk||'')}"${draft.benchmark===tk?' checked':''}>
+        <span class="stn"><b>${tk?esc(tk):'None'}</b><small>${esc(name)}</small></span><span class="stv">${val}<small>${sub}</small></span></label>`;
+      $('stbench').innerHTML=tks.map(tk=>{ const c=(BEN[tk].cps||[]).filter(v=>v!=null), r=c.length?(1+c[c.length-1])/(1+c[0])-1:null;
+          return row(tk,NAMES[tk]||'Fetched from IBKR on each refresh',r==null?'<b>—</b>':`<b class="${r>=0?'up':'dn'}">${pct(r)}</b>`,
+            you!=null&&r!=null?`you ${you-r>=0?'ahead':'behind'} by ${Math.abs((you-r)*100).toFixed(1)} pts`:''); }).join('')
+        +row(null,'Hide the comparison on the Dashboard and Performance pages','','');
+      $('stbenchk').textContent=s0?`since ${new Date(s0.t).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}; you ${you==null?'—':pct(you)}`:'';
+    }
+    function horizon(){
+      const a=draft.plan_to_age, eff=Math.max(a,(D.plan.coast_full_age||0)+7), yr=new Date().getFullYear()+Math.round(a-D.age_now);
+      $('sthorv').innerHTML=`${a}<small> years old</small>`;
+      $('sthornote').innerHTML=`The FIRE plan and its charts run to this age, around ${yr}${eff>a?`. Your full retirement age is late enough that they run to ${eff} anyway`:''}. Longer is more cautious: the money has to last.`;
+    }
+    function tax(){
+      const w=draft.withholding_rate, cut=new Date(MS_NOW.getTime()-365*864e5), d12=(I.dividends||[]).filter(d=>new Date(d.date)>=cut);
+      const g=d12.reduce((s,d)=>s+(d.display_amount||0),0), cc=d12.length?d12[0].display_currency:CCY;
+      $('sttaxseg').querySelectorAll('button').forEach(b=>b.classList.toggle('on',Math.abs(+b.dataset.wr-w)<1e-6));
+      if(document.activeElement!==$('sttaxn')) $('sttaxn').value=+(w*100).toFixed(2);
+      $('sttaxrows').innerHTML=`<div class="lrow"><span>Dividends, last 12 months</span><b>${g?cc+' '+n0(g):'—'}</b></div>
+        <div class="lrow"><span>Estimated withheld</span><b>${g?cc+' '+n0(g*w):'—'}</b></div>
+        <div class="lrow" style="border:0"><span>Estimated after tax</span><b>${g?cc+' '+n0(g*(1-w)):'—'}</b></div>`;
+    }
+    function miles(){
+      const auto=!draft.milestones.length, T0=goalT(), lad=ladderFor(draft.milestones);
+      $('stmode').querySelectorAll('button').forEach(b=>b.classList.toggle('on',(b.dataset.ms==='auto')===auto));
+      $('stmsadd').hidden=auto;
+      $('stmiles').innerHTML=auto?`<div class="note" style="margin:0">Steps of 1, 2.5 and 5 scaled to your target. Choose <b>My own list</b> to set them yourself.</div>`
+        :`<div class="chips">${draft.milestones.map((v,i)=>`<span class="chip"><b>${esc(short(v))}</b><button type="button" data-msdel="${i}" aria-label="Remove ${esc(short(v))}">×</button></span>`).join('')}</div>`;
+      $('stlad').innerHTML=lad.map(v=>`<span${Math.abs(v-T0)<1?' class="t"':''}>${esc(short(v))}${Math.abs(v-T0)<1?' · target':''}</span>`).join('');
+      $('stladk').textContent=`${lad.length} steps, last one the target`;
+      $('stmserr').textContent=draft.milestones.some(v=>v>=T0)?`Amounts at or above the target (${short(T0)}) are left out; the target is always the last step.`:'';
+    }
+    function status(){
+      const dirty=!same(draft,now), edited=!same(now,C);
+      $('ststat').innerHTML=`<span>${dirty?'<b style="color:var(--ink)">Unsaved changes.</b> Saving redraws every page.':edited?'<b style="color:var(--ink)">Edited in this browser.</b> config.json still has its own values.':'Using the values from config.json.'}</span>
+        <span style="display:flex;gap:8px;flex-wrap:wrap">${dirty?'<button type="button" class="btn ghost" data-st="discard">Discard</button><button type="button" class="btn solid" data-st="save">Save and redraw</button>'
+          :(edited?'<button type="button" class="btn ghost" data-st="reset">Reset to config.json</button>':'')+'<button type="button" class="btn" data-st="export">Copy as config</button>'}</span>`;
+    }
+    const all=()=>{ bench(); $('sthorr').value=draft.plan_to_age; horizon(); tax(); miles(); status(); };
+    const page=$('p-settings');
+    page.addEventListener('change',e=>{ if(e.target.name==='stb'){ draft.benchmark=e.target.value||null; bench(); status(); } });
+    page.addEventListener('input',e=>{
+      if(e.target.id==='sthorr'){ draft.plan_to_age=+e.target.value; horizon(); status(); }
+      if(e.target.id==='sttaxn'){ draft.withholding_rate=Math.max(0,Math.min(60,+e.target.value||0))/100; tax(); status(); }
+      if(e.target.id==='stmsnew') $('stmserr').textContent=''; });
+    $('stmsadd').addEventListener('submit',e=>{ e.preventDefault(); const v=parseAmt($('stmsnew').value);
+      if(v==null||v<=0){ $('stmserr').textContent='Type an amount like 250000, 250k or 1.2m.'; return; }
+      if(!draft.milestones.includes(v)) draft.milestones=draft.milestones.concat(v).sort((a,b)=>a-b); $('stmsnew').value=''; miles(); status(); });
+    page.addEventListener('click',e=>{ const t=e.target.closest('[data-ms],[data-msdel],[data-wr],[data-st]'); if(!t) return;
+      if(t.dataset.ms){ if(t.dataset.ms==='auto') draft.milestones=[];
+        else if(!draft.milestones.length){ const T0=goalT(); draft.milestones=ladderFor([]).filter(v=>v<T0); }
+        miles(); status(); }
+      if(t.dataset.msdel!=null){ draft.milestones=draft.milestones.filter((_,i)=>i!==+t.dataset.msdel); miles(); status(); }
+      if(t.dataset.wr!=null){ draft.withholding_rate=+t.dataset.wr; tax(); status(); }
+      const a=t.dataset.st;
+      if(a==='discard'){ draft=JSON.parse(JSON.stringify(now)); all(); }
+      if(a==='save'){ if(same(draft,C)) lsDel(SK); else lsSet(SK,{v:1,s:norm(draft),saved:new Date().toISOString()}); location.reload(); }
+      if(a==='reset'){ lsDel(SK); location.reload(); }
+      if(a==='export'){ const n=norm(now), txt=JSON.stringify({goal:{plan_to_age:n.plan_to_age,milestones:n.milestones},dividends:{withholding_rate:n.withholding_rate},benchmark:{ticker:n.benchmark}},null,2);
+        const m=el(`<div class="modal" role="dialog" aria-modal="true" aria-label="Copy settings as config"><div class="box"><b style="font-size:15px">Copy settings as config</b>
+          <p class="note" style="margin:0;font-size:12.5px">In config.json, set these keys inside the matching blocks ("goal", "dividends", "benchmark") and leave everything else as it is. An empty milestones list means the automatic ladder.</p>
+          <textarea readonly spellcheck="false" style="min-height:220px"></textarea><div style="display:flex;gap:8px;justify-content:flex-end;align-items:center"><span class="note" data-ok style="margin:0"></span>
+          <button class="btn" type="button" data-copy>Copy</button><button class="btn ghost" type="button" data-close>Close</button></div></div></div>`);
+        const ta=m.querySelector('textarea'); ta.value=txt;
+        m.addEventListener('click',ev=>{ if(ev.target===m||ev.target.closest('[data-close]')) m.remove(); });
+        m.querySelector('[data-copy]').addEventListener('click',async()=>{ const ok=m.querySelector('[data-ok]'); try{ await navigator.clipboard.writeText(txt); ok.textContent='Copied.'; }catch(_){ ta.select(); ok.textContent='Select the text and copy it.'; } });
+        document.body.appendChild(m); ta.focus(); ta.select(); } });
+    all();
+  })();
+
   /* ---------------- MONTHLY REVIEW ---------------- */
   (function(){
     if(!$('rvmonths')) return;
@@ -3445,7 +3600,7 @@ const RISK = (function(){
 
 
 /* ---------- pages ---------- */
-const PAGES=['dashboard','holdings','targets','performance','dividends','review','plan','editor'];
+const PAGES=['dashboard','holdings','targets','performance','dividends','review','plan','editor','settings'];
 document.addEventListener('click',e=>{ const a=e.target.closest('[data-go]'); if(a){ e.preventDefault(); showPage(a.dataset.go); } });
 document.addEventListener('click',e=>{ const r=e.target.closest('[data-sc-go]'); if(r) activate(r.dataset.scGo); });
 function showPage(p, fromHash){
