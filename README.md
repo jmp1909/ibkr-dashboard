@@ -26,8 +26,8 @@ An app with a side menu and nine pages:
 | Performance | Time- and money-weighted returns, you vs VT (total return), returns by window, a monthly heatmap with best and worst months and recovery, deposits, what fund fees cost you by retirement, and the currency split |
 | Dividends | Totals, yield, estimated withholding, per month, per fund and every payment |
 | Monthly review | Any month at a glance: what you paid in, what markets did, dividends, how far you got towards the target, and whether you saved what the plan said |
-| FIRE plan | The projection from your actual history into the future, with the range of 500 simulated markets, one-off events, coast FIRE and independence marked; key ages, simulation odds, yearly flows, a what-if grid and milestones |
-| Plan editor | A draggable timeline of life phases and one-off events, the phases, events and Swiss pensions, with the result updating beside it |
+| FIRE plan | The projection from your actual history into the future, with the range of 500 simulated markets, one-off events, coast FIRE and independence marked; key ages, simulation odds, yearly flows, a what-if grid and milestones; a chart of income and saving each year until independence |
+| Plan editor | A draggable timeline of life phases and one-off events, the phases, events and Swiss pensions, with the result updating beside it, and your income and saving for each year, with a year-by-year table to type any year's income |
 | Settings | The benchmark (VT, ACWI, VTI, VXUS or none, each with its return next to yours), how long the plan runs, the dividend withholding rate, and your milestones. Saved in your browser, with Copy as config |
 
 Charts have hover readouts, legends double as switches, and the page remembers where you were.
@@ -82,6 +82,7 @@ Copy `config.example.json` to `config.json`, then edit it:
 | `benchmark.ticker` | no | Benchmark on the Dashboard and Performance pages, as total return. Default VT; null hides it. Also on the Settings page |
 | `benchmark.choices` | no | Benchmarks fetched on each refresh so the Settings page can switch instantly. Default VT, ACWI, VTI, VXUS |
 | `dividends.withholding_rate` | no | Estimated tax withheld at source. Default 0.15. Also on the Settings page |
+| `income_by_year` | no | Monthly income for single calendar years, e.g. `{"2028": 9500}`, replacing the phase's for that year. Written by the Plan editor's year-by-year table |
 | `scenarios` | no | Named what-ifs stored as changes from the plan, see Scenarios below |
 | `pensions` | no | Swiss pillar 2 / 3a pots and AHV — see below. Off by default |
 | `currency_basket` | no | Overrides for the currencies held *inside* each fund (not the one it's priced in), which are otherwise worked out from its countries |
@@ -191,6 +192,16 @@ Overrides can set any `goal` value, any `pensions` value (e.g. `"pillar3a.balanc
 of a phase by its `id`, and can `add_phases`, `remove_phases`, `add_events` or `remove_events`.
 If `config.json` changes after you made a scenario, the page says so and offers to re-apply the
 scenario's changes on top of the new version.
+
+### Income year by year
+
+Each phase has one monthly income that grows at its `income_growth`. To set a particular year
+differently (a raise, a bonus year, part-time for a while), open **Year by year** under the
+Income and saving chart in the Plan editor and type that year's monthly income. It replaces the
+phase's income for that calendar year only; other years keep following the phase. A phase that
+saves a share of income saves that share of the typed amount. **Same after** copies a typed
+amount to the rest of its phase, and × puts a year back. Typed years are marked on the chart,
+count as scenario changes, and are written to `income_by_year` by Copy as config.
 
 ### Editing the plan on the dashboard
 

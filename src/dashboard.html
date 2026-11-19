@@ -323,6 +323,17 @@ table.heat2 tbody tr:hover td,table.sens2 tbody tr:hover td{background:none}
 .tgpre .btn{padding:5px 10px;font-size:12.5px}
 .tgadd{display:flex;gap:8px;padding:10px 16px 16px;border-top:1px solid var(--line)}
 .tginfo{border-top:1px solid var(--line)}
+.iptw{max-height:420px;overflow:auto;margin:0 16px;border:1px solid var(--line);border-radius:10px}
+.iptab{width:100%;font-size:13px}
+.iptab thead th{position:sticky;top:0;background:var(--card);z-index:1}
+.iptab td,.iptab th{padding:6px 12px;white-space:nowrap}
+.iptab td small{color:var(--mid);font-size:11px}
+.iptab tr.typed td{background:#F3F6FB}
+.iptab .ipin{width:104px;font:inherit;font-size:13px;font-weight:600;text-align:right;padding:4px 8px;border:1px solid var(--line2);border-radius:7px;background:var(--card);color:var(--ink)}
+.iptab .ipin::placeholder{color:var(--faint);font-weight:500}
+.iptab .ipin:focus{outline:2px solid var(--plan);outline-offset:-1px;border-color:transparent}
+.iptab .ipact{text-align:right;min-width:110px}
+.ipnote{margin:10px 16px 14px}
 .tginfo summary{display:flex;align-items:center;gap:8px;padding:11px 16px;cursor:pointer;list-style:none;font-size:12.5px;font-weight:500;color:var(--mid);border-radius:0 0 12px 12px}
 .tginfo summary::-webkit-details-marker{display:none}
 .tginfo summary:hover{color:var(--ink);background:var(--hover)}
@@ -562,6 +573,9 @@ table.heat2 tbody tr:hover td,table.sens2 tbody tr:hover td{background:none}
     <div class="card"><div class="cardh"><h2>Each year</h2><span>saved, earned by the portfolio, withdrawn</span></div><div class="chartbody" id="fyears" style="padding-bottom:10px"><div class="tip" id="fytip"></div></div><div class="chartfoot" style="padding-bottom:12px"><div class="legend" id="fylegend"></div></div></div>
     <div class="card"><div class="cardh"><h2>What if</h2><span>years to target</span></div><div class="pad2 tbl" id="fsens"></div></div>
   </div>
+  <div class="card" style="margin-top:16px"><div class="cardh"><h2>Income and saving</h2><a href="#editor" data-go="editor" class="cardlink">change year by year</a></div>
+    <div class="chartbody" id="fip" style="padding-bottom:6px"><div class="tip" id="fiptip"></div></div>
+    <div class="chartfoot" style="padding-bottom:12px"><div class="legend" id="fiplegend"></div></div></div>
   <div class="card" style="margin-top:16px"><div class="cardh"><h2>Milestones</h2><span id="fmilek"></span></div><div class="tbl"><table class="ctable" id="fmiles"></table></div></div>
 </section>
 
@@ -575,6 +589,13 @@ table.heat2 tbody tr:hover td,table.sens2 tbody tr:hover td{background:none}
       <div class="seg" id="tlzoom" role="group" aria-label="Timeline range" style="margin:0"></div></div>
     <div class="tl" id="timeline"></div>
   </div>
+  <div class="card" style="margin-bottom:16px"><div class="cardh"><h2>Income and saving</h2><span id="edipk">a month, each year until independence</span></div>
+    <div class="chartbody" id="edip" style="padding-bottom:6px"><div class="tip" id="ediptip"></div></div>
+    <div class="chartfoot" style="padding-bottom:10px"><div class="legend" id="ediplegend"></div></div>
+    <details class="tginfo ipdet" id="ipdet"><summary><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>Year by year: type any year&rsquo;s income to change just that year<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="iptw"><table class="ctable iptab"><thead><tr><th class="l">Year</th><th class="l">Age</th><th class="l">Phase</th><th>Income a month</th><th>Saves a month</th><th>Saved that year</th><th aria-label="Actions"></th></tr></thead><tbody id="iprows"></tbody></table></div>
+      <div class="note ipnote">A typed income replaces the phase&rsquo;s for that calendar year only; other years keep following the phase and its growth. A phase that saves a share of income saves that share of the typed amount; one that saves a fixed amount is unchanged. Enter moves to the next year.</div>
+    </details></div>
   <div class="edcols">
     <div id="controls"></div>
     <div class="side2 edres">
@@ -1353,6 +1374,7 @@ function normalisePlan(p){
     target_mode:(p.target_mode==='spending'?'spending':'amount'),
     annual_spending:num(p.annual_spending, num(p.target)*num(p.withdrawal_rate)),
     pensions:normPensions(p.pensions||{}, num),
+    income_by_year:normIBY(p.income_by_year, num),
     phases:(p.phases||[]).map(x=>({ _k:'k'+(KEYSEQ++), id:String(x.id), label:String(x.label),
       s:ym2m(x.start), e:(x.end==null?null:ym2m(x.end)),
       monthly_income:num(x.monthly_income), saving_mode:(x.saving_mode==='fixed'?'fixed':'rate'),
@@ -1365,6 +1387,12 @@ function normalisePlan(p){
            || out.events.some(e=>!Number.isFinite(e.m));
   if(bad) throw new Error('unusable plan');
   if(out.target_mode==='spending' && out.withdrawal_rate>0) out.target=out.annual_spending/out.withdrawal_rate;
+  return out;
+}
+/* Monthly income typed in for single years; a year not listed follows its phase. */
+function normIBY(o, num){
+  const out={}; Object.entries(o||{}).forEach(([k,v])=>{ const y=parseInt(k,10), x=num(v,NaN);
+    if(y>1900 && y<2200 && Number.isFinite(x) && x>=0) out[String(y)]=x; });
   return out;
 }
 function normPensions(q, num){
@@ -1391,6 +1419,7 @@ function canon(pl){
     coast_full_age:r6(pl.coast_full_age), volatility:r6(pl.volatility),
     target_mode:pl.target_mode, annual_spending:r6(pl.annual_spending),
     pensions:canonPensions(pl.pensions),
+    income_by_year:Object.fromEntries(Object.keys(pl.income_by_year||{}).sort().map(y=>[y,r6(pl.income_by_year[y])])),
     phases:pl.phases.slice().sort((a,b)=>a.s-b.s).map(p=>({ id:p.id, label:p.label, start:m2ym(p.s),
       end:(p.e===null?null:m2ym(p.e)), monthly_income:r6(p.monthly_income), saving_mode:p.saving_mode,
       savings_rate:r6(p.savings_rate), monthly_saving:r6(p.monthly_saving), income_growth:r6(p.income_growth) })),
@@ -1430,7 +1459,8 @@ const lsDel = k => { try{ localStorage.removeItem(k); }catch(e){} };
 /* A plan stored before the plan gained fields must compare equal once those
    fields take config.json's values, or every upgrade would look like a change. */
 const fromConfig = {volatility:D.plan.volatility, target_mode:D.plan.target_mode,
-                    annual_spending:D.plan.annual_spending, pensions:D.plan.pensions};
+                    annual_spending:D.plan.annual_spending, pensions:D.plan.pensions,
+                    income_by_year:D.plan.income_by_year||{}};
 const recanon = x => { try{ const o=typeof x==='string'?JSON.parse(x):x;
   return JSON.stringify(canon(normalisePlan(Object.assign({}, fromConfig, o)))); }catch(e){ return null; } };
 
@@ -1453,11 +1483,14 @@ const setp = (o,path,v) => { const ks=path.split('.'); let a=o; ks.slice(0,-1).f
 const same = (a,b) => JSON.stringify(a)===JSON.stringify(b);
 const evKey = e => e.label+'|'+e.date+'|'+e.amount;
 
+const ibyYears = (b,p) => [...new Set([...Object.keys(b.income_by_year||{}), ...Object.keys(p.income_by_year||{})])].sort();
 /* every difference between two plans (canonical form), in words */
 function diffPlans(b, p){
   const out=[];
   GOAL_KEYS.forEach(([k,l,f])=>{ if(!same(b[k],p[k])) out.push({kind:'goal',key:k,label:l,from:f(b[k]),to:f(p[k])}); });
   PEN_KEYS.forEach(([k,l,f])=>{ const x=getp(b.pensions,k), y=getp(p.pensions,k); if(!same(x,y)) out.push({kind:'pen',key:k,label:l,from:f(x),to:f(y)}); });
+  ibyYears(b,p).forEach(y=>{ const x=(b.income_by_year||{})[y], z=(p.income_by_year||{})[y];
+    if(!same(x,z)) out.push({kind:'iby',key:y,label:`Income in ${y}`,from:x==null?'from its phase':money(x)+' a month',to:z==null?'from its phase':money(z)+' a month'}); });
   b.phases.forEach(bp=>{ const pp=p.phases.find(q=>q.id===bp.id);
     if(!pp){ out.push({kind:'phdel',id:bp.id,label:`Phase “${bp.label}”`,from:'in the plan',to:'removed'}); return; }
     PH_KEYS.forEach(([k,l,f])=>{ if(!same(bp[k],pp[k])) out.push({kind:'ph',id:bp.id,key:k,label:`${pp.label}: ${l}`,from:f(bp[k]),to:f(pp[k])}); }); });
@@ -1471,6 +1504,7 @@ function overridesOf(b, p){
   const ov={};
   GOAL_KEYS.forEach(([k])=>{ if(!same(b[k],p[k])) (ov.goal=ov.goal||{})[k]=p[k]; });
   PEN_KEYS.forEach(([k])=>{ const y=getp(p.pensions,k); if(!same(getp(b.pensions,k),y)) (ov.pensions=ov.pensions||{})[k]=y; });
+  ibyYears(b,p).forEach(y=>{ const z=(p.income_by_year||{})[y]; if(!same((b.income_by_year||{})[y],z)) (ov.income_by_year=ov.income_by_year||{})[y]=z==null?null:z; });
   b.phases.forEach(bp=>{ const pp=p.phases.find(q=>q.id===bp.id);
     if(!pp){ (ov.remove_phases=ov.remove_phases||[]).push(bp.id); return; }
     PH_KEYS.forEach(([k])=>{ if(!same(bp[k],pp[k])){ ov.phases=ov.phases||{}; (ov.phases[bp.id]=ov.phases[bp.id]||{})[k]=pp[k]; } }); });
@@ -1483,6 +1517,7 @@ function applyOverrides(b, ov){
   const c=JSON.parse(JSON.stringify(b));
   Object.entries(ov.goal||{}).forEach(([k,v])=>{ c[k]=v; });
   Object.entries(ov.pensions||{}).forEach(([k,v])=>{ try{ setp(c.pensions,k,v); }catch(e){} });
+  Object.entries(ov.income_by_year||{}).forEach(([y,v])=>{ c.income_by_year=c.income_by_year||{}; if(v==null) delete c.income_by_year[y]; else c.income_by_year[y]=v; });
   Object.entries(ov.phases||{}).forEach(([id,f])=>{ const p=c.phases.find(q=>q.id===id); if(p) Object.assign(p,f); });
   (ov.remove_phases||[]).forEach(id=>{ c.phases=c.phases.filter(q=>q.id!==id); });
   (ov.add_phases||[]).forEach(p=>{ if(!c.phases.some(q=>q.id===p.id)) c.phases.push(p); });
@@ -1560,7 +1595,8 @@ const isLive = p => p.e===null || p.e>=M0;
 const activePhases = () => state.phases.filter(isLive);
 const phaseAt = n => state.phases.find(p=>n>=p.s && (p.e===null || n<=p.e)) || null;
 /* income growth compounds from the later of the phase start and now */
-const incomeAt = (p,n) => p.monthly_income*Math.pow(1+(p.income_growth||0),(n-Math.max(p.s,M0))/12);
+const incomeAt = (p,n) => { const o=state.income_by_year&&state.income_by_year[Math.floor(n/12)];
+  return o!=null ? o : p.monthly_income*Math.pow(1+(p.income_growth||0),(n-Math.max(p.s,M0))/12); };
 const savingAt = (p,n) => p.saving_mode==='fixed' ? p.monthly_saving : incomeAt(p,n)*p.savings_rate;
 const PHASE_COLORS = ['#DCE8F7','#FBEBD3','#E9E2F6','#F8E0DB','#D8EFEA','#ECEDEF','#E0EAF9','#F3E3EF'];
 const phaseColor = p => PHASE_COLORS[Math.max(0,state.phases.indexOf(p))%PHASE_COLORS.length];
@@ -2583,6 +2619,7 @@ function resetChange(ch){
   const b=JSON.parse(CONFIG_CANON), c=canon(state);
   if(ch.kind==='goal') c[ch.key]=b[ch.key];
   else if(ch.kind==='pen') setp(c.pensions, ch.key, getp(b.pensions, ch.key));
+  else if(ch.kind==='iby'){ const v=(b.income_by_year||{})[ch.key]; if(v==null) delete c.income_by_year[ch.key]; else c.income_by_year[ch.key]=v; }
   else if(ch.kind==='ph'){ const p=c.phases.find(q=>q.id===ch.id); if(p) p[ch.key]=b.phases.find(q=>q.id===ch.id)[ch.key]; }
   else if(ch.kind==='phdel') c.phases.push(b.phases.find(q=>q.id===ch.id));
   else if(ch.kind==='phadd') c.phases=c.phases.filter(q=>q.id!==ch.id);
@@ -2634,7 +2671,9 @@ function exportText(){
     return o;
   });
   const events=c.events.map(e=>({date:e.date, label:e.label, amount:e.amount}));
-  return JSON.stringify({goal, phases, events, pensions:c.pensions}, null, 2);
+  const out={goal, phases, events, pensions:c.pensions};
+  if(Object.keys(c.income_by_year||{}).length) out.income_by_year=c.income_by_year;
+  return JSON.stringify(out, null, 2);
 }
 function showExport(){
   const s=activeSc(), full=exportText();
@@ -3557,8 +3596,94 @@ const RISK = (function(){
     return {mc,changed};
   }
 
+  /* ---- income path: what each year earns and saves, until independence ---- */
+  function ipYears(P, plan){
+    const keep=state;
+    try{
+      if(plan) state=normalisePlan(plan);
+      const F=plan?monthFlows():(FLOWS||monthFlows()), stop=P&&P.fireAge!=null?M0+Math.round((P.fireAge-D.age_now)*12):M0+F.N;
+      const out=[], by={};
+      for(let t=0;t<F.N;t++){ const m=M0+t; if(m>=stop) break; const p=phaseAt(m); if(!p) continue;
+        const y=Math.floor(m/12); let r=by[y];
+        if(!r){ r=by[y]={y, age:ageAt(Math.max(m,y*12)), inc:0, sav:0, n:0, ph:[], last:p}; out.push(r); }
+        r.inc+=F.inc[t]; r.sav+=F.sav[t]; r.n++; if(!r.ph.includes(p.label)) r.ph.push(p.label); r.last=p; }
+      out.forEach(r=>{ r.incM=r.inc/r.n; r.savM=r.sav/r.n; r.typed=(state.income_by_year||{})[r.y]!=null; });
+      return out;
+    } finally { state=keep; }
+  }
+  function ipChart(host, tip, Y, B, opt){
+    host.querySelectorAll('svg,.ipempty').forEach(e=>e.remove());
+    if(!Y.length){ host.insertAdjacentHTML('beforeend','<div class="note ipempty" style="padding:12px 16px">No working years left before independence on this plan.</div>'); return; }
+    const W=Math.max(320,Math.round((host.clientWidth||700)-24)), H=opt.h||200, ml=4, mr=52, mt=14, mb=24;
+    const bmap={}; (B||[]).forEach(r=>{ bmap[r.y]=r; });
+    let hi=Math.max(1,...Y.map(r=>Math.max(r.incM,r.savM)),...(B||[]).filter(r=>r.y<=Y[Y.length-1].y).map(r=>r.incM));
+    const step=nice(hi/4); hi=Math.ceil(hi*1.08/step)*step;
+    const slot=(W-ml-mr)/Y.length, bw=Math.max(2,Math.min(28,slot*0.7)), ty=v=>mt+(1-v/hi)*(H-mt-mb), bx=i=>ml+i*slot+(slot-bw)/2;
+    let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="monthly income and saving for each year until independence">`;
+    for(let v=0;v<=hi+1e-9;v+=step) s+=`<line x1="${ml}" x2="${W-mr}" y1="${ty(v)}" y2="${ty(v)}" stroke="var(--line)"/><text class="ax" x="${W-mr+10}" y="${ty(v)+4}">${kf(v)}</text>`;
+    /* phase changes: a faint divider where the phase name changes */
+    Y.forEach((r,i)=>{ if(i && r.ph[0]!==Y[i-1].ph[Y[i-1].ph.length-1]){ const x=ml+i*slot; s+=`<line x1="${x}" x2="${x}" y1="${mt}" y2="${H-mb}" stroke="var(--line2)" stroke-dasharray="2 3"/><text x="${x+4}" y="${mt+9}" font-size="10.5" fill="var(--mid)">${esc(r.ph[0])}</text>`; } });
+    Y.forEach((r,i)=>{ const x=bx(i), rw=Math.min(3,bw/2);
+      s+=`<rect x="${x.toFixed(1)}" y="${ty(r.incM).toFixed(1)}" width="${bw.toFixed(1)}" height="${(H-mb-ty(r.incM)).toFixed(1)}" rx="${rw}" fill="${r.typed?'#C9D6EA':'#E3E8EF'}"/>`;
+      s+=`<rect x="${x.toFixed(1)}" y="${ty(r.savM).toFixed(1)}" width="${bw.toFixed(1)}" height="${(H-mb-ty(r.savM)).toFixed(1)}" rx="${rw}" fill="var(--plan)" opacity=".8"/>`;
+      if(r.typed) s+=`<circle cx="${(x+bw/2).toFixed(1)}" cy="${(ty(r.incM)-6).toFixed(1)}" r="2.6" fill="var(--ink)"/>`; });
+    if(B && B.length){ let d=''; Y.forEach((r,i)=>{ const b=bmap[r.y]; if(!b) return; const y=ty(b.incM).toFixed(1); d+=`M${(ml+i*slot).toFixed(1)} ${y}H${(ml+(i+1)*slot).toFixed(1)}`; });
+      if(d) s+=`<path d="${d}" fill="none" stroke="#8B6BC9" stroke-width="1.6" stroke-dasharray="4 3"/>`; }
+    const every=Math.max(1,Math.ceil(Y.length/(W<500?6:12)));
+    Y.forEach((r,i)=>{ if(i%every===0) s+=`<text class="ax" x="${(ml+i*slot+slot/2).toFixed(1)}" y="${H-6}" text-anchor="middle">${r.y}</text>`; });
+    s+=`<rect class="hit" x="${ml}" y="0" width="${W-ml-mr}" height="${H}" fill="transparent"/></svg>`;
+    host.insertAdjacentHTML('beforeend',s);
+    const svg=host.querySelector('svg');
+    svg.querySelector('.hit').addEventListener('pointermove',e=>{ const pt=svg.createSVGPoint(); pt.x=e.clientX; pt.y=e.clientY; const q=pt.matrixTransform(svg.getScreenCTM().inverse());
+      const i=Math.min(Y.length-1,Math.max(0,Math.floor((q.x-ml)/slot))), r=Y[i], b=bmap[r.y], row=(c,l,v)=>`<div class="r"><span><i style="background:${c}"></i>${l}</span><b>${v}</b></div>`;
+      tip.innerHTML=`<div class="d">${r.y}, age ${Math.floor(r.age)} · ${esc(r.ph.join(' → '))}</div>`+row(r.typed?'#C9D6EA':'#E3E8EF','Income a month'+(r.typed?' (typed in)':''),mny(r.incM))
+        +row('var(--plan)','Saves a month',mny(r.savM))+row('transparent','Saved that year',mny(r.sav))+(b&&Math.abs(b.incM-r.incM)>0.5?row('#8B6BC9','config.json income',mny(b.incM)):'');
+      tip.style.opacity=1; const rr=svg.getBoundingClientRect(), x=((ml+(i+0.5)*slot)/W)*rr.width; tip.style.left=Math.min(Math.max(x+12,8),rr.width-tip.offsetWidth-8)+'px'; tip.style.top='12px'; });
+    svg.querySelector('.hit').addEventListener('pointerleave',()=>{ tip.style.opacity=0; });
+  }
+  let ipFocus=null;
+  function ipTable(Y){
+    const h=$('iprows'); if(!h) return;
+    h.innerHTML=Y.map((r,i)=>{ const typed=r.typed, v=typed?Math.round(state.income_by_year[r.y]).toLocaleString('en-US'):'';
+      const later=Y.slice(i+1).some(q=>q.ph[0]===r.ph[r.ph.length-1]);
+      return `<tr${typed?' class="typed"':''}><td class="l"><b>${r.y}</b>${r.n<12?`<small> ${r.n} mo</small>`:''}</td><td class="l">${Math.floor(r.age)}</td><td class="l">${esc(r.ph.join(' → '))}</td>
+        <td><input type="text" inputmode="numeric" autocomplete="off" class="ipin" data-y="${r.y}" value="${v}" placeholder="${Math.round(r.incM).toLocaleString('en-US')}" aria-label="Monthly income in ${r.y}"></td>
+        <td>${n0(r.savM)}</td><td>${n0(r.sav)}</td>
+        <td class="ipact">${typed?`${later?`<button type="button" class="linkbtn" data-ipfill="${r.y}" title="Use this amount for the rest of ${esc(r.ph[r.ph.length-1])}">same after</button>`:''}<button type="button" class="x" data-ipclear="${r.y}" aria-label="Back to the phase's income in ${r.y}">×</button>`:''}</td></tr>`; }).join('');
+    const n=Object.keys(state.income_by_year||{}).length;
+    $('ipdet').querySelector('summary').childNodes[1].textContent=n?`Year by year: ${n} year${n>1?'s':''} typed in`:'Year by year: type any year’s income to change just that year';
+    if(ipFocus!=null){ const x=h.querySelector(`.ipin[data-y="${ipFocus}"]`); ipFocus=null; if(x){ x.focus(); x.select(); } }
+  }
+  function ipSet(changes){
+    state.income_by_year=Object.assign({}, state.income_by_year||{});
+    Object.entries(changes).forEach(([y,v])=>{ if(v==null) delete state.income_by_year[y]; else state.income_by_year[y]=v; });
+    savePlan(); rebuildPlan();
+  }
+  document.addEventListener('change',e=>{ const i=e.target.closest&&e.target.closest('.ipin'); if(!i) return;
+    const t=String(i.value).trim().replace(/[\s,'’_]/g,''), k=/k$/i.test(t), raw=k?String(+t.slice(0,-1)*1000):t, v=raw===''?null:Math.max(0,Math.round(+raw));
+    if(raw!=='' && !Number.isFinite(+raw)){ i.value=''; i.setAttribute('aria-invalid','true'); return; }
+    const cur=(state.income_by_year||{})[i.dataset.y]; if((cur==null&&v==null)||cur===v) return;
+    ipSet({[i.dataset.y]:v}); });
+  document.addEventListener('keydown',e=>{ const i=e.target.closest&&e.target.closest('.ipin'); if(!i||e.key!=='Enter') return;
+    e.preventDefault(); const all=[...document.querySelectorAll('#iprows .ipin')], k=all.indexOf(i), nx=all[k+(e.shiftKey?-1:1)];
+    ipFocus=nx?nx.dataset.y:null; i.blur(); if(nx && document.activeElement!==nx && ipFocus){ nx.focus(); nx.select(); ipFocus=null; } });
+  document.addEventListener('click',e=>{ const c=e.target.closest('[data-ipclear],[data-ipfill]'); if(!c) return;
+    if(c.dataset.ipclear){ ipSet({[c.dataset.ipclear]:null}); return; }
+    const y=+c.dataset.ipfill, v=state.income_by_year[y], Y=ipYears(null), r=Y.find(q=>q.y===y), ph=r?r.ph[r.ph.length-1]:null, ch={};
+    Y.forEach(q=>{ if(q.y>y && q.ph[0]===ph && q.ph.length===1) ch[q.y]=v; }); if(Object.keys(ch).length) ipSet(ch); });
+  function ipDraw(P){
+    const Y=ipYears(P), changed=JSON.stringify(canon(state))!==CONFIG_CANON, B=changed?ipYears(baselinePlan(),JSON.parse(CONFIG_CANON)):null;
+    const leg=`<span><i style="border-color:#E3E8EF;border-top-width:8px"></i>Income</span><span><i style="border-color:var(--plan);border-top-width:8px;opacity:.8"></i>Saved</span>`
+      +(Object.keys(state.income_by_year||{}).length?`<span><b style="color:var(--ink)">●</b> income typed in</span>`:'')
+      +(B?`<span><i style="border-color:#8B6BC9;border-top-style:dashed"></i>config.json income</span>`:'');
+    [['fip','fiptip','fiplegend',220],['edip','ediptip','ediplegend',190]].forEach(([c,t,l,h])=>{ if($(c)){ ipChart($(c),$(t),Y,B,{h}); $(l).innerHTML=leg; } });
+    if($('edipk')) $('edipk').textContent=Y.length?`a month, ${Y[0].y} to ${Y[Y.length-1].y}`+(P.fireAge!=null?', until independence':''):'';
+    ipTable(Y);
+  }
+
   /* plan results, pushed in by the engine on every redraw */
   window.dashPlan=function(P){
+    ipDraw(P);
     const T=state.target, B=baselinePlan(), end=ageAt(M0+P.N);
     const yrA=a=>yrOfAge(a), dl=(P.fireAge!=null&&B.fireAge!=null)?P.fireAge-B.fireAge:null;
     /* dashboard card */

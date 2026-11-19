@@ -238,7 +238,31 @@ def build_plan(cfg: dict[str, Any], today: date) -> dict[str, Any]:
         "goal_extra": {k: v for k, v in goal.items() if k not in _EDITABLE_GOAL},
         "phases": phases,
         "events": events,
+        "income_by_year": build_income_by_year(cfg),
     }
+
+
+def build_income_by_year(cfg: dict[str, Any]) -> dict[str, float]:
+    """
+    Optional monthly income typed in for single calendar years, e.g.
+    {"2028": 9500}. A year not listed follows its phase; the dashboard's
+    year-by-year table writes this block.
+    """
+    raw = cfg.get("income_by_year") or {}
+    if not isinstance(raw, dict):
+        raise SystemExit("config.json: income_by_year must be an object like {\"2028\": 9500}.")
+    out: dict[str, float] = {}
+    for k, v in raw.items():
+        if str(k).startswith("_"):
+            continue
+        try:
+            year = int(k)
+        except ValueError:
+            raise SystemExit(f"config.json: income_by_year key {k!r} must be a year like \"2028\".") from None
+        if not 1900 < year < 2200:
+            raise SystemExit(f"config.json: income_by_year year {k!r} is out of range.")
+        out[str(year)] = _num(v, f"income_by_year.{k}", 0)
+    return dict(sorted(out.items()))
 
 
 def monthly_saving(p: dict[str, Any]) -> float:

@@ -153,6 +153,8 @@
     "_note": "IBKR's feed reports dividends gross; this rate estimates tax withheld at source. 0.15 = US treaty rate with a W-8BEN on file.",
     "withholding_rate": 0.15
   },
+  "_income_by_year_note": "Optional. Monthly income for single calendar years, replacing the phase's for that year only, e.g. {\"2028\": 9500}. The Plan editor's year-by-year table and its Copy as config write this.",
+  "income_by_year": {},
   "_scenarios_note": "Optional. Named what-ifs, each holding only what it changes from the plan above. The dashboard lists them next to your plan; its 'Copy as config' button writes this format for you.",
   "scenarios": [
     {
