@@ -269,20 +269,23 @@ def resolve_lookthrough(
 
     fd_cfg = cfg.get("fund_data") or {}
     fetched: dict[str, dict[str, Any]] = {}
+    cache: dict[str, dict[str, Any]] = {}
     if demo:
         from demo_data import DEMO_FUND_DATA
 
-        fetched = DEMO_FUND_DATA
+        fetched = dict(DEMO_FUND_DATA)
+        cache = {fund_data.DEV_PROXY: fetched.pop(fund_data.DEV_PROXY, {})}
     elif fd_cfg.get("enabled", True):
         wanted = [p["ticker"] for p in positions] + list(cfg.get("targets", {}))
         wanted += benchmark_choices(cfg)[1] + list(fd_cfg.get("extra", []))
-        cache = fund_data.load(wanted, root / fd_cfg.get("cache_path", "data/fund_data.json"),
+        cache = fund_data.load(wanted + [fund_data.DEV_PROXY],
+                               root / fd_cfg.get("cache_path", "data/fund_data.json"),
                                int(fd_cfg.get("max_age_days", 7)))
         fetched = {k: v for k, v in cache.items() if k in {w.upper() for w in wanted}}
     scheme = str(fd_cfg.get("emerging", "msci")).lower()
     if scheme not in fund_data.EMERGING:
         raise SystemExit(f"config.json: fund_data.emerging must be 'msci' or 'ftse', got {scheme!r}.")
-    return fund_data.merge(fetched, cfg.get("lookthrough", {}), scheme)
+    return fund_data.merge(fetched, cfg.get("lookthrough", {}), scheme, cache.get(fund_data.DEV_PROXY))
 
 
 def compute_exposure(positions: list[dict[str, Any]], lookthrough: dict[str, Any]) -> dict[str, float]:
@@ -304,6 +307,21 @@ def compute_exposure(positions: list[dict[str, Any]], lookthrough: dict[str, Any
     if unmapped:
         log.warning("No regional split for %s - none could be fetched; add it under lookthrough in config.json.", ", ".join(unmapped))
     return out
+
+
+def resolve_baskets(
+    cfg: dict[str, Any], lookthrough: dict[str, dict[str, Any]] | None
+) -> tuple[dict[str, dict[str, float]], dict[str, str]]:
+    """Each fund's currency mix: fetched, with config.json's currency_basket on top."""
+    baskets: dict[str, dict[str, float]] = {}
+    sources: dict[str, str] = {}
+    for tk, e in (lookthrough or {}).items():
+        if e.get("basket"):
+            baskets[tk], sources[tk] = e["basket"], e.get("basket_source") or "fetched"
+    for tk, mix in (cfg.get("currency_basket") or {}).items():
+        if isinstance(mix, dict) and mix:
+            baskets[tk], sources[tk] = mix, "config.json"
+    return baskets, sources
 
 
 def compute_basket(positions: list[dict[str, Any]], basket_cfg: dict[str, Any]) -> list[dict[str, Any]]:
@@ -334,6 +352,7 @@ def build_fx_section(
     dates: list[date],
     cps: list[float],
     positions: list[dict[str, Any]],
+    lookthrough: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any] | None:
     """
     Assemble the currency block, or None if it is disabled or unavailable.
@@ -341,6 +360,7 @@ def build_fx_section(
     A failure here must never take the rest of the dashboard down — the FX
     service is a third party and the return figures do not depend on it.
     """
+    baskets, sources = resolve_baskets(cfg, lookthrough)
     fx_cfg = cfg.get("currency", {})
     if not fx_cfg.get("enabled", False):
         return None
@@ -387,7 +407,8 @@ def build_fx_section(
             }
             for s in splits
         ],
-        "basket": compute_basket(positions, cfg.get("currency_basket", {})),
+        "basket": compute_basket(positions, baskets),
+        "basket_sources": {p["ticker"]: sources.get(p["ticker"]) for p in positions},
     }
 
 
@@ -612,7 +633,8 @@ def main(argv: list[str] | None = None) -> int:
     flows: list[CashFlow] = reconstruct_flows(dates, navs, cps)
     log.info("Reconstructed %d external cash flows.", len(flows))
     windows = all_window_returns(dates, navs, flows)
-    fx_block = build_fx_section(cfg, ROOT, dates, cps, positions)
+    lookthrough = resolve_lookthrough(cfg, positions, ROOT, demo=args.demo)
+    fx_block = build_fx_section(cfg, ROOT, dates, cps, positions, lookthrough)
     income_block = build_income_section(cfg, ROOT, dates, series.get("extras") or {})
 
     # -- assemble ------------------------------------------------------
@@ -632,7 +654,6 @@ def main(argv: list[str] | None = None) -> int:
             ccy, reported_ccy, reported_ccy, ccy, reported_ccy,
         )
 
-    lookthrough = resolve_lookthrough(cfg, positions, ROOT, demo=args.demo)
     for p in positions:
         p["role"] = lookthrough.get(p["ticker"], {}).get("role", "")
 

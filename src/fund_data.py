@@ -59,6 +59,18 @@ _ALIASES = {"korea (south)": "korea", "south korea": "korea", "republic of korea
             "turkiye": "turkey", "uae": "united arab emirates", "czechia": "czech republic",
             "usa": "united states", "us": "united states", "u.s.": "united states"}
 
+# Countries paying in each named currency; everything else is "Other developed"
+# or "Emerging" (by the same emerging list as the regional split).
+CURRENCY_OF = {"united states": "USD", "japan": "JPY", "united kingdom": "GBP", "switzerland": "CHF"}
+EUROZONE = {
+    "austria", "belgium", "bulgaria", "croatia", "cyprus", "estonia", "finland", "france",
+    "germany", "greece", "ireland", "italy", "latvia", "lithuania", "luxembourg", "malta",
+    "netherlands", "portugal", "slovakia", "slovenia", "spain",
+}
+# Broad developed-markets fund whose country mix stands in for a developed
+# ex-US fund that publishes no country list of its own.
+DEV_PROXY = "VEA"
+
 _US_STYLE = re.compile(r"^(large|mid-cap|mid|small)\s*(value|blend|growth)$", re.I)
 _EM_CATS = {"china region", "india equity", "latin america stock"}
 _DEV_CATS = {"japan stock", "europe stock", "diversified pacific/asia", "miscellaneous region"}
@@ -82,6 +94,22 @@ def split_from_countries(countries: dict[str, float], scheme: str = "msci") -> d
     if total <= 0:
         return None
     return {k: round(v / total, 4) for k, v in out.items()}
+
+
+def basket_from_countries(countries: dict[str, float], scheme: str = "msci") -> dict[str, float] | None:
+    """Group a {country: weight} list into the currencies the companies earn and report in."""
+    em = EMERGING.get(scheme, EMERGING_MSCI)
+    out: dict[str, float] = {}
+    for name, w in countries.items():
+        k = country_key(name)
+        if not k or k in ("-", "other", "cash"):
+            continue
+        ccy = CURRENCY_OF.get(k) or ("EUR" if k in EUROZONE else "Emerging" if k in em else "Other developed")
+        out[ccy] = out.get(ccy, 0.0) + float(w)
+    total = sum(out.values())
+    if total <= 0:
+        return None
+    return {k: round(v / total, 4) for k, v in sorted(out.items(), key=lambda kv: -kv[1])}
 
 
 def split_from_category(category: str | None) -> dict[str, float] | None:
@@ -319,13 +347,17 @@ def load(tickers: Iterable[str], cache_path: Path, max_age_days: int = 7) -> dic
 
 
 def merge(fetched: dict[str, dict[str, Any]], overrides: dict[str, Any],
-          scheme: str = "msci") -> dict[str, dict[str, Any]]:
+          scheme: str = "msci", dev_proxy: dict[str, Any] | None = None) -> dict[str, dict[str, Any]]:
     """
     One look-through entry per fund: fetched data, with config.json on top.
 
     A config entry with its own us/dev/em replaces the fetched split as a
     whole (a partial split would no longer add up); other keys override one
     by one. `source` records where the split came from, for the page.
+
+    Each entry also gets `basket`, the currencies inside the fund. A developed
+    ex-US fund with no country list of its own borrows `dev_proxy`'s mix
+    (outside the US), marked as an estimate.
     """
     out: dict[str, dict[str, Any]] = {}
     for tk, rec in fetched.items():
@@ -336,6 +368,20 @@ def merge(fetched: dict[str, dict[str, Any]], overrides: dict[str, Any],
                 e.update(split)
         if "us" in e:
             e["source"] = rec.get("split_source", "fetched")
+        basket, bsrc = None, None
+        if rec.get("countries"):
+            basket, bsrc = basket_from_countries(rec["countries"], scheme), rec.get("split_source")
+        elif e.get("us") == 1:
+            basket, bsrc = {"USD": 1.0}, e.get("source")
+        elif e.get("em") == 1:
+            basket, bsrc = {"Emerging": 1.0}, e.get("source")
+        elif e.get("dev") == 1 and dev_proxy and dev_proxy.get("countries"):
+            em = EMERGING.get(scheme, EMERGING_MSCI)  # the fund holds developed markets only
+            ex_us = {c: w for c, w in dev_proxy["countries"].items()
+                     if country_key(c) != "united states" and country_key(c) not in em}
+            basket, bsrc = basket_from_countries(ex_us, scheme), f"estimated from {DEV_PROXY}'s country mix"
+        if basket:
+            e["basket"], e["basket_source"] = basket, bsrc
         if "ter" in e:
             e["ter_source"] = rec.get("ter_source", "fetched")
         out[tk] = e

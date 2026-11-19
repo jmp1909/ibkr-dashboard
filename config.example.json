@@ -113,41 +113,8 @@
     "AVDV": { "role": "Tilt - developed ex-US small value" },
     "AVES": { "role": "Tilt - emerging markets value" }
   },
-  "_basket_note": "Approximate currency of the assets INSIDE each fund. USD is only the fund's reporting currency - VT holds euros and yen too. Update from fund factsheets.",
-  "currency_basket": {
-    "VT": {
-      "USD": 0.62,
-      "EUR": 0.075,
-      "JPY": 0.055,
-      "GBP": 0.04,
-      "CHF": 0.022,
-      "Other developed": 0.068,
-      "Emerging": 0.12
-    },
-    "AVUV": {
-      "USD": 1.0
-    },
-    "AVLV": {
-      "USD": 1.0
-    },
-    "AVIV": {
-      "EUR": 0.3,
-      "JPY": 0.22,
-      "GBP": 0.15,
-      "CHF": 0.06,
-      "Other developed": 0.27
-    },
-    "AVDV": {
-      "EUR": 0.3,
-      "JPY": 0.24,
-      "GBP": 0.14,
-      "CHF": 0.03,
-      "Other developed": 0.29
-    },
-    "AVES": {
-      "Emerging": 1.0
-    }
-  },
+  "_basket_note": "Optional. The currencies inside each fund are worked out from its countries (see fund_data). Add a fund here, e.g. \"AVDV\": {\"EUR\": 0.3, \"JPY\": 0.24, \"GBP\": 0.14, \"CHF\": 0.03, \"Other developed\": 0.29}, to override it.",
+  "currency_basket": {},
   "output": {
     "_format_note": "e.g. de-CH + \"'\" gives 1'234'567; en-US + \",\" gives 1,234,567; de-DE + \".\" gives 1.234.567.",
     "locale": "en-US",

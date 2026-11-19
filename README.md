@@ -84,7 +84,7 @@ Copy `config.example.json` to `config.json`, then edit it:
 | `dividends.withholding_rate` | no | Estimated tax withheld at source. Default 0.15. Also on the Settings page |
 | `scenarios` | no | Named what-ifs stored as changes from the plan, see Scenarios below |
 | `pensions` | no | Swiss pillar 2 / 3a pots and AHV — see below. Off by default |
-| `currency_basket` | no | Currencies held *inside* each fund — not the one it's priced in |
+| `currency_basket` | no | Overrides for the currencies held *inside* each fund (not the one it's priced in), which are otherwise worked out from its countries |
 | `currency.enabled` | no | Set false if your funds report in the currency you spend |
 | `account.display_currency` | yes | The currency your figures are shown in — see the note below |
 | `output.locale` | no | Number formatting, e.g. `en-US` → 1,234,567 · `de-CH` → 1'234'567 · `de-DE` → 1.234.567 |
@@ -215,15 +215,14 @@ The dashboard hides what it can't describe honestly, so a minimal config still p
 clean page:
 
 - **no `targets`** → the drift and next-buy section disappears
-- **no `lookthrough` entry for your holdings** → the regional exposure panel disappears
-  rather than inventing a split
-- **no `currency_basket` entry** → the currency-denomination panel disappears
+- **no regional split for a holding** (none fetched, none in `lookthrough`) → it is left out
+  of the regional exposure rather than given an invented split
+- **no currency mix for any holding** → the currency-denomination panel disappears
 - **`currency.enabled: false`**, or assets and spending in the same currency → the whole
   currency section disappears
 
-The bundled `lookthrough` and `currency_basket` values describe one specific set of ETFs
-(VT and some Avantis funds). **If you hold different funds, replace them** — otherwise
-those panels describe someone else's portfolio rather than yours.
+The example `lookthrough` only names the roles of one specific set of ETFs (VT and some
+Avantis funds); everything else about your funds is fetched, so there is nothing to replace.
 
 ## Live data
 
@@ -281,6 +280,12 @@ Country lists are grouped into US, other developed and emerging markets with one
 funds: MSCI's by default, or FTSE's with `fund_data.emerging: "ftse"` (FTSE counts Korea and
 Poland as developed; it is the index family behind Vanguard's global funds).
 
+The **currencies inside each fund** come from the same country lists: each company counts in
+its home country's currency (USD, EUR, JPY, GBP, CHF, other developed, emerging). A US-only
+fund is all USD and an emerging-markets fund all emerging. A developed-markets fund outside the
+US that publishes no countries (AVDV, AVIV) borrows the developed-country mix of Vanguard's
+broad VEA, marked on the page as an estimate.
+
 Results are cached in `data/fund_data.json` for a week, a failed fetch keeps the last good data,
 and a split from a real country list is never replaced by a guess from a category. None of these
 is an official API, so anything you set under `lookthrough` wins. A global fund from another
@@ -323,6 +328,7 @@ reaches back about a year — the 3- and 5-year windows fill in on their own ove
 ## Notes
 
 - `--demo` uses a separate history file, so experimenting never touches real data.
+- Tests for the fund data run offline: `python -m unittest discover tests`.
 - `--no-open` skips launching the browser; `-v` gives verbose logging.
 - Windows-only launcher. The Python side is cross-platform; on macOS/Linux run
   `bin/run.sh root/conf.yaml` and `python src/main.py` yourself.

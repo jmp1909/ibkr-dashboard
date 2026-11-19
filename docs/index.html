@@ -1398,6 +1398,13 @@ const SC_KEY = 'ibkr-fire-scenarios:v1:' + (D.demo ? 'demo' : 'live');
 const OLD_KEY = 'ibkr-fire-plan:v1:' + (D.demo ? 'demo' : 'live');
 const lsGet = k => { try{ const s=localStorage.getItem(k); return s?JSON.parse(s):null; }catch(e){ return null; } };
 const lsSet = (k,v) => { try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} };
+/* the withholding rate in words: only the two standard US rates get a reason */
+function wrWhy(wr){
+  const p=+(wr*100).toFixed(1)+'%';
+  return Math.abs(wr-0.15)<1e-6?`${p}, the US treaty rate with a W-8BEN on file`
+    :Math.abs(wr-0.30)<1e-6?`${p}, the US rate without a W-8BEN`
+    :wr<=0?'no tax withheld':`${p}, the rate set under Settings`;
+}
 /* "VT from Vanguard; AVUV, AVDV from the fund category" for the funds given */
 function ltSources(tks){
   const LT=D.lookthrough||{}, g={}, f={};
@@ -2694,7 +2701,7 @@ function showExport(){
     + [...f.entries()].sort((a,b)=>b[1]-a[1]).map(([t,v])=>`<tr><td class="l">${esc(t)}</td><td>${fm2(v)}</td><td>${fm2(v*(1-wr))}</td><td>${(v/total*100).toFixed(0)}%</td></tr>`).join('')
     + '</tbody>';
   document.getElementById('divnote').innerHTML = `IBKR reports these gross. Tax withheld at source isn't in this feed, so the net column
-    assumes ${(wr*100).toFixed(0)}% (the US treaty rate with a W-8BEN on file; change it under Settings).
+    assumes ${wrWhy(wr)} (change it under Settings).
     Your account statement has the exact figure, and in Switzerland it can usually be reclaimed against your tax bill.
     ${mixed?'':(ccy!==L[0].currency?`Converted from ${L[0].currency} at the ECB rate on the payment day.`:'')}`;
 })();
@@ -3198,11 +3205,14 @@ const RISK = (function(){
       $('pccywin').innerHTML=F.splits.map(r=>!r.available?`<div class="hrow wrow dim"><div class="n"><b>${esc(r.label)}</b><small>${esc(r.note)}</small></div><div></div><div></div></div>`
         :`<div class="hrow wrow"><div class="n"><b>${esc(r.label)}</b><small>total ${pctS(r.total)}</small></div><div class="v"><b class="${r.asset>=0?'up':'dn'}">${pctS(r.asset)}</b><small>funds</small></div><div class="v"><b class="${r.currency>=0?'up':'dn'}">${pctS(r.currency)}</b><small>currency</small></div></div>`).join('');
       const bk=F.basket||[], cls=bk.filter(b=>b.ccy!=='Unclassified');
-      if(!cls.length) $('pccybasket').innerHTML='<div class="note">Add <code>currency_basket</code> to config.json to see the currencies inside your funds.</div>';
+      if(!cls.length) $('pccybasket').innerHTML='<div class="note">No currency mix yet. It is worked out from each fund’s countries on the next refresh; you can also set <code>currency_basket</code> in config.json.</div>';
       else { const home=bk.find(b=>b.ccy===F.display_currency), hw=home?home.weight:0;
         $('pccybasket').innerHTML=`<div class="stack">${bk.map((b,i)=>`<i style="width:${(b.weight*100).toFixed(1)}%;background:${PAL[i%PAL.length]}" title="${esc(b.ccy)} ${(b.weight*100).toFixed(1)}%"></i>`).join('')}</div>`
           +bk.map((b,i)=>`<div class="lrow"><span><i style="background:${PAL[i%PAL.length]}"></i>${esc(b.ccy)}</span><b>${(b.weight*100).toFixed(1)}%</b></div>`).join('')
-          +`<div class="note" style="margin-top:12px"><b>${(hw*100).toFixed(1)}%</b> is in ${esc(F.display_currency)}, the currency you spend. The rest moves with exchange rates, which is normal for a global portfolio.</div>`; } }
+          +`<div class="note" style="margin-top:12px"><b>${(hw*100).toFixed(1)}%</b> is in ${esc(F.display_currency)}, the currency you spend. The rest moves with exchange rates, which is normal for a global portfolio.</div>`
+          +(()=>{ const src=F.basket_sources||{}, g={}; Object.entries(src).forEach(([k,v])=>{ if(v) (g[v]=g[v]||[]).push(k); });
+              const t=Object.entries(g).map(([v,ks])=>`${ks.map(esc).join(', ')}: ${v==='config.json'?'<code>config.json</code>':esc(v)}`).join('; ');
+              return t?`<div class="note">By the companies’ home countries. ${t}. <code>currency_basket</code> in config.json overrides.</div>`:''; })(); } }
   })();
 
   /* ---------------- DIVIDENDS ---------------- */
@@ -3214,14 +3224,14 @@ const RISK = (function(){
     const short=(NOW-new Date(DIVS[0].date).getTime())<330*864e5, dc=DIVS[0].display_currency||CCY;
     kpis('vkpis',[['Received',dc+' '+n0(tot),`${DIVS.length} payments`],['Last 12 months',n0(ttm),short?'less than a year of history':'trailing'],
       ['Yield',PTOT?(ttmRaw/PTOT*100).toFixed(2)+'%':'—',short?'so far, understated':'on today’s holdings'],
-      ['Tax withheld',n0(tot*wr),`estimated at ${(wr*100).toFixed(0)}%`],['After tax',n0(tot*(1-wr)),'estimated','up']]);
+      ['Tax withheld',n0(tot*wr),`estimated at ${+(wr*100).toFixed(1)}%`],['After tax',n0(tot*(1-wr)),'estimated','up']]);
     const byMonth={}; DIVS.forEach(d=>{ const t=new Date(d.date), k=new Date(t.getFullYear(),t.getMonth(),15).getTime(); byMonth[k]=(byMonth[k]||0)+d.display_amount; });
     const bars=Object.entries(byMonth).map(([k,v])=>[+k,v]).sort((a,b)=>a[0]-b[0]);
     const x0=Math.min(S[0].t,bars[0][0]-20*864e5);
     area($('vchart'),$('vtip'),{id:'vdiv',h:240,x0,x1:NOW,xt:monthTicks(x0,NOW),zero:true,yf:kf,yt:mny,bars,barName:'Dividends',series:[],aria:'dividends per month',tf:t=>fd(t,{month:'long',year:'numeric'})});
     const f={}; DIVS.forEach(d=>{ f[d.ticker]=(f[d.ticker]||0)+d.display_amount; });
     $('vfund').innerHTML=Object.entries(f).sort((a,b)=>b[1]-a[1]).map(([tk,v])=>`<div class="hrow">${fundCell(tk,'')}<div class="n"><small>about ${n0(v*(1-wr))} after tax</small><div class="abar" style="max-width:none;margin-top:6px"><i style="width:${(v/tot*100).toFixed(1)}%;background:${colorOf(tk)}"></i></div></div><div class="v"><b>${n0(v)}</b><small style="color:var(--mid)">${(v/tot*100).toFixed(0)}%</small></div></div>`).join('');
-    $('vnote').textContent=`withholding estimated at ${(wr*100).toFixed(0)}%; your statement has the exact figure`;
+    $('vnote').textContent=`withholding estimated at ${wrWhy(wr)}; your statement has the exact figure`;
     $('vpay').innerHTML='<thead><tr><th class="l">Date</th><th class="l">Fund</th><th>Gross</th><th>Est. after tax</th></tr></thead><tbody>'
       +DIVS.slice().reverse().map(d=>`<tr><td class="l">${fd(new Date(d.date).getTime())}</td><td class="l">${fundCell(d.ticker,'')}</td><td><b>${dec(d.display_amount)}</b></td><td>${dec(d.display_amount*(1-wr))}</td></tr>`).join('')+'</tbody>';
   })();
