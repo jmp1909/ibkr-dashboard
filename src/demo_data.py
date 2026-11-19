@@ -65,7 +65,20 @@ def _demo_extras() -> dict:
         for i, (d, c) in enumerate(zip(_DATES, _CPS))
     ]
     base = index[0][1]
+    # Synthetic daily prices per fund, ending at each sample position's price,
+    # so the demo can show its small trend lines. Invented, like the rest.
+    shape = {"VT": (1.0, 0.0), "AVUV": (1.35, 1.3), "AVDV": (1.1, 2.4), "AVES": (0.8, 3.7)}
+    fund_history = {}
+    for p in DEMO_POSITIONS:
+        beta, ph = shape.get(p["ticker"], (1.0, 0.0))
+        raw = [(1 + beta * c) * (1 + 0.012 * math.sin(i / 6 + ph)) for i, c in enumerate(_CPS)]
+        k = p["price"] / raw[-1]
+        fund_history[p["ticker"]] = [
+            [int(datetime.strptime(d, "%Y%m%d").timestamp() * 1000), round(v * k, 2)]
+            for d, v in zip(_DATES, raw)
+        ]
     return {
+        "fund_history": fund_history,
         "dividends": dividends,
         "benchmark_index": [(d, v / base) for d, v in index],
         "benchmark_ticker": "VT",

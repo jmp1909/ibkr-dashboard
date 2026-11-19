@@ -17,6 +17,7 @@ import argparse
 import json
 import logging
 import sys
+import time
 import webbrowser
 from datetime import date, datetime
 from pathlib import Path
@@ -95,6 +96,23 @@ def _num(v: Any, where: str, lo: float | None = None, hi: float | None = None) -
     if (lo is not None and x < lo) or (hi is not None and x > hi):
         raise SystemExit(f"config.json: {where} = {x} is outside {lo}..{hi}.")
     return x
+
+
+def build_scenarios(cfg: dict[str, Any]) -> list[dict[str, Any]]:
+    """
+    Optional named scenarios, each stored as only what it changes from the main
+    plan. The dashboard applies them on top of the plan and shows them next to
+    it; the format is what its "Copy as config" produces.
+    """
+    out = []
+    for i, sc in enumerate(cfg.get("scenarios") or []):
+        if not isinstance(sc, dict) or not str(sc.get("name") or "").strip():
+            raise SystemExit(f"config.json: scenarios[{i}] needs a name.")
+        ov = sc.get("overrides") or {}
+        if not isinstance(ov, dict):
+            raise SystemExit(f"config.json: scenarios[{i}].overrides must be an object.")
+        out.append({"name": str(sc["name"]).strip()[:40], "overrides": ov})
+    return out
 
 
 def build_pensions(cfg: dict[str, Any]) -> dict[str, Any]:
@@ -211,6 +229,7 @@ def build_plan(cfg: dict[str, Any], today: date) -> dict[str, Any]:
         "volatility": _num(goal.get("volatility", 0.16), "goal.volatility", 0, 0.6),
         "plan_to_age": _num(goal.get("plan_to_age", 95), "goal.plan_to_age", 60, 110),
         "pensions": build_pensions(cfg),
+        "scenarios": build_scenarios(cfg),
         "real_return": float(goal["real_return"]),
         "withdrawal_rate": wr,
         "coast_full_age": float(goal["coast_full_age"]),
@@ -423,6 +442,16 @@ def fetch_income(client: Any, cfg: dict[str, Any], base_ccy: str) -> dict[str, A
     except Exception as exc:  # noqa: BLE001
         log.warning("Dividend history unavailable: %s", exc)
         tickers = {}
+    # Recent daily prices per fund, for the small trend lines next to each holding.
+    history: dict[str, list[list[float]]] = {}
+    for conid, tk in tickers.items():
+        try:
+            history[tk] = income.closes(client.price_history(conid, period="6m"))
+            time.sleep(0.25)  # the gateway rate-limits aggressively
+        except Exception as exc:  # noqa: BLE001
+            log.warning("Price history for %s unavailable: %s", tk, exc)
+    if history:
+        extras["fund_history"] = history
     if ticker:
         try:
             conid = next((c for c, t in tickers.items() if t == ticker), None) or client.search_conid(ticker)
@@ -591,6 +620,7 @@ def main(argv: list[str] | None = None) -> int:
         ],
         "fx": fx_block,
         "income": income_block,
+        "fund_history": (series.get("extras") or {}).get("fund_history", {}),
         "plan": plan,
         "fmt": {
             "locale": out_cfg.get("locale", "en-US"),

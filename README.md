@@ -16,28 +16,21 @@ no account involved.
 
 ## What it shows
 
-| Section | |
+An app with a side menu and seven pages:
+
+| Page | |
 |---|---|
-| Hero band | Portfolio value, contributions, growth, return, years to target |
-| Holdings | Positions with cost basis, dividend income (by quarter and fund, with estimated withholding), and fund look-through to real regional exposure |
-| Drift from target | Target vs actual weights, plus a **buy-only** allocator that points your next contribution at whatever has fallen furthest behind |
-| Saved vs market | Your deposits against total value — how much of your wealth is savings rather than returns |
-| Money-weighted returns | XIRR over standard windows, from cash flows reconstructed out of the NAV and TWR series, plus your time-weighted return against a total-return benchmark (VT by default) |
-| Risk and costs | Volatility, worst fall and recovery, an underwater chart, a monthly-returns heatmap, and what your funds' expense ratios cost you by retirement |
-| Currency | Splits return into asset performance vs exchange-rate movement, with look-through to the currencies actually inside your funds |
-| Milestones | Real crossing dates for milestones you've passed, projected dates for the rest |
-| The two finish lines | Coast FIRE and full FIRE on an editable life plan: a draggable timeline of phases and one-off events, a yearly chart of income, saving, withdrawals and investment return, the crossover year, life after retirement (how long the money lasts, and after a −30% crash), an uncertainty band from 500 simulated markets, optional Swiss pensions, and a grid of years-to-target across return and saving assumptions |
+| Dashboard | Portfolio value with a holdings donut, a chart of value, return vs VT, drawdown and dividends (range 1M to ALL), holdings with three-month trend lines, allocation against your targets, the next purchase, and your FIRE age |
+| Holdings | Every position with cost, gain, weight against target and fund cost; where the money really is after fund look-through; a buy-only planner for your next contribution |
+| Performance | Time- and money-weighted returns, you vs VT (total return), returns by window, a monthly heatmap with best and worst months and recovery, deposits, what fund fees cost you by retirement, and the currency split |
+| Dividends | Totals, yield, estimated withholding, per month, per fund and every payment |
+| Monthly review | Any month at a glance: what you paid in, what markets did, dividends, how far you got towards the target, and whether you saved what the plan said |
+| FIRE plan | The projection from your actual history into the future, with the range of 500 simulated markets, one-off events, coast FIRE and independence marked; key ages, simulation odds, yearly flows, a what-if grid and milestones |
+| Plan editor | A draggable timeline of life phases and one-off events, the phases, events and Swiss pensions, with the result updating beside it |
 
-The page has three views: **Today** (where you stand, a timetable of when you reach each
-stop on the plan, milestones), **Portfolio** (holdings, dividends, returns, risk, currency) and
-**Plan** (the editable timeline and projections). The tab you last used is remembered, and
-`#today`, `#portfolio` or `#plan` in the URL opens a view directly.
-
-An **at a glance** box under the header sums up where you stand, whether you're on plan, and
-what changed since your last refresh. Every chart has a one-line headline saying what it shows,
-so the page can be read from the headlines alone; the two busiest plan charts have a
-**Simple / Detailed** switch, and your choice is remembered. Charts have hover readouts. The output is one HTML file with no external dependencies, so
-you can email it to yourself or open it offline.
+Charts have hover readouts, legends double as switches, and the page remembers where you were.
+The output is one HTML file with no external dependencies beyond a web font, so you can email
+it to yourself or open it offline.
 
 ## Requirements
 
@@ -83,8 +76,9 @@ Copy `config.example.json` to `config.json`, then edit it:
 | `events[]` | no | One-off lump sums: a bonus, an inheritance, or a purchase (negative) |
 | `targets` | no | Intended allocation. Must sum to 1. Omit to hide the drift section |
 | `lookthrough` | no | Regional split inside each fund, from its factsheet, plus `ter` (expense ratio) for the fee comparison |
-| `benchmark.ticker` | no | Benchmark for section 04, as total return. Default VT; null hides it |
+| `benchmark.ticker` | no | Benchmark on the Dashboard and Performance pages, as total return. Default VT; null hides it |
 | `dividends.withholding_rate` | no | Estimated tax withheld at source. Default 0.15 |
+| `scenarios` | no | Named what-ifs stored as changes from the plan, see Scenarios below |
 | `pensions` | no | Swiss pillar 2 / 3a pots and AHV — see below. Off by default |
 | `currency_basket` | no | Currencies held *inside* each fund — not the one it's priced in |
 | `currency.enabled` | no | Set false if your funds report in the currency you spend |
@@ -101,7 +95,7 @@ numbers under another's name. To genuinely change the currency, change the accou
 currency in IBKR.
 
 Separately, `currency.asset_currency` is the currency your *funds report in* (often USD).
-When that differs from what you spend, section 05 splits your return into what the
+When that differs from what you spend, the Performance page splits your return into what the
 investments did and what the exchange rate did.
 
 ### Phases
@@ -174,9 +168,29 @@ age of 65). AHV is a yearly pension from `start_age` that reduces what the portf
 out. Take the figures from your own pension statements; the dashboard does not model tax or
 annuity conversion.
 
+### Scenarios
+
+**Base** is always your `config.json` and is never changed from the page. Change anything on the
+FIRE plan page or in the plan editor and it becomes a scenario ("My edits"); **+ New scenario**
+copies what is on screen into another one. The scenario bar lists every change from Base, each
+with its own undo, and you can show any other scenario as a dashed line to compare. Scenarios
+are kept in your browser; **Copy as config** gives either the whole plan or just the scenario's
+changes, in this format:
+
+```json
+"scenarios": [
+  { "name": "Promotion at 35", "overrides": { "phases": { "senior": { "monthly_income": 9500 } } } }
+]
+```
+
+Overrides can set any `goal` value, any `pensions` value (e.g. `"pillar3a.balance"`), any field
+of a phase by its `id`, and can `add_phases`, `remove_phases`, `add_events` or `remove_events`.
+If `config.json` changes after you made a scenario, the page says so and offers to re-apply the
+scenario's changes on top of the new version.
+
 ### Editing the plan on the dashboard
 
-You don't have to edit JSON. In section 07:
+You don't have to edit JSON. In the **Plan editor** (goal values are on the **FIRE plan** page):
 
 - **Drag** a phase's edges to change when it starts and ends, or drag the middle to move it.
   Where two phases touch, the shared edge moves both; nothing can be moved into the past.
@@ -187,11 +201,9 @@ You don't have to edit JSON. In section 07:
   and "fixed amount" without its current saving jumping.
 - **One-off events** are diamonds on the timeline; drag them, or edit name and amount below.
 
-Changes are kept in your browser across reloads. They don't touch `config.json` until you
-choose to: **Copy as config** gives you the `goal`, `phases`, `events` and `pensions` blocks to paste in,
-and **Reset to config** throws the browser edits away. If `config.json` changes while you
-have browser edits, the page tells you and lets you pick which to keep, rather than silently
-choosing one.
+Every edit lands in the active scenario (see Scenarios above), kept in your browser across
+reloads. Nothing touches `config.json` until you copy it there yourself; switching back to
+**Base** shows `config.json` as it is.
 
 ### Sections that disable themselves
 

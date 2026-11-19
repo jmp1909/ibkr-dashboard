@@ -51,6 +51,12 @@ def payouts_from_history(raw: dict[str, Any]) -> list[tuple[date, float]]:
     return sorted(out)
 
 
+def closes(raw: dict[str, Any], keep: int = 140) -> list[list[float]]:
+    """Daily closes from a history response as [epoch ms, close], newest last."""
+    bars = sorted(raw.get("data") or [], key=lambda b: b["t"])
+    return [[int(b["t"]), float(b["c"])] for b in bars][-keep:]
+
+
 def total_return_index(raw: dict[str, Any]) -> list[tuple[date, float]]:
     """
     Daily total-return index (dividends reinvested at the ex-date close).

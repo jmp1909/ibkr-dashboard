@@ -4,7 +4,7 @@ config.json
 
 # Your account data and generated output
 data/
-dashboard.html
+/dashboard.html
 
 # The Client Portal Gateway is a separate download from IBKR
 clientportal.gw/

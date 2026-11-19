@@ -218,5 +218,18 @@
   "dividends": {
     "_note": "IBKR's feed reports dividends gross; this rate estimates tax withheld at source. 0.15 = US treaty rate with a W-8BEN on file.",
     "withholding_rate": 0.15
-  }
+  },
+  "_scenarios_note": "Optional. Named what-ifs, each holding only what it changes from the plan above. The dashboard lists them next to your plan; its 'Copy as config' button writes this format for you.",
+  "scenarios": [
+    {
+      "name": "Promotion at 35",
+      "overrides": {
+        "phases": {
+          "senior": {
+            "monthly_income": 9500
+          }
+        }
+      }
+    }
+  ]
 }
