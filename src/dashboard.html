@@ -207,7 +207,7 @@ details.pen summary{cursor:pointer;font-size:14px;font-weight:600}
   display:flex;flex-direction:column;justify-content:center;box-shadow:inset -2px 0 0 #fff;border-radius:6px}
 .tl .blk.started{cursor:default}
 .tl .blk .nm{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
-.tl .blk .dt{font-size:11px;opacity:.75;white-space:nowrap;overflow:hidden;pointer-events:none}
+.tl .blk .dt{font-size:11px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 .tl .h{position:absolute;top:0;bottom:0;width:11px;cursor:ew-resize;z-index:2}
 .tl .h.l{left:0}.tl .h.r{right:0}
 .tl .h::after{content:'';position:absolute;top:14px;bottom:14px;left:4px;width:2px;background:rgba(0,0,0,.25);border-radius:1px}
@@ -353,6 +353,7 @@ table.heat2 tbody tr:hover td,table.sens2 tbody tr:hover td{background:none}
 @media (max-width:700px){.tgrow{grid-template-columns:1fr 84px 28px}.tgrow input[type=range],.tgrow .tgcur{grid-column:1/-1}}
 .hrow.sp{grid-template-columns:auto minmax(0,1fr) auto auto}
 .hrow:has(>.n:first-child).sp{grid-template-columns:minmax(0,1fr) auto auto}
+.hrow.wrow:has(>.n:first-child){grid-template-columns:minmax(0,1fr) auto auto}
 .spark{display:block}
 .skc .spark{margin-left:auto}
 .cardlink{font-size:12px;color:var(--plan);text-decoration:none}
@@ -3622,7 +3623,11 @@ const RISK = (function(){
     let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="monthly income and saving for each year until independence">`;
     for(let v=0;v<=hi+1e-9;v+=step) s+=`<line x1="${ml}" x2="${W-mr}" y1="${ty(v)}" y2="${ty(v)}" stroke="var(--line)"/><text class="ax" x="${W-mr+10}" y="${ty(v)+4}">${kf(v)}</text>`;
     /* phase changes: a faint divider where the phase name changes */
-    Y.forEach((r,i)=>{ if(i && r.ph[0]!==Y[i-1].ph[Y[i-1].ph.length-1]){ const x=ml+i*slot; s+=`<line x1="${x}" x2="${x}" y1="${mt}" y2="${H-mb}" stroke="var(--line2)" stroke-dasharray="2 3"/><text x="${x+4}" y="${mt+9}" font-size="10.5" fill="var(--mid)">${esc(r.ph[0])}</text>`; } });
+    const lanes=[-1e9,-1e9], lw=t=>t.length*6+10;   /* where each label line is free again */
+    Y.forEach((r,i)=>{ if(i && r.ph[0]!==Y[i-1].ph[Y[i-1].ph.length-1]){ const x=ml+i*slot, t=r.ph[0], room=W-mr-x;
+      s+=`<line x1="${x}" x2="${x}" y1="${mt}" y2="${H-mb}" stroke="var(--line2)" stroke-dasharray="2 3"/>`;
+      const k=lanes.findIndex(e=>x>=e); if(k>=0 && room>=Math.min(lw(t),60)){ const txt=lw(t)<=room?t:t.slice(0,Math.max(3,Math.floor((room-16)/6)))+'…';
+        s+=`<text x="${x+4}" y="${mt+9+k*12}" font-size="10.5" fill="var(--mid)"><title>${esc(t)}</title>${esc(txt)}</text>`; lanes[k]=x+lw(txt); } } });
     Y.forEach((r,i)=>{ const x=bx(i), rw=Math.min(3,bw/2);
       s+=`<rect x="${x.toFixed(1)}" y="${ty(r.incM).toFixed(1)}" width="${bw.toFixed(1)}" height="${(H-mb-ty(r.incM)).toFixed(1)}" rx="${rw}" fill="${r.typed?'#C9D6EA':'#E3E8EF'}"/>`;
       s+=`<rect x="${x.toFixed(1)}" y="${ty(r.savM).toFixed(1)}" width="${bw.toFixed(1)}" height="${(H-mb-ty(r.savM)).toFixed(1)}" rx="${rw}" fill="var(--plan)" opacity=".8"/>`;
@@ -3630,7 +3635,8 @@ const RISK = (function(){
     if(B && B.length){ let d=''; Y.forEach((r,i)=>{ const b=bmap[r.y]; if(!b) return; const y=ty(b.incM).toFixed(1); d+=`M${(ml+i*slot).toFixed(1)} ${y}H${(ml+(i+1)*slot).toFixed(1)}`; });
       if(d) s+=`<path d="${d}" fill="none" stroke="#8B6BC9" stroke-width="1.6" stroke-dasharray="4 3"/>`; }
     const every=Math.max(1,Math.ceil(Y.length/(W<500?6:12)));
-    Y.forEach((r,i)=>{ if(i%every===0) s+=`<text class="ax" x="${(ml+i*slot+slot/2).toFixed(1)}" y="${H-6}" text-anchor="middle">${r.y}</text>`; });
+    Y.forEach((r,i)=>{ if(i%every===0){ const cx=ml+i*slot+slot/2, a=cx<ml+16?'start':'middle';
+      s+=`<text class="ax" x="${(a==='start'?ml:cx).toFixed(1)}" y="${H-6}" text-anchor="${a}">${r.y}</text>`; } });
     s+=`<rect class="hit" x="${ml}" y="0" width="${W-ml-mr}" height="${H}" fill="transparent"/></svg>`;
     host.insertAdjacentHTML('beforeend',s);
     const svg=host.querySelector('svg');
